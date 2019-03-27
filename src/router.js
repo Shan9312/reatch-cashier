@@ -1,9 +1,9 @@
 import Vue from 'vue'
-import Router from 'vue-router'
+import VueRouter from 'vue-router'
 
-Vue.use(Router)
+Vue.use(VueRouter)
 
-export default new Router({
+const router = new VueRouter({
   //mode: 'history',
   base: process.env.BASE_URL,
   routes: [{
@@ -17,7 +17,7 @@ export default new Router({
     {
       path: '/middle',
       name: 'MiddlePage',
-      component: () => import( /* webpackChunkName: "main" */ '@/views/middle-page.vue'),
+      component: () => import( /* webpackChunkName: "main" */ '@/views/middle-page'),
       meta: {
         title: '中间页'
       }
@@ -45,6 +45,21 @@ export default new Router({
       meta: {
         title: '微信支付结果'
       }
+    },
+    {
+      path: '*',
+      redirect: {
+        name: 'ErrorPage'
+      }
     }
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.title)) {
+    document.title = to.meta.title
+  }
+  next()
+})
+
+export default router
