@@ -1,4 +1,6 @@
-import Brower from '@/common/global'
+import {
+  Browser
+} from '@/common/global'
 
 /** 百度统计
  * _hmt.push(['_trackEvent', category, action, opt_, opt_value]);

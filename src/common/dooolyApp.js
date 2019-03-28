@@ -1,4 +1,6 @@
-import Browser from '@/common/global'
+import {
+    Browser
+} from '@/common/global'
 
 /**
  * 原生应用交互方法
