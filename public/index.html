@@ -15,8 +15,33 @@
   <link rel="icon" href="<%= BASE_URL %>favicon.ico">
   <title>reach-cashier</title>
 </head>
-
 <body>
+  <script>
+    //移动端自适应
+    (function (designWidth, baseNum) {
+      designWidth = designWidth || 375;
+      var doc = document,
+        docEl = doc.documentElement,
+        html = doc.getElementsByTagName('html')[0],
+        tid;
+      function refreshRem() {
+        var clientWidth = docEl.getBoundingClientRect().width;
+        var rem = clientWidth * baseNum / designWidth;
+        html.style.fontSize = rem + 'px';
+      }
+      refreshRem();
+      window.addEventListener("resize", function () {
+        clearTimeout(tid);
+        tid = setTimeout(refreshRem, 300);
+      }, false);
+      window.addEventListener("pageshow", function (e) {
+        if (e.persisted) {
+          clearTimeout(tid);
+          tid = setTimeout(refreshRem, 300);
+        }
+      }, false);
+    })(750, 100);
+  </script>
   <noscript>
     <strong>We're sorry but reach-cashier doesn't work properly without JavaScript enabled. Please enable it to
       continue.</strong>
