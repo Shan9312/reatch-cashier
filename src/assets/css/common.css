@@ -1,0 +1,247 @@
+.fl {
+  float: left;
+}
+
+.fr {
+  float: right;
+}
+
+.tc {
+  text-align: center;
+}
+
+.tr {
+  text-align: right;
+}
+
+/*mint-ui修改*/
+/*mint-ui message弹窗样式消失*/
+.mint-msgbox {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate3d(-50%,-50%,0);
+  transform: translate3d(-50%,-50%,0);
+  background-color: #fff;
+  width: 85%;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  font-size: 16px;
+  -webkit-user-select: none;
+  overflow: hidden;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transition: .2s;
+  -o-transition: .2s;
+  transition: .2s;
+}
+.v-modal {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: .5;
+  background: #000;
+}
+.mint-msgbox-message {
+  color: #999;
+  margin: 0;
+  text-align: center;
+  line-height: 36px;
+}
+.mint-msgbox-btns {
+    display: flex;
+    height: 40px;
+    line-height: 40px;
+}
+.mint-msgbox-confirm {
+    width: 100%;
+}
+/*mint-ui message弹窗样式消失*/
+.mint-indicator-wrapper {
+  padding: 15px 30px !important;
+  border-radius: 4px !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  font-size: 0 !important;
+  z-index: 99999;
+}
+
+.mint-spinner-snake {
+  height: 16px !important;
+  width: 16px !important;
+}
+
+.mint-indicator-text {
+  color: rgb(204, 204, 204) !important;
+  font-size: 12px !important;
+}
+
+.mint-indicator-mask {
+  z-index: 99999;
+}
+
+.mint-msgbox {
+  border-radius: 0.1rem !important;
+  width: 2.7rem !important;
+}
+
+.mint-msgbox-content {
+  padding: 0 0.1rem !important;
+  min-height: auto !important;
+  border: 0 !important;
+}
+
+.mint-msgbox-confirm {
+  color: #ee3f44 !important;
+  font-size: 0.18rem;
+}
+
+.mint-msgbox-title {
+  height: 0.4rem !important;
+  line-height: 0.4rem !important;
+  text-align: center !important;
+  font-size: 0.18rem !important;
+  color: #333 !important;
+  font-weight: bold !important;
+}
+
+.mint-msgbox-message {
+  line-height: normal !important;
+  font-size: 0.14rem !important;
+}
+
+.mint-msgbox-btns {
+  height: 0.5rem !important;
+  line-height: 0.5rem !important;
+  border-top: 1px solid #ddd !important;
+  font-size: 0.16rem !important;
+  margin-top: 0.15rem !important;
+}
+
+.mint-msgbox-header {
+  padding: 0.15rem 0 0 !important;
+}
+
+.mint-switch-input:checked+.mint-switch-core {
+  border-color: #4CD964 !important;
+  background-color: #4CD964 !important;
+}
+
+/*loging.gif样式*/
+.loading_gif {
+  display: inline-block;
+  font-size: 0;
+  width: 0.45rem;
+  height: 0.12rem;
+  position: relative;
+}
+
+.loading_gif:before {
+  content: '';
+  width: 0.12rem;
+  height: 0.12rem;
+  background: #ee3f44;
+  position: absolute;
+  border-radius: 50%;
+  left: 0;
+  top: 0;
+  animation: left 0.7s linear 0s infinite alternate;
+}
+
+.loading_gif:after {
+  content: '';
+  width: 0.12rem;
+  height: 0.12rem;
+  background: yellow;
+  position: absolute;
+  border-radius: 50%;
+  left: 0.33rem;
+  top: 0;
+  animation: right 0.7s linear 0s infinite alternate;
+}
+
+@keyframes left {
+  0% {
+    left: 0;
+  }
+
+  100% {
+    left: 0.33rem
+  }
+}
+
+@keyframes right {
+  0% {
+    left: 0.33rem;
+  }
+
+  100% {
+    left: 0
+  }
+}
+@keyframes right{
+  0% {left: 0.33rem;}
+  100% {left: 0}
+}
+/*mint-ui修改*/
+.mint-indicator-wrapper{
+  padding: 15px 30px!important;
+  border-radius: 4px!important;
+  background: rgba(0, 0, 0, 0.5)!important;
+  font-size: 0!important;
+  z-index:99999;
+}
+.mint-spinner-snake{
+  height: 16px!important;
+  width: 16px!important;
+}
+.mint-indicator-text{
+  color: rgb(204,204,204)!important;
+  font-size: 12px!important;
+}
+.mint-indicator-mask{
+  z-index: 99999;
+}
+.mint-msgbox{
+  border-radius: 0.05rem!important;
+  width: 2.7rem!important;
+}
+.mint-msgbox-content{
+  padding: 0 0.1rem!important;
+  min-height: auto!important;
+  border: 0!important;
+}
+.mint-msgbox-confirm{
+  color:#ee3f44!important;
+	font-size: 0.18rem;
+}
+.mint-msgbox-cancel{
+  font-size: 0.18rem;
+}
+.mint-msgbox-title{
+  height: 0.4rem!important;
+  line-height: 0.4rem!important;
+  text-align: center!important;
+  font-size: 0.18rem!important;
+  color: #333!important;
+  font-weight: bold!important;
+}
+.mint-msgbox-message{
+  line-height: normal!important;
+  font-size: 0.14rem!important;
+}
+.mint-msgbox-btns{
+  height: 0.5rem!important;
+  line-height: 0.5rem!important;
+  border-top: 1px solid #ddd!important;
+  font-size: 0.16rem!important;
+  margin-top: 0.15rem!important;
+}
+.mint-msgbox-header{
+  padding: 0.15rem 0 0 !important;
+}
+.mint-switch-input:checked + .mint-switch-core {
+  border-color: #4CD964!important;
+  background-color: #4CD964!important;
+}

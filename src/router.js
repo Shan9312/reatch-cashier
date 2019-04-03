@@ -50,7 +50,8 @@ const router = new VueRouter({
     {
       path: '*',
       redirect: {
-        name: 'Payment'
+        // name: 'Payment',
+        path: '/cardBuyPay/200',
       }
     }
   ]

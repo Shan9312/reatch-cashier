@@ -12,8 +12,6 @@ html, body {
   -webkit-backface-visibility: hidden;
   -webkit-text-size-adjust: 100%;
   -webkit-font-smoothing: antialiased;
-  width: 100%;
-  height: 100%;
 }
 
 div, span, input, textarea, h1, h2, h3, h4, h5, h6, p, pre, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, label, table {
