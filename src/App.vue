@@ -10,6 +10,8 @@ export default {
 </script>
 
 <style lang="less">
+@import "assets/css/common.css";
+@import "assets/css/reset.css";
   #app {
       width: 100%;
       height: 100%;

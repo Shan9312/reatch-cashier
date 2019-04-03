@@ -19,7 +19,7 @@
                     <span class="fl direct-left names">{{item.text}}
                         <img class="direct-pic" 
                         @click="handleWhatOrientIntergral"
-                        src="../../../assets/images/payment/why.png" alt="定向积分疑问">
+                        src="../../../assets/images/checkout-counter/why_icon.png" alt="定向积分疑问">
                     </span>
                     <span class="fr direct-available">可抵扣余额:
                         <label> {{item.payAmount > 0? item.payAmount : '余额不可用'}}</label>
@@ -31,11 +31,11 @@
                        :class="{'no-border': item.selected}"> 
                     <img class="pic fr"
                         v-if="item.selected"
-                        src="../../../assets/images/payment/pay_check.png" alt="定向积分选中">
+                        src="../../../assets/images/checkout-counter/pay_check.png" alt="定向积分选中">
                 </span>
                 <!-- 若支付方式不能使用 则是为 禁止状态 -->
                 <span  class="circle no-border" v-if="!item.usable">
-                    <img class="pic fr" src="../../../assets/images/payment/pay_check_gray.png" alt="定向积分不可点击">
+                    <img class="pic fr" src="../../../assets/images/checkout-counter/pay_check_gray.png" alt="定向积分不可点击">
                 </span>
               </div>
             </div>
@@ -61,11 +61,11 @@
                                 :class="{'no-border': item.selected}"> 
                             <img class="pic fr"
                                 v-if="item.selected"
-                                src="../../../assets/images/payment/pay_check.png" alt="定向积分选中">
+                                src="../../../assets/images/checkout-counter/pay_check.png" alt="定向积分选中">
                         </span>
                         <!-- 若支付方式不能使用 则是为 禁止状态 -->
                         <span  class="circle no-border" v-if="!item.usable">
-                            <img class="pic fr" src="../../../assets/images/payment/pay_check_gray.png" alt="定向积分不可点击">
+                            <img class="pic fr" src="../../../assets/images/checkout-counter/pay_check_gray.png" alt="定向积分不可点击">
                         </span>
                     </div>
                 </section>
@@ -76,14 +76,6 @@
         <div class="footer" >
             确认支付
         </div>
-        <!-- 错误弹出框 -->
-        <!-- <div class="toast_bg">
-            <div class="toast">
-                <p>温馨提示</p>
-                <div class="text">{{'错误弹框'}}</div>
-                <div class="input" @click="errorBulletDialog = false">确定</div>
-            </div>
-        </div> -->
     </div>
 </template>
 
@@ -176,7 +168,7 @@ export default {
                     usable: this.defaultOptions.dooolyIntergral > 0,
                     payAmount: 180,
                     selected: true,
-                    imgSrc: require('../../../assets/images/payment/icon_1.png'),
+                    imgSrc: require('../../../assets/images/checkout-counter/dooly_icon.png'),
                     id: 2,
                 })
             }
@@ -188,7 +180,7 @@ export default {
                     usable: true,
                     payAmount: 0,
                     selected: false,
-                    imgSrc: require('../../../assets/images/payment/icon_2.png'),
+                    imgSrc: require('../../../assets/images/checkout-counter/wechat_icon.png'),
                     id: 3,
                 })
             }
@@ -200,7 +192,7 @@ export default {
                     usable: true,
                     payAmount: 0,
                     selected: false,
-                    imgSrc: require('../../../assets/images/payment/icon_3.png'),
+                    imgSrc: require('../../../assets/images/checkout-counter/alipay_icon.png'),
                     id: 4,
                 })
             }
@@ -555,8 +547,7 @@ export default {
         padding: 0.14rem 0.15rem 0.36rem;
         font-size: 0.16rem;
         color: #333;
-        background: #fff url('../../../assets/images/payment/title_bg.png') repeat-x 0
-        bottom;
+        background: #fff url('../../../assets/images/checkout-counter/title_background.png') repeat-x 0 bottom;
         background-size: auto 0.15rem;
         .amount {
             font-size: 0.18rem;
