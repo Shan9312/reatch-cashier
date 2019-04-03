@@ -73,7 +73,7 @@
         </div>
         <!-- 付款方式列表 -->
         <!-- 底部确认按钮 -->
-        <div class="footer" >
+        <div class="footer" @click="handleConfirmPay">
             确认支付
         </div>
     </div>
@@ -126,13 +126,25 @@ export default {
         return this.usablePayList.filter(payItem => payItem.selected)
       }
     },
-    mounted () {
+    created () {
         // 初始化 支付方式列表
         this.initUseAblePayList();
         // 初始化 用户默认支付方式
         this.initDefaultPayType();
     },
     methods: {
+        /**
+         * 点击确定付款
+         * 
+         * */
+        handleConfirmPay() {
+          // 若选择 兜礼，定向积分 则调用 用户验证码（键盘输入页）
+          if(!this.selectedPayList.length)return false;
+          if(!(this.selectedPayList.filter(payItem => payItem.id > 2)).length){
+            console.log('000')
+          }
+          // 若选择 微信，支付宝 则调用 第三方付款
+        },
         /**
          * 定向积分定义解释
          * 
@@ -166,7 +178,7 @@ export default {
                     text: '兜礼积分',
                     name: 'dooolyIntergral',
                     usable: this.defaultOptions.dooolyIntergral > 0,
-                    payAmount: 180,
+                    payAmount: 30,
                     selected: true,
                     imgSrc: require('../../../assets/images/checkout-counter/dooly_icon.png'),
                     id: 2,
@@ -211,7 +223,7 @@ export default {
             let orientIntergralPayAmount = 0
             let dooolyIntergralSelected = false
             let dooolyIntergralPayAmount = 0
-
+            
             if (this.result.orientIntergralFlag) {
               // 选中定向积分支付及修改需支付金额
               orientIntergralSelected = true
@@ -225,13 +237,13 @@ export default {
             this.usablePayList.map(payType => {
             if (payType.name == 'orientIntergral') {
                 payType.selected = orientIntergralSelected
-                payType.payAmount = orientIntergralPayAmount
+                // payType.payAmount = orientIntergralPayAmount
             }
             })
             this.usablePayList.map(payType => {
             if (payType.name == 'dooolyIntergral') {
                 payType.selected = dooolyIntergralSelected
-                payType.payAmount = dooolyIntergralPayAmount
+                // payType.payAmount = dooolyIntergralPayAmount
             }
             })
             // 重置判断
@@ -388,14 +400,13 @@ export default {
 
         orientIntergralItem = this.selectedPayList.filter(payItem => payItem.name == 'orientIntergral')
         dooolyIntergralItem = this.selectedPayList.filter(payItem => payItem.name == 'dooolyIntergral')
-
+        // debugger
         if (orientIntergralItem.length > 0) {
           orientIntergralPayAmount = orientIntergralItem[0].payAmount
         }
         if (dooolyIntergralItem.length > 0) {
           dooolyIntergralPayAmount = dooolyIntergralItem[0].payAmount
         }
-
         // 当前支付方式不可用则直接返回
         if (!item.usable) return false
         // 当前只选中一种支付方式的情况下不允许取消选中
@@ -407,7 +418,9 @@ export default {
         let cashTypeArr = ['wechat', 'alipay'] //现金支付类型
         // 不可取消微信支付及支付宝支付
         if (item.selected && cashTypeArr.includes(item.name)) return false
-        // 定向积分+兜礼积分点击 取消时
+        /**
+         * 定向积分+兜礼积分点击 取消时
+         * */ 
         if (item.selected && !cashTypeArr.includes(item.name)) {
           if ((this.defaultOptions.orientIntergral >= this.defaultOptions.needPayAmount && item.name == 'dooolyIntergral') ||
             (this.defaultOptions.dooolyIntergral >= (this.defaultOptions.needPayAmount + this.defaultOptions.serviceCharge) && item.name == 'orientIntergral')) {
@@ -432,7 +445,6 @@ export default {
           // 当我已经选中微信/支付宝时，这个时候为切换现金支付方式
           if (cashItem.length > 0) {
             let payAmount = cashItem[0].payAmount
-
             this.usablePayList.map(payItem => {
               if (payItem.name == item.name) {
                 payItem.selected = true
@@ -462,10 +474,13 @@ export default {
               this.usablePayList.map(payItem => {
                 if (payItem.name == 'dooolyIntergral') {
                   payItem.selected = false
-                  payItem.payAmount = 0
+                  // payItem.payAmount = 0 ;// 兜礼积分 不为0
                 }
               })
-            }
+            } 
+            // // 定向积分+兜礼积分组合 不够的情况下，选择现金支付，使用定向+ 兜礼+ 现金 
+            // else if ((orientIntergralPayAmount + dooolyIntergralPayAmount) < (this.defaultOptions.needPayAmount + this.defaultOptions.serviceCharge)){
+            // }
           } else { // 不支持混合支付 直接切换为现金支付
             this.usablePayList.map(payItem => {
               if (!cashTypeArr.includes(payItem.name)) {
@@ -511,27 +526,31 @@ export default {
         }
 
         item.selected = !item.selected
+        // copy返回的数值
         let optionsClone = JSON.parse(JSON.stringify(this.defaultOptions))
+        // 从选中的支付列表中， 判断是哪个付款方式
         orientIntergralItem = this.selectedPayList.filter(payItem => payItem.name == 'orientIntergral')
         dooolyIntergralItem = this.selectedPayList.filter(payItem => payItem.name == 'dooolyIntergral')
         wechatItem = this.selectedPayList.filter(payItem => payItem.name == 'wechat')
         alipayItem = this.selectedPayList.filter(payItem => payItem.name == 'alipay')
-
-        if (orientIntergralItem.length == 0) {
+        // 初始化 付款方式
+        if (!orientIntergralItem.length) {
           optionsClone.orientIntergral = 0
         }
-        if (dooolyIntergralItem.length == 0) {
+        if (!dooolyIntergralItem.length) {
           optionsClone.dooolyIntergral = 0
         }
-        if (wechatItem.length == 0) {
+        if (!wechatItem.length) {
           optionsClone.supportWechat = false
         }
-        if (alipayItem.length == 0) {
+        if (!alipayItem.length) {
           optionsClone.supportAlipay = false
         } else {
           optionsClone.supportWechat = false
         }
+        //
         this.initUseAblePayList();
+        // 切换后的  付款方式。
         this.initDefaultPayType(optionsClone)
       }
     },
@@ -576,45 +595,45 @@ export default {
             justify-content: space-between;
             align-items: center;
             text-align: left;
-        .center {
-            width: 78%;
-            &.direct {
-                width: 91%;
-                font-size: 0.14rem;
-                .direct-left {
-                    position: relative;
-                    color: #999;
-                }
-                .direct-pic {
-                    width: 0.14rem;
-                    height: 0.14rem;
-                    position: absolute;
-                    right: -0.18rem;
-                    top: 50%;
-                    transform: translateY(-50%);
-                }
-                .direct-available {
-                    color: #333;
-                }
-            }
-            .available {
-                font-size: 0.12rem;
-                color: #999;
-                .point {
-                    color: #ee3f44;
-                }
-            }
-        }
-            .circle {
-                width: 0.23rem;
-                height: 0.23rem;
-                border-radius: 50%;
-                border: 1px solid #ddd;
-                box-sizing: border-box;
-                &.no-border {
-                border-color: transparent;
-                }
-            }
+          .center {
+              width: 78%;
+              &.direct {
+                  width: 91%;
+                  font-size: 0.14rem;
+                  .direct-left {
+                      position: relative;
+                      color: #999;
+                  }
+                  .direct-pic {
+                      width: 0.14rem;
+                      height: 0.14rem;
+                      position: absolute;
+                      right: -0.18rem;
+                      top: 50%;
+                      transform: translateY(-50%);
+                  }
+                  .direct-available {
+                      color: #333;
+                  }
+              }
+              .available {
+                  font-size: 0.12rem;
+                  color: #999;
+                  .point {
+                      color: #ee3f44;
+                  }
+              }
+          }
+          .circle {
+              width: 0.23rem;
+              height: 0.23rem;
+              border-radius: 50%;
+              border: 1px solid #ddd;
+              box-sizing: border-box;
+              &.no-border {
+              border-color: transparent;
+              }
+          }
         }
     }
     .pay-title {
@@ -641,13 +660,13 @@ export default {
         text-align: center;
     }
     .toast_bg {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(51, 51, 51, 0.8);
-    z-index: 9999;
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(51, 51, 51, 0.8);
+      z-index: 9999;
     .toast {
       position: absolute;
       left: 50%;
