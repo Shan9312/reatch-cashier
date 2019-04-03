@@ -8,13 +8,6 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "babel-polyfill": "^6.26.0",
-    "crypto-js": "^3.1.9-1",
-    "js-cookie": "^2.2.0",
-    "jsencrypt": "^3.0.0-rc.1",
-    "less": "^3.8.1",
-    "less-loader": "^4.1.0",
-    "vue-jsonp": "^0.1.8",
     "mint-ui": "^2.2.13",
     "ua-parser": "^0.3.5",
     "vue": "^2.6.6",
