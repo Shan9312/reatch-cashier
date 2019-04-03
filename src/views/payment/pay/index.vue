@@ -1,10 +1,10 @@
 <template>
-    <div class="pay-warppe">
+    <div class="pay-warpper">
         <!-- 支付总金额提示 -->
         <div class="content">
              需支付：
             <span class="amount">{{defaultOptions.needPayAmount}}</span>
-            <label class="col" v-show="defaultOptions.supportDooolyIntergral
+            <label class="charge-text" v-show="defaultOptions.supportDooolyIntergral
                              && defaultOptions.dooolyIntergral>0 
                              && isShowChargePay">
                  （含手续费：<span class="charge">{{defaultOptions.serviceCharge}}</span>）
@@ -29,13 +29,13 @@
                 <span  class="circle" v-if="item.usable"
                        @click="handlerChoose(item)"
                        :class="{'no-border': item.selected}"> 
-                    <img class="pic fr"
+                    <img class="picture fr"
                         v-if="item.selected"
                         src="../../../assets/images/checkout-counter/pay_check.png" alt="定向积分选中">
                 </span>
                 <!-- 若支付方式不能使用 则是为 禁止状态 -->
                 <span  class="circle no-border" v-if="!item.usable">
-                    <img class="pic fr" src="../../../assets/images/checkout-counter/pay_check_gray.png" alt="定向积分不可点击">
+                    <img class="picture fr" src="../../../assets/images/checkout-counter/pay_check_gray.png" alt="定向积分不可点击">
                 </span>
               </div>
             </div>
@@ -47,7 +47,7 @@
             <div class="pay-type">
                 <section v-for='item in usablePayList' :key="item.id">
                     <div class="line" v-if="item.id !== 1">
-                        <img class="pic fl"  :src="item.imgSrc"/>
+                        <img class="picture fl"  :src="item.imgSrc"/>
                         <div class="center">
                         <span class="type-text fl names">{{item.text}}</span>
                         <span class="fr available" v-if="item.id === 2">
@@ -59,31 +59,35 @@
                         <span   class="circle" v-if="item.usable"
                                 @click="handlerChoose(item)"
                                 :class="{'no-border': item.selected}"> 
-                            <img class="pic fr"
+                            <img class="picture fr"
                                 v-if="item.selected"
                                 src="../../../assets/images/checkout-counter/pay_check.png" alt="定向积分选中">
                         </span>
                         <!-- 若支付方式不能使用 则是为 禁止状态 -->
                         <span  class="circle no-border" v-if="!item.usable">
-                            <img class="pic fr" src="../../../assets/images/checkout-counter/pay_check_gray.png" alt="定向积分不可点击">
+                            <img class="picture fr" src="../../../assets/images/checkout-counter/pay_check_gray.png" alt="定向积分不可点击">
                         </span>
                     </div>
                 </section>
             </div>
         </div>
-        <!-- 付款方式列表 -->
+        <!-- 付款方式列表 end-->
         <!-- 底部确认按钮 -->
         <div class="footer" @click="handleConfirmPay">
             确认支付
         </div>
+        <!-- 键盘页面 -->
+        <keyboard-page></keyboard-page>
+        <!-- 键盘页面 end-->
     </div>
 </template>
 
 <script>
+import keyboardPage from '../../../components/keybord-page';
 
 export default {
     name: 'Payment',
-    components: {},
+    components: { keyboardPage },
     data () {
         return {
             orderNum: this.$route.params.orderNum, // 订单号
@@ -138,10 +142,12 @@ export default {
          * 
          * */
         handleConfirmPay() {
+          // 需要判断当前 浏览器内核： wechat,chrome webkit,androin,IOS 并且查看当前用户id的有效期
+
           // 若选择 兜礼，定向积分 则调用 用户验证码（键盘输入页）
           if(!this.selectedPayList.length)return false;
           if(!(this.selectedPayList.filter(payItem => payItem.id > 2)).length){
-            console.log('000')
+            console.log('**')
           }
           // 若选择 微信，支付宝 则调用 第三方付款
         },
@@ -204,7 +210,7 @@ export default {
                     usable: true,
                     payAmount: 0,
                     selected: false,
-                    imgSrc: require('../../../assets/images/checkout-counter/alipay_icon.png'),
+                    imgSrc: require('../../../assets/images/checkout-counter/icon_alipay.png'),
                     id: 4,
                 })
             }
@@ -418,9 +424,7 @@ export default {
         let cashTypeArr = ['wechat', 'alipay'] //现金支付类型
         // 不可取消微信支付及支付宝支付
         if (item.selected && cashTypeArr.includes(item.name)) return false
-        /**
-         * 定向积分+兜礼积分点击 取消时
-         * */ 
+        // 定向积分+兜礼积分点击 取消时
         if (item.selected && !cashTypeArr.includes(item.name)) {
           if ((this.defaultOptions.orientIntergral >= this.defaultOptions.needPayAmount && item.name == 'dooolyIntergral') ||
             (this.defaultOptions.dooolyIntergral >= (this.defaultOptions.needPayAmount + this.defaultOptions.serviceCharge) && item.name == 'orientIntergral')) {
@@ -441,7 +445,6 @@ export default {
         // 微信选中时点击支付宝则切换到支付宝并取消微信选中，反之一样
         if (cashTypeArr.includes(item.name) && !item.selected) {
           let cashItem = this.selectedPayList.filter(payItem => cashTypeArr.includes(payItem.name))
-
           // 当我已经选中微信/支付宝时，这个时候为切换现金支付方式
           if (cashItem.length > 0) {
             let payAmount = cashItem[0].payAmount
@@ -557,7 +560,7 @@ export default {
 }
 </script>
 <style lang="less" scoped>
-.pay-warppe{
+.pay-warpper{
     img {
         width: 100%;
         height: 100%;
@@ -572,7 +575,7 @@ export default {
             font-size: 0.18rem;
             color: #ee3f44;
         }
-        .col {
+        .charge-text {
             font-size: 0.12rem;
             color: #999;
             .charge {
@@ -585,7 +588,7 @@ export default {
         padding: 0 0.15rem;
         font-size: 0.14rem;
         color: #333;
-        .pic {
+        .picture {
             width: 0.23rem;
             height: 0.23rem;
         }
@@ -667,86 +670,86 @@ export default {
       height: 100%;
       background: rgba(51, 51, 51, 0.8);
       z-index: 9999;
-    .toast {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 2.7rem;
-      height: 1.78rem;
-      background: #fff;
-      transform: translate(-50%, -50%);
-      border-radius: 0.1rem;
-      text-align: center;
-      p {
-        font-size: 0.18rem;
-        padding-top: 0.36rem;
-        color: #333;
-        font-weight: bold;
-      }
-      .text {
-        font-size: 0.14rem;
-        color: #999;
-        padding: 0.2rem 0.1rem;
-      }
-      .input {
-        width: 100%;
-        height: 0.5rem;
-        line-height: 0.5rem;
+      .toast {
         position: absolute;
-        left: 0;
-        bottom: 0;
-        border-top: 1px solid #ececec;
-        font-size: 0.18rem;
-        color: #ee3f44;
-      }
-    }
-  }
-  .isLeave_bg {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(51, 51, 51, 0.8);
-    z-index: 9999;
-    .isLeave {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 2.7rem;
-      height: 1.6rem;
-      background: #fff;
-      transform: translate(-50%, -50%);
-      border-radius: 0.1rem;
-      p {
-        font-size: 0.18rem;
-        padding: 0.4rem 0.1rem 0;
-        color: #333;
-      }
-      .input_view {
-        display: flex;
-        position: absolute;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        height: 0.5rem;
-        border-top: 1px solid #ececec;
-        .inputBtn {
-          flex: 1;
-          text-align: center;
+        left: 50%;
+        top: 50%;
+        width: 2.7rem;
+        height: 1.78rem;
+        background: #fff;
+        transform: translate(-50%, -50%);
+        border-radius: 0.1rem;
+        text-align: center;
+        p {
           font-size: 0.18rem;
-          line-height: 0.5rem;
-        }
-        .left {
+          padding-top: 0.36rem;
           color: #333;
-          border-right: 1px solid #ececec;
+          font-weight: bold;
         }
-        .right {
+        .text {
+          font-size: 0.14rem;
+          color: #999;
+          padding: 0.2rem 0.1rem;
+        }
+        .input {
+          width: 100%;
+          height: 0.5rem;
+          line-height: 0.5rem;
+          position: absolute;
+          left: 0;
+          bottom: 0;
+          border-top: 1px solid #ececec;
+          font-size: 0.18rem;
           color: #ee3f44;
         }
       }
     }
-  }
+    .isLeave_bg {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(51, 51, 51, 0.8);
+      z-index: 9999;
+      .isLeave {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 2.7rem;
+        height: 1.6rem;
+        background: #fff;
+        transform: translate(-50%, -50%);
+        border-radius: 0.1rem;
+        p {
+          font-size: 0.18rem;
+          padding: 0.4rem 0.1rem 0;
+          color: #333;
+        }
+        .input_view {
+          display: flex;
+          position: absolute;
+          left: 0;
+          bottom: 0;
+          width: 100%;
+          height: 0.5rem;
+          border-top: 1px solid #ececec;
+          .inputBtn {
+            flex: 1;
+            text-align: center;
+            font-size: 0.18rem;
+            line-height: 0.5rem;
+          }
+          .left {
+            color: #333;
+            border-right: 1px solid #ececec;
+          }
+          .right {
+            color: #ee3f44;
+          }
+        }
+      }
+    }
 }
 </style>
 
