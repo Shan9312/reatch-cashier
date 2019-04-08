@@ -87,12 +87,12 @@
        * 
        * */
       handleEntryNum(obj) {
-        // this.numArr.push(obj);
-        // if (this.numArr.length > 6) return
-        // console.log(this.numArr)
-        // this.numArr.forEach((item, index) => {
-        //   this.passwordNumArr[index].value = item;
-        // });
+        this.numArr.push(obj);
+        if (this.numArr.length > 6) return
+        console.log(this.numArr)
+        this.numArr.forEach((item, index) => {
+          this.passwordNumArr[index].value = item;
+        });
       },
       /**
        * 手动删除输入的数值盘
