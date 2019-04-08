@@ -57,7 +57,7 @@
     </div>
 
     <!-- 键盘页面 -->
-    <keyboard :isShowKeyboard="isShowKeyboard" @handleCloseKeyboard="handleCloseKeyboard"></keyboard>
+    <keyboard ref="keybordItem" :isShowKeyboard="isShowKeyboard" :isPayPassword="defaultOptions.isPayPassword" :handleConfirmPay="handleConfirmPay" @handleCloseKeyboard="handleCloseKeyboard"></keyboard>
     <!-- 键盘页面 end-->
   </div>
 </template>
@@ -92,6 +92,7 @@
           supportAlipay: true, // 是否支持支付宝
           // 需要返回给后端的字段 payType， 0积分支付 1微信支付 2积分微信混合支付 6 支付宝；
           // 0,2,11:支持兜礼积分  1,2: 支持微信   6,11:支持支付宝
+          isPayPassword: '1', // 后端返回：'1' :短信验证; '2' :密码支付
         },
         usableOptions: {}, // 实际的支付对象
         result: {
@@ -124,9 +125,7 @@
       // 初始化 用户默认支付方式
       this.initDefaultPayType();
     },
-    mounted() {
-
-    },
+    mounted() {},
     methods: {
       /**
        * 根据用户的信息 获取付款页面的内容
@@ -150,6 +149,29 @@
 
       },
       /**
+       * 支付宝付款订单
+       * 
+       * */
+      alipayPay(data) {
+        this.$dooolyApp.APPpay(data, "pay_callBack", 'zfb')
+      },
+      /**
+       * 微信付款订单
+       * 
+       * */
+      wechatPay() {
+
+      },
+      // 若 倒计时在 60s内 则不重复发送短信验证
+      isRepeatPhoneVerification() {
+        if (this.$refs.keybordItem.phoneVerificationBycountNum) {
+          this.isShowKeyboard = true;
+          return
+        } else {
+          this.$refs.keybordItem.countTime = 60;
+        }
+      },
+      /**
        * 点击确定付款
        * 
        * */
@@ -163,8 +185,11 @@
         if (!this.selectedPayList.length) return false;
         // 若 已选中的支付列表中 有积分支付方式 则打开键盘页 验证短信
         if ((this.selectedPayList.filter(payItem => payItem.id < 3)).length) {
-          console.log('积分支付了');
           this.isShowKeyboard = true;
+          // 避免手机短信重复验证
+          this.isRepeatPhoneVerification();
+          // 验证倒计时计数
+          this.$refs.keybordItem.handleCountdownNum();
         } else if ((this.selectedPayList.filter(payItem => payItem.name === 'wechat')).length) {
           console.log('微信支付了');
         } else if ((this.selectedPayList.filter(payItem => payItem.name === 'alipay')).length) {
