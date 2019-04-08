@@ -57,13 +57,14 @@
     </div>
 
     <!-- 键盘页面 -->
-    <keyboard ref="keybordItem" :isShowKeyboard="isShowKeyboard" :isPayPassword="defaultOptions.isPayPassword" :handleConfirmPay="handleConfirmPay" @handleCloseKeyboard="handleCloseKeyboard"></keyboard>
+    <Keyboard ref="keybordItem" :isShowKeyboard="isShowKeyboard" :isPayPassword="defaultOptions.isPayPassword" :handleConfirmPay="handleConfirmPay" @handleCloseKeyboard="handleCloseKeyboard">
+    </Keyboard>
     <!-- 键盘页面 end-->
   </div>
 </template>
 
 <script>
-  import Keyboard from '@/components/Keybord'; // 手机号验证的 键盘弹框
+  import Keyboard from '@/components/Keyboard'; // 手机号验证的 键盘弹框
   import CheckoutBtn from '@/components/CheckoutButton'; // 支付选中的状态样式
   import ajax from '@/common/ajax'
   import api from '@/common/factory-api'
