@@ -1,12 +1,9 @@
 import axios from 'axios'
 import {
-    Browser,
-    MintUI,
-    GlobalFun
+    GlobalProperty,
+    GlobalFunction,
+    MintUI
 } from '@/common/global'
-import {
-    GloabalFun
-} from './global';
 
 const defaultData = {
 
@@ -16,8 +13,15 @@ const defaultOptions = {
 }
 
 const request = (method, url, data, options = {}) => {
-    let token, groupId, channel
-    let browserName = Browser.getName()
+    let browserName, storage, headers, token, groupId, channel
+
+    browserName = GlobalProperty.browserName
+    storage = GlobalProperty.localStroage
+    headers = GlobalProperty.headers
+
+    token = storage.getItem('token')
+    groupId = stroage.getItem('groupId')
+    channel = headers['channel']
 
     // set http request parameters
     data = Object.assign({}, defaultData, data)
@@ -49,7 +53,7 @@ const request = (method, url, data, options = {}) => {
                 message: resData.info
             })
             // log out
-            GlobalFun.logout()
+            GlobalFunction.logout()
         }
 
         return Promise.resolve(data)
@@ -59,7 +63,7 @@ const request = (method, url, data, options = {}) => {
         })
 
         if (!navigator.onLine) return false
-        GloabalFun.uploadErrorLog(browserName, error)
+        GlobalFunction.uploadErrorLog()
 
         return Promise.reject(err)
     }).finally(() => {
@@ -73,10 +77,10 @@ const request = (method, url, data, options = {}) => {
 }
 
 export default {
-    get: (url, data = {}, options) => {
+    get: (url, data = {}) => {
         let params, timestamp
 
-        // set timestamp for let http get request lose efficacy
+        // set timestamp
         timestamp = new Date().getTime()
         data['timestamp'] = timestamp
 
