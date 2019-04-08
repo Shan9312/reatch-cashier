@@ -20,7 +20,7 @@ const request = (method, url, data, options = {}) => {
   headers = GlobalProperty.headers
 
   token = storage.getItem('token')
-  groupId = stroage.getItem('groupId')
+  groupId = storage.getItem('groupId')
   channel = headers['channel']
 
   // set http request parameters

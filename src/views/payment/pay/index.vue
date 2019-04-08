@@ -16,7 +16,8 @@
         <div class="line" v-if="item.id === 1">
           <div class="center direct">
             <span class="fl direct-left names">{{item.text}}
-              <img class="direct-pic" @click="handleWhatOrientIntergral" src="@/assets/images/checkout-counter/icon_why.png" alt="定向积分疑问">
+              <img class="direct-pic" @click="handleWhatOrientIntergral"
+                src="@/assets/images/checkout-counter/icon_why.png" alt="定向积分疑问">
             </span>
             <span class="fr direct-available">可抵扣余额:
               <label> {{item.payAmount > 0? item.payAmount : '余额不可用'}}</label>
@@ -57,7 +58,8 @@
     </div>
 
     <!-- 键盘页面 -->
-    <Keyboard ref="keybordItem" :isShowKeyboard="isShowKeyboard" :isPayPassword="defaultOptions.isPayPassword" :handleConfirmPay="handleConfirmPay" @handleCloseKeyboard="handleCloseKeyboard">
+    <Keyboard ref="keybordItem" :isShowKeyboard="isShowKeyboard" :isPayPassword="defaultOptions.isPayPassword"
+      :handleConfirmPay="handleConfirmPay" @handleCloseKeyboard="handleCloseKeyboard">
     </Keyboard>
     <!-- 键盘页面 end-->
   </div>
@@ -71,7 +73,10 @@
 
   export default {
     name: 'Payment',
-    components: { Keyboard, CheckoutBtn },
+    components: {
+      Keyboard,
+      CheckoutBtn
+    },
     computed: {
       selectedPayList() {
         // 集中获取 被选中的支付列表
@@ -120,7 +125,7 @@
     },
     created() {
       // 初始化获取用户订单付款信息
-      this.getPayContentByUserId();
+      // this.getPayContentByUserId();
       // 初始化 支付方式列表
       this.initUseAblePayList();
       // 初始化 用户默认支付方式
@@ -154,7 +159,7 @@
        * 
        * */
       alipayPay(data) {
-        this.$dooolyApp.APPpay(data, "pay_callBack", 'zfb')
+        // this.$dooolyApp.APPpay(data, "pay_callBack", 'zfb')
       },
       /**
        * 微信付款订单
@@ -324,7 +329,8 @@
           }
           // 兜礼积分 判断是否禁用: 兜礼数值 =0 或 定向积分数值 > 付款实际金额
           if (payItem.name === 'dooolyIntergral') {
-            if (this.defaultOptions.dooolyIntergral == 0 || this.defaultOptions.orientIntergral >= this.defaultOptions.needPayAmount) {
+            if (this.defaultOptions.dooolyIntergral == 0 || this.defaultOptions.orientIntergral >= this
+              .defaultOptions.needPayAmount) {
               payItem.usable = false;
             } else {
               payItem.usable = usable;
@@ -399,7 +405,8 @@
         if (this.usableOptions.supportWechat) {
           let wechatPayAmount = 0
           if (this.usableOptions.supportHybrid) {
-            wechatPayAmount = this.usableOptions.realPayAmount - this.result.orientIntergralPayAmount - this.result.dooolyIntergralPayAmount
+            wechatPayAmount = this.usableOptions.realPayAmount - this.result.orientIntergralPayAmount - this.result
+              .dooolyIntergralPayAmount
           } else {
             wechatPayAmount = this.usableOptions.realPayAmount
           }
@@ -420,7 +427,8 @@
         if (this.usableOptions.supportAlipay) {
           let alipayPayAmount = 0
           if (this.usableOptions.supportHybrid) {
-            alipayPayAmount = this.usableOptions.realPayAmount - this.result.orientIntergralPayAmount - this.result.dooolyIntergralPayAmount
+            alipayPayAmount = this.usableOptions.realPayAmount - this.result.orientIntergralPayAmount - this.result
+              .dooolyIntergralPayAmount
           } else {
             alipayPayAmount = this.usableOptions.realPayAmount
           }
@@ -467,8 +475,10 @@
         if (item.selected && cashTypeArr.includes(item.name)) return false
         // 定向积分+兜礼积分点击 取消时
         if (item.selected && !cashTypeArr.includes(item.name)) {
-          if ((this.defaultOptions.orientIntergral >= this.defaultOptions.needPayAmount && item.name == 'dooolyIntergral') ||
-            (this.defaultOptions.dooolyIntergral >= (this.defaultOptions.needPayAmount + this.defaultOptions.serviceCharge) && item.name == 'orientIntergral')) {
+          if ((this.defaultOptions.orientIntergral >= this.defaultOptions.needPayAmount && item.name ==
+              'dooolyIntergral') ||
+            (this.defaultOptions.dooolyIntergral >= (this.defaultOptions.needPayAmount + this.defaultOptions
+              .serviceCharge) && item.name == 'orientIntergral')) {
             // 单项积分足够时，可以取消另一项
           } else {
             if (!this.defaultOptions.supportHybrid) { // 不支持混合支付，并且单项积分不够支付时 不允许取消其中一项
@@ -514,7 +524,8 @@
               })
             }
             // 定向积分+兜礼积分组合够的情况下，选择现金支付，默认取消兜礼，使用定向+现金 
-            else if ((orientIntergralPayAmount + dooolyIntergralPayAmount) >= (this.defaultOptions.needPayAmount + this.defaultOptions.serviceCharge)) {
+            else if ((orientIntergralPayAmount + dooolyIntergralPayAmount) >= (this.defaultOptions.needPayAmount + this
+                .defaultOptions.serviceCharge)) {
               this.usablePayList.map(payItem => {
                 if (payItem.name == 'dooolyIntergral') {
                   payItem.selected = false
@@ -537,7 +548,8 @@
         // 不支持混合支付时当前选中现金支付时切换到积分支付
         if (!item.selected && !cashTypeArr.includes(item.name)) {
           // 定向积分或着兜礼积分单项满足时，可以直接选中单项
-          if ((item.name == 'orientIntergral' && this.defaultOptions.orientIntergral >= this.defaultOptions.needPayAmount) ||
+          if ((item.name == 'orientIntergral' && this.defaultOptions.orientIntergral >= this.defaultOptions
+              .needPayAmount) ||
             item.name == 'dooolyIntergral' && this.defaultOptions && this.defaultOptions.dooolyIntergral >=
             (this.defaultOptions.needPayAmount + this.defaultOptions.serviceCharge)
           ) {

@@ -20,7 +20,7 @@ module.exports = {
 
 function addStyleResource(rule) {
     rule.use('less')
-        .loader('style-resouce-loader')
+        .loader('style-resources-loader')
         .options({
             patterns: [
                 path.resolve(__dirname, './src/styles/variable.less'),
