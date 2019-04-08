@@ -1,5 +1,5 @@
 import {
-  Browser
+  GlobalProperty
 } from '@/common/global'
 
 /** 百度统计
@@ -13,10 +13,12 @@ import {
  * @param {*} opt_label 
  */
 const BaiduStats = (action, opt_label) => {
-  let group, category, browserName
+  let storage, group, category, browserName
 
-  browserName = Brower.getName()
-  group = localStorage.getItem('groupShortName') || localStorage.getItem('groupId')
+  storage = GlobalProperty.localStorage
+  browserName = GlobalProperty.browserName
+
+  group = storage.getItem('groupShortName') || storage.getItem('groupId')
   opt_label = opt_label ? `${this.$route.name}-${opt_label}` : this.$route.name
   category = browserName == 'thirdApp' ? '第三方收银台' : 'H5收银台'
   category = group ? `${sort}-${group}` : `${category}-未登录`

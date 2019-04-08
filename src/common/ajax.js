@@ -1,12 +1,9 @@
 import axios from 'axios'
 import {
-  Browser,
-  MintUI,
-  GlobalFun
+  GlobalProperty,
+  GlobalFunction,
+  MintUI
 } from '@/common/global'
-import {
-  GloabalFun
-} from './global';
 
 const defaultData = {
 
@@ -16,8 +13,16 @@ const defaultOptions = {
 }
 
 const request = (method, url, data, options = {}) => {
-  let token, groupId, channel
-  let browserName = Browser.getName()
+  let browserName, storage, headers, token, groupId, channel
+
+  browserName = GlobalProperty.browserName
+  storage = GlobalProperty.localStroage
+  headers = GlobalProperty.headers
+
+  token = storage.getItem('token')
+  groupId = stroage.getItem('groupId')
+  channel = headers['channel']
+
   // set http request parameters
   data = Object.assign({}, defaultData, data)
   options = Object.assign({}, defaultOptions, {
@@ -25,7 +30,7 @@ const request = (method, url, data, options = {}) => {
     url,
     data
   }, options)
-  //   debugger
+
   // set http request headers
   if (token) options.headers['token'] = token
   if (groupId) options.headers['groupId'] = groupId
@@ -48,19 +53,19 @@ const request = (method, url, data, options = {}) => {
         message: resData.info
       })
       // log out
-      GlobalFun.logout()
+      GlobalFunction.logout()
     }
 
-    return Promise.resolve(resData.data)
-  }).catch(error => {
+    return Promise.resolve(data)
+  }).catch(err => {
     MintUI.Toast.open({
       message: '小兜兜正忙,请稍候重试!'
     })
 
     if (!navigator.onLine) return false
-    GloabalFun.uploadErrorLog(browserName, error)
+    GlobalFunction.uploadErrorLog()
 
-    return Promise.reject(error)
+    return Promise.reject(err)
   }).finally(() => {
     // in our's android app that will be use android native function to close loading modal else use h5 function
     if (browserName === 'Chrome WebView' && !data.outApp) {
@@ -72,10 +77,10 @@ const request = (method, url, data, options = {}) => {
 }
 
 export default {
-  get: (url, data = {}, options) => {
+  get: (url, data = {}) => {
     let params, timestamp
 
-    // set timestamp for let http get request lose efficacy
+    // set timestamp
     timestamp = new Date().getTime()
     data['timestamp'] = timestamp
 
@@ -85,9 +90,9 @@ export default {
     });
     params = `?${params.substring(1)}`;
 
-    return request('get', `${url}${params}`)
+    request('get', `${url}${params}`)
   },
   post: (url, data, options) => {
-    return request('post', url, data, options)
+    request('post', url, data, options)
   }
 }
