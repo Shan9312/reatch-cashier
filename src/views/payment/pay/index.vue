@@ -63,8 +63,8 @@
 </template>
 
 <script>
-  import Keyboard from '@/components/keybord'; // 手机号验证的 键盘弹框
-  import CheckoutBtn from '@/components/checkout-button'; // 支付选中的状态样式
+  import Keyboard from '@/components/Keybord'; // 手机号验证的 键盘弹框
+  import CheckoutBtn from '@/components/CheckoutButton'; // 支付选中的状态样式
   import ajax from '@/common/ajax'
   import api from '@/common/factory-api'
 
@@ -698,18 +698,6 @@
             }
           }
         }
-
-        .circle {
-          width: 0.23rem;
-          height: 0.23rem;
-          border-radius: 50%;
-          border: 1px solid #ddd;
-          box-sizing: border-box;
-
-          &.no-border {
-            border-color: transparent;
-          }
-        }
       }
     }
 
@@ -737,106 +725,6 @@
       color: #fff;
       font-size: 0.16rem;
       text-align: center;
-    }
-
-    .toast_bg {
-      position: fixed;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(51, 51, 51, 0.8);
-      z-index: 9999;
-
-      .toast {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        width: 2.7rem;
-        height: 1.78rem;
-        background: #fff;
-        transform: translate(-50%, -50%);
-        border-radius: 0.1rem;
-        text-align: center;
-
-        p {
-          font-size: 0.18rem;
-          padding-top: 0.36rem;
-          color: #333;
-          font-weight: bold;
-        }
-
-        .text {
-          font-size: 0.14rem;
-          color: #999;
-          padding: 0.2rem 0.1rem;
-        }
-
-        .input {
-          width: 100%;
-          height: 0.5rem;
-          line-height: 0.5rem;
-          position: absolute;
-          left: 0;
-          bottom: 0;
-          border-top: 1px solid #ececec;
-          font-size: 0.18rem;
-          color: #ee3f44;
-        }
-      }
-    }
-
-    .isLeave_bg {
-      position: fixed;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(51, 51, 51, 0.8);
-      z-index: 9999;
-
-      .isLeave {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        width: 2.7rem;
-        height: 1.6rem;
-        background: #fff;
-        transform: translate(-50%, -50%);
-        border-radius: 0.1rem;
-
-        p {
-          font-size: 0.18rem;
-          padding: 0.4rem 0.1rem 0;
-          color: #333;
-        }
-
-        .input_view {
-          display: flex;
-          position: absolute;
-          left: 0;
-          bottom: 0;
-          width: 100%;
-          height: 0.5rem;
-          border-top: 1px solid #ececec;
-
-          .inputBtn {
-            flex: 1;
-            text-align: center;
-            font-size: 0.18rem;
-            line-height: 0.5rem;
-          }
-
-          .left {
-            color: #333;
-            border-right: 1px solid #ececec;
-          }
-
-          .right {
-            color: #ee3f44;
-          }
-        }
-      }
     }
   }
 </style>
