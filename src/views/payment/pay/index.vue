@@ -159,9 +159,7 @@
        * 微信付款订单
        * 
        * */
-      wechatPay() {
-
-      },
+      wechatPay() {},
       // 若 倒计时在 60s内 则不重复发送短信验证
       isRepeatPhoneVerification() {
         if (this.$refs.keybordItem.phoneVerificationBycountNum) {
