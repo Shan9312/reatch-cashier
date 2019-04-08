@@ -1,5 +1,5 @@
 <template>
-  <div id='keybords' class='keyboard-page' v-if="isShowKeyboard">
+  <div class='keyboard-page' v-if="isShowKeyboard">
     <div class="content">
       <div class="keyboard-title">
         <img src="@/assets/images/checkout-counter/icon_close.png" alt="" @click="handleClose">
@@ -18,27 +18,27 @@
       <!-- 短信提示信息 -->
       <div class="message-title">
         <!-- 定向积分支付 手机验证码 -->
-        <p v-if="true" class="code">
-          <span v-if="true">
+        <p v-if="isPayPassword === '1'" class="code">
+          <span v-if="phoneVerificationBycountNum">
             验证码已发送至您的手机,
             <label class="text-color-red">{{countdownNum}}s</label>
             后请重新获取
           </span>
           <span v-else>
             未收到验证码，请
-            <label class="text-color-red">重新获取</label>
+            <label class="text-color-red" @click="handleAgainGetPhoneNum">重新获取</label>
           </span>
         </p>
         <p v-else>
-          <label class="text-color-red">忘记密码？</label>
+          <label class="text-color-red" @click="handleForgetPassword">忘记密码？</label>
         </p>
       </div>
       <!-- 数字键盘 -->
       <ul class="keyboard-num">
-        <li v-for="(item,index) in keyboardNumArr" :key="index">{{item}}
+        <li v-for="(item,index) in keyboardNumArr" :key="index" @click="handleEntryNum(item)">{{item}}
         </li>
         <li>
-          <img class="keyboard-delete" src="../assets/images/checkout-counter/keyboard_delete_icon.png">
+          <img class="keyboard-delete" @click="handleDelNum" src="../assets/images/checkout-counter/keyboard_delete_icon.png">
         </li>
       </ul>
     </div>
@@ -52,6 +52,12 @@
     props: {
       isShowKeyboard: {
         type: Boolean,
+      }, // 是否现在键盘页面
+      isPayPassword: {
+        type: String,
+      }, // 输入密码 或是 短信验证的
+      handleConfirmPay: {
+        type: Function,
       }
     },
     data() {
@@ -62,6 +68,7 @@
         ],
         keyboardNumArr: [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0],
         countdownNum: 60,
+        numArr: [],
       };
     },
     created() {
@@ -69,29 +76,55 @@
     },
     mounted() {},
     watch: {},
+    computed: {
+      phoneVerificationBycountNum() {
+        return 0 < this.countdownNum && this.countdownNum < 60
+      },
+    },
     methods: {
       /**
-       * 1. 弹出键盘页面，进行倒计时
-       * 2. 输入密码 支付密码 或者 手机验证
-       * 3. 点击确认支付，支付成功页面 已截图了微信上了
+       * 手动输入密码
+       * 
        * */
+      handleEntryNum(obj) {
+        this.numArr.push(obj);
+        if (this.numArr.length > 6) return
+        console.log(this.numArr)
+        this.numArr.forEach((item, index) => {
+          this.passwordNumArr[index].value = item;
+        });
+      },
+      /**
+       * 手动删除输入的数值盘
+       * 
+       * */
+      handleDelNum() {
+        console.log()
+      },
+      // 忘记密码 就调用链接跳转
+      handleForgetPassword() {
+
+      },
+      /**
+       * 重新获取手机验证短信
+       * 
+       * */
+      handleAgainGetPhoneNum() {
+        this.handleConfirmPay();
+      },
       /**
        * 若是积分付款则 60s倒计时
        * 
        * */
       handleCountdownNum() {
-        if (this.countdownNum === 60) {
+        if (this.countdownNum === 0) {
+          this.countdownNum = 60;
+        } else {
           this.countdownNum--;
+          setTimeout(() => {
+            this.handleCountdownNum();
+          }, 1000)
         }
-        const timer = setInterval(() => {
-          if (this.countdownNum <= 0) {
-            this.countdownNum = 60;
-            clearInterval(timer);
-            timer = null;
-          } else {
-            this.countdownNum--;
-          }
-        }, 1000);
       },
       // 关闭keyBoard页面
       handleClose() {
