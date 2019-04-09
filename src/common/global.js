@@ -1,6 +1,7 @@
 import {
   Indicator,
   Toast,
+  MessageBox,
 } from 'mint-ui'
 import {
   errorLog
@@ -98,6 +99,15 @@ const MintUI = {
         message: '',
         position: 'middle',
         duration: 2000
+      }, options))
+    }
+  },
+  MessageBox: {
+    open(options) {
+      return MessageBox(Object.assign({}, {
+        title: '',
+        message: '',
+        showCancelButton: false
       }, options))
     }
   },

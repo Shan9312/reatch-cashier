@@ -71,6 +71,10 @@
   import CheckoutBtn from '@/components/CheckoutButton'; // 支付选中的状态样式
   import ajax from '@/common/ajax'
   import api from '@/common/factory-api'
+  import {
+    MintUI
+  } from '@/common/global'
+
 
   export default {
     name: 'Payment',
@@ -125,6 +129,7 @@
       };
     },
     created() {
+      console.log(MintUI.MessageBox)
       // 初始化获取用户订单付款信息
       // this.getPayContentByUserId();
       // 初始化 支付方式列表
@@ -620,7 +625,7 @@
        * 
        * */
       handleWhatOrientIntergral() {
-        this.$MessageBox({
+        MintUI.MessageBox.open({
           title: '什么是定向积分？',
           message: '定向积分是只能在兜礼固定商品分类、固定商户才能消费的特殊积分，它是企业对员工的另一种特殊关怀。当该商品支持定向积分时，可用余额默认勾选，你可以选择使用或者不使用。当该商品不支持定向积分时，可用余额显示不可用。',
           showCancelButton: false,
