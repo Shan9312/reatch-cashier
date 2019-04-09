@@ -11,21 +11,21 @@
         </span>
       </div>
       <!-- 确认支付 按钮 -->
-      <div class="pay-btn" :class="{'text-color-red':true}">
+      <div class="pay-btn" :class="{'text-color-red':true}" @click="handleConfirmOrderPay">
         确认支付
       </div>
       <!-- 短信提示信息 -->
       <div class="message-title">
         <!-- 定向积分支付 手机验证码 -->
         <p v-if="isPayPassword === '1'" class="code">
-          <span v-if="phoneVerificationBycountNum">
+          <span v-if="countdownNum === 0 || countdownNum === 60">
+            未收到验证码，请
+            <label class="text-color-red" @click="handleCountdownNum">重新获取</label>
+          </span>
+          <span v-else>
             验证码已发送至您的手机,
             <label class="text-color-red">{{countdownNum}}s</label>
             后请重新获取
-          </span>
-          <span v-else>
-            未收到验证码，请
-            <label class="text-color-red" @click="handleCountdownNum">重新获取</label>
           </span>
         </p>
         <p v-else>
@@ -46,39 +46,36 @@
 </template>
 
 <script>
-  import {
-    setTimeout,
-    clearInterval
-  } from 'timers';
   export default {
     name: 'keyboard',
     props: {
       isPayPassword: {
         type: String,
-      }, // 输入密码 或是 短信验证的
-      handleConfirmPay: {
-        type: Function,
-      }
+      }, // // 1: 短信 ,2: 密码支付,默认显示1
+    },
+    computed: {
+      phoneVerificationBycountNum() {
+        return 0 < this.countdownNum && this.countdownNum < 60
+      },
     },
     data() {
       return {
         keyboardNumArr: [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0],
         countdownNum: 60,
         verificationCodeArr: [],
-        timer: null,
+        verificationTimer: null,
       };
     },
-    created() {
-      console.log(1221);
-    },
-    mounted() {},
-    watch: {},
-    computed: {
-      phoneVerificationBycountNum() {
-        return 0 < this.countdownNum && this.countdownNum < 60
-      },
-    },
+    created() {},
     methods: {
+      /**
+       * 确认订单支付
+       * 
+       * */
+      handleConfirmOrderPay() {
+        if (!this.verificationCodeArr || this.verificationCodeArr.length != 6) return false
+        this.$emit('handleConfirmOrderPay', this.verificationCodeArr.join(''));
+      },
       /**
        * 手动输入密码
        * 
@@ -86,14 +83,15 @@
       handleEntryNum(num) {
         if (this.verificationCodeArr.length >= 6) return;
         this.verificationCodeArr.push(num);
-        // console.log(this.passwordNumArr)
       },
       /**
        * 手动删除输入的数值盘
        * 
        * */
       handleDelNum() {
-        console.log()
+        if (this.verificationCodeArr.length) {
+          this.verificationCodeArr.pop();
+        }
       },
       // 忘记密码 就调用链接跳转
       handleForgetPassword() {
@@ -104,25 +102,24 @@
        * 
        * */
       handleCountdownNum() {
-        this.countdownNum = 60;
-        if (this.timer) {
-          clearInterval(this.timer)
-          this.timer = null
-        }
-        this.timer = setInterval(() => {
+        this.countdownNum--;
+        clearInterval(this.verificationTimer)
+        this.verificationTimer = null;
+        this.verificationTimer = setInterval(() => {
           this.countdownNum--;
           if (this.countdownNum === 0) {
-            clearInterval(this.timer)
-            this.timer = null;
+            clearInterval(this.verificationTimer);
+            this.verificationTimer = null;
             this.countdownNum = 60;
           }
-        }, 1000)
+        }, 1000);
       },
       // 关闭keyBoard页面
       handleClose() {
         this.$emit('handleCloseKeyboard', false);
       },
     },
+    watch: {},
   }
 </script>
 

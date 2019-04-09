@@ -14,27 +14,27 @@ const defaultOptions = {
 
 const request = (method, url, data, options = {}) => {
   let browserName, storage, headers, token, groupId, channel
-
+  // debugger
   browserName = GlobalProperty.browserName
-  storage = GlobalProperty.localStroage
+  storage = GlobalProperty.localStorage
   headers = GlobalProperty.headers
-
   token = storage.getItem('token')
   groupId = storage.getItem('groupId')
   channel = headers['channel']
-
   // set http request parameters
   data = Object.assign({}, defaultData, data)
   options = Object.assign({}, defaultOptions, {
     method,
     url,
-    data
+    data,
   }, options)
-
   // set http request headers
+  // debugger
   if (token) options.headers['token'] = token
   if (groupId) options.headers['groupId'] = groupId
-  if (channel) options.headers['channel'] = channel
+  // if (channel) options.headers['channel'] = channel
+
+
 
   // in our's android app that will be use android native function to open loading modal else use h5 function
   if (browserName === 'Chrome WebView' && !data.outApp) {
@@ -56,7 +56,7 @@ const request = (method, url, data, options = {}) => {
       GlobalFunction.logout()
     }
 
-    return Promise.resolve(data)
+    return Promise.resolve(resData)
   }).catch(err => {
     MintUI.Toast.open({
       message: '小兜兜正忙,请稍候重试!'
@@ -90,9 +90,9 @@ export default {
     });
     params = `?${params.substring(1)}`;
 
-    request('get', `${url}${params}`)
+    return request('get', `${url}${params}`)
   },
   post: (url, data, options) => {
-    request('post', url, data, options)
+    return request('post', url, data, options)
   }
 }
