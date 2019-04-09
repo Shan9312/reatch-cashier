@@ -10,7 +10,6 @@ import '@/common/deviceInit' // 移动适配
 
 // mint-ui 使用
 Vue.prototype.$MessageBox = MessageBox;
-
 Vue.config.productionTip = false;
 
 new Vue({

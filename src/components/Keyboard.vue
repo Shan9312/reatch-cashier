@@ -1,5 +1,5 @@
 <template>
-  <div class='keyboard-page' v-if="isShowKeyboard">
+  <div class='keyboard-page'>
     <div class="content">
       <div class="keyboard-title">
         <img src="@/assets/images/checkout-counter/icon_close.png" alt="" @click="handleClose">
@@ -7,8 +7,7 @@
       </div>
       <!-- 密码输入框 -->
       <div class="password-list">
-        <span class="password-circle" v-for="item in passwordNumArr" :key="item.id">
-          {{item.value | filterPasswordNum}}
+        <span :class="{'password-point': item <= verificationCodeArr.length}" v-for="item in 6" :key="item">
         </span>
       </div>
       <!-- 确认支付 按钮 -->
@@ -26,7 +25,7 @@
           </span>
           <span v-else>
             未收到验证码，请
-            <label class="text-color-red" @click="handleAgainGetPhoneNum">重新获取</label>
+            <label class="text-color-red" @click="handleCountdownNum">重新获取</label>
           </span>
         </p>
         <p v-else>
@@ -38,7 +37,8 @@
         <li v-for="(item,index) in keyboardNumArr" :key="index" @click="handleEntryNum(item)">{{item}}
         </li>
         <li>
-          <img class="keyboard-delete" @click="handleDelNum" src="../assets/images/checkout-counter/keyboard_delete_icon.png">
+          <img class="keyboard-delete" @click="handleDelNum"
+            src="../assets/images/checkout-counter/keyboard_delete_icon.png">
         </li>
       </ul>
     </div>
@@ -46,13 +46,13 @@
 </template>
 
 <script>
-  import { setTimeout, clearInterval } from 'timers';
+  import {
+    setTimeout,
+    clearInterval
+  } from 'timers';
   export default {
     name: 'keyboard',
     props: {
-      isShowKeyboard: {
-        type: Boolean,
-      }, // 是否现在键盘页面
       isPayPassword: {
         type: String,
       }, // 输入密码 或是 短信验证的
@@ -62,17 +62,14 @@
     },
     data() {
       return {
-        passwordNumArr: [
-          { value: '', id: 1 }, { value: '', id: 2 }, { value: '', id: 3 },
-          { value: '', id: 4 }, { value: '', id: 5 }, { value: '', id: 6 }
-        ],
         keyboardNumArr: [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0],
         countdownNum: 60,
-        numArr: [],
+        verificationCodeArr: [],
+        timer: null,
       };
     },
     created() {
-      // console.log(this.$browser);
+      console.log(1221);
     },
     mounted() {},
     watch: {},
@@ -86,13 +83,10 @@
        * 手动输入密码
        * 
        * */
-      handleEntryNum(obj) {
-        this.numArr.push(obj);
-        if (this.numArr.length > 6) return
-        console.log(this.numArr)
-        this.numArr.forEach((item, index) => {
-          this.passwordNumArr[index].value = item;
-        });
+      handleEntryNum(num) {
+        if (this.verificationCodeArr.length >= 6) return;
+        this.verificationCodeArr.push(num);
+        // console.log(this.passwordNumArr)
       },
       /**
        * 手动删除输入的数值盘
@@ -106,36 +100,27 @@
 
       },
       /**
-       * 重新获取手机验证短信
-       * 
-       * */
-      handleAgainGetPhoneNum() {
-        this.handleConfirmPay();
-      },
-      /**
        * 若是积分付款则 60s倒计时
        * 
        * */
       handleCountdownNum() {
-        if (this.countdownNum === 0) {
-          this.countdownNum = 60;
-        } else {
-          this.countdownNum--;
-          setTimeout(() => {
-            this.handleCountdownNum();
-          }, 1000)
+        this.countdownNum = 60;
+        if (this.timer) {
+          clearInterval(this.timer)
+          this.timer = null
         }
+        this.timer = setInterval(() => {
+          this.countdownNum--;
+          if (this.countdownNum === 0) {
+            clearInterval(this.timer)
+            this.timer = null;
+            this.countdownNum = 60;
+          }
+        }, 1000)
       },
       // 关闭keyBoard页面
       handleClose() {
         this.$emit('handleCloseKeyboard', false);
-      },
-    },
-    // 键盘输入密码 过滤器
-    filters: {
-      filterPasswordNum(val) {
-        if (!val) return;
-        return '●';
       },
     },
   }
@@ -184,13 +169,29 @@
         margin: 0.2rem auto 0.15rem;
 
         &>span {
+          position: relative;
           width: 0.55rem;
           height: 0.42rem;
           line-height: 0.42rem;
           font-size: 0.18rem;
           color: #333;
           border-right: 1px solid #ddd;
+
+          &.password-point:before {
+            content: '';
+            position: absolute;
+            width: 0.08rem;
+            height: 0.08rem;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            background: #000;
+            transform: translate(-50%, -50%);
+          }
         }
+
+
+
       }
 
       .pay-btn {

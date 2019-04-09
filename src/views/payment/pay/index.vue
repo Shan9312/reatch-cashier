@@ -58,8 +58,9 @@
     </div>
 
     <!-- 键盘页面 -->
-    <Keyboard ref="keybordItem" :isShowKeyboard="isShowKeyboard" :isPayPassword="defaultOptions.isPayPassword"
-      :handleConfirmPay="handleConfirmPay" @handleCloseKeyboard="handleCloseKeyboard">
+    <Keyboard ref="keybordItem" v-show="isShowKeyboard" :isShowKeyboard="isShowKeyboard"
+      :isPayPassword="defaultOptions.isPayPassword" :handleConfirmPay="handleConfirmPay"
+      @handleCloseKeyboard="handleCloseKeyboard">
     </Keyboard>
     <!-- 键盘页面 end-->
   </div>
@@ -640,7 +641,7 @@
       padding: 0.14rem 0.15rem 0.36rem;
       font-size: 0.16rem;
       color: #333;
-      background: #fff url('../../../assets/images/checkout-counter/title_background.png') repeat-x 0 bottom;
+      background: #fff url('~/assets/images/checkout-counter/title_background.png') repeat-x 0 bottom;
       background-size: auto 0.15rem;
 
       .amount {
