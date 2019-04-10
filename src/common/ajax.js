@@ -9,7 +9,7 @@ const defaultData = {
 
 }
 const defaultOptions = {
-
+  headers: {},
 }
 
 const request = (method, url, data, options = {}) => {
@@ -32,7 +32,7 @@ const request = (method, url, data, options = {}) => {
   // debugger
   if (token) options.headers['token'] = token
   if (groupId) options.headers['groupId'] = groupId
-  // if (channel) options.headers['channel'] = channel
+  if (channel) options.headers['channel'] = channel
 
 
 

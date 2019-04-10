@@ -149,55 +149,6 @@
 }
 
 /*mint-ui修改*/
-/*mint-ui message弹窗样式消失*/
-.mint-msgbox {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  -webkit-transform: translate3d(-50%, -50%, 0);
-  transform: translate3d(-50%, -50%, 0);
-  background-color: #fff;
-  width: 85%;
-  -webkit-border-radius: 3px;
-  border-radius: 3px;
-  font-size: 16px;
-  -webkit-user-select: none;
-  overflow: hidden;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  -webkit-transition: .2s;
-  -o-transition: .2s;
-  transition: .2s;
-}
-
-.v-modal {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  opacity: .5;
-  background: #000;
-}
-
-.mint-msgbox-message {
-  color: #999;
-  margin: 0;
-  text-align: center;
-  line-height: 36px;
-}
-
-.mint-msgbox-btns {
-  display: flex;
-  height: 40px;
-  line-height: 40px;
-}
-
-.mint-msgbox-confirm {
-  width: 100%;
-}
-
-/*mint-ui message弹窗样式消失  end*/
 .mint-indicator-wrapper {
   padding: 15px 30px !important;
   border-radius: 4px !important;

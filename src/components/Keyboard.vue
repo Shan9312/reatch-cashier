@@ -3,7 +3,7 @@
     <div class="content">
       <div class="keyboard-title">
         <img src="@/assets/images/checkout-counter/icon_close.png" alt="" @click="handleClose">
-        {{'请输入兜礼支付密码'}}
+        {{isPayPassword == '1' ? '请输入短信验证码' : '请输入兜礼支付密码'}}
       </div>
       <!-- 密码输入框 -->
       <div class="password-list">
@@ -11,7 +11,7 @@
         </span>
       </div>
       <!-- 确认支付 按钮 -->
-      <div class="pay-btn" :class="{'text-color-red':true}" @click="handleConfirmOrderPay">
+      <div class="pay-btn" :class="{'text-color-red':verificationCodeArr.length === 6}" @click="handlePayBtn">
         确认支付
       </div>
       <!-- 短信提示信息 -->
@@ -46,6 +46,8 @@
 </template>
 
 <script>
+  import Api from '@/common/factory-api';
+
   export default {
     name: 'keyboard',
     props: {
@@ -69,16 +71,14 @@
     created() {},
     methods: {
       /**
-       * 确认订单支付
-       * 
+       * 确认订单支付按钮： 把密码/验证值 传给父，在父组件中执行订单支付
        * */
-      handleConfirmOrderPay() {
+      handlePayBtn() {
         if (!this.verificationCodeArr || this.verificationCodeArr.length != 6) return false
-        this.$emit('handleConfirmOrderPay', this.verificationCodeArr.join(''));
+        this.$emit('handlePayBtn', this.verificationCodeArr.join(''));
       },
       /**
        * 手动输入密码
-       * 
        * */
       handleEntryNum(num) {
         if (this.verificationCodeArr.length >= 6) return;
@@ -86,20 +86,20 @@
       },
       /**
        * 手动删除输入的数值盘
-       * 
        * */
       handleDelNum() {
         if (this.verificationCodeArr.length) {
           this.verificationCodeArr.pop();
         }
       },
-      // 忘记密码 就调用链接跳转
+      /**
+       * 忘记密码 就调用外链接跳转
+       * */
       handleForgetPassword() {
-
+        dooolyAPP.gotoJumpJq(this.$router, Api.webSite);
       },
       /**
        * 若是积分付款则 60s倒计时
-       * 
        * */
       handleCountdownNum() {
         this.countdownNum--;
@@ -114,7 +114,9 @@
           }
         }, 1000);
       },
-      // 关闭keyBoard页面
+      /**
+       * 关闭keyBoard页面
+       * */
       handleClose() {
         this.$emit('handleCloseKeyboard', false);
       },
