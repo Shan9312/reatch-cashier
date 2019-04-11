@@ -20,7 +20,7 @@
         <p v-if="isPayPassword === '1'" class="code">
           <span v-if="countdownNum === 0 || countdownNum === 60">
             未收到验证码，请
-            <label class="text-color-red" @click="handleCountdownNum">重新获取</label>
+            <label class="text-color-red" @click="handleRepeatVerificat">重新获取</label>
           </span>
           <span v-else>
             验证码已发送至您的手机,
@@ -53,12 +53,7 @@
     props: {
       isPayPassword: {
         type: String,
-      }, // // 1: 短信 ,2: 密码支付,默认显示1
-    },
-    computed: {
-      phoneVerificationBycountNum() {
-        return 0 < this.countdownNum && this.countdownNum < 60
-      },
+      }, // 1: 短信 ,2: 密码支付,默认显示1
     },
     data() {
       return {
@@ -113,6 +108,12 @@
             this.countdownNum = 60;
           }
         }, 1000);
+      },
+      /**
+       * 重新获取手机验证码
+       * */
+      handleRepeatVerificat() {
+        this.$emit('confirmOrder', true);
       },
       /**
        * 关闭keyBoard页面

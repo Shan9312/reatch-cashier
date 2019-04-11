@@ -59,7 +59,7 @@
     <!-- 键盘页面 -->
     <Keyboard ref="keybordItem" v-show="isShowKeyboard" :isShowKeyboard="isShowKeyboard"
       :isPayPassword="defaultOptions.isPayPassword" @handleCloseKeyboard="handleCloseKeyboard"
-      @handlePayBtn="handlePayBtn">
+      @handlePayBtn="handlePayBtn" @confirmOrder="confirmOrder">
     </Keyboard>
     <!-- 键盘页面 end-->
   </div>
@@ -70,14 +70,18 @@
   import CheckoutBtn from '@/components/CheckoutButton'; // 支付选中的状态样式
   import Ajax from '@/common/ajax';
   import Api from '@/common/factory-api'; // 接口api 
+  import Cookies from 'js-cookie';
   import {
-    CryptoFunction
-  } from '@/common/utils.js';
+    UtilsFunction
+  } from '@/common/utils.js'; // 引用的数据格式处理的 函数
   import {
     MintUI,
     GlobalProperty,
     GlobalFunction
-  } from '@/common/global'
+  } from '@/common/global' // 引用的组件 函数
+  import {
+    debug
+  } from 'util';
 
   export default {
     name: 'Payment',
@@ -89,11 +93,13 @@
       selectedPayList() {
         // 集中获取 被选中的支付列表
         return this.useAblePayList.filter(payItem => payItem.selected)
-      }
+      },
+
     },
     data() {
       return {
         orderNum: this.$route.params.orderNum, // 订单号
+        userId: localStorage.userId || Cookies.get('userId') || UtilsFunction.getUrlParams('userId'),
         defaultOptions: {
           needPayAmount: 100, // 需支付金额
           realPayAmount: 100, // 实际支付金额 传入值跟需支付金额一样即可
@@ -106,7 +112,9 @@
           supportAlipay: true, // 是否支持支付宝
           isPayPassword: '1', // 后端返回：'1' :短信验证; '2' :密码支付
           payId: '', // 后端返回的 预订单ID
-          dirIntegralSwitch: false, // 支付方式为 积分类型，发给后端字段
+          dirIntegralSwitch: false, // 支付方式为 定向积分，发给后端字段
+          commonIntegralSwitch: false, // 支付方式为 兜礼积分，发给后端字段
+          productType: '', // 后端返回的 商品类型
         },
         usableOptions: {}, // 实际的支付对象
         result: {
@@ -127,20 +135,19 @@
           //   id: 1, // id 标示唯一的值
           // }, // 支付方式的属性
         ], // 支付种类的列表; 如 定积分/兜礼/微信/支付宝 等等
+        integralList: [], // 含积分的数组
         errorBulletDialog: false, // 是否显示错误弹窗
         isShowKeyboard: false, // 是否显示 键盘页面
         redirectUrl: `${GlobalProperty.apiDomain.doooly}cardBuyPayResult`, // TODO:支付成功页面；从接口取得返回地址，接口有值给后台就传接口的值
+        responseRedirectUrl: false, // 判断 unifiedorder接口获取的地址是否有
         tradeType: 'DOOOLY_JS', // 设置交易类型
         payType: 0, // 设置付款类型
+        meituanObj: {}, // 美团支付信息
       };
     },
     created() {
-      console.log(CryptoFunction);
       // 获取用户 订单信息
       this.getPayContentByUserId();
-      /**
-       * 第三方 美团支付 跳转，改功能暂放
-       * */
     },
     methods: {
       /**
@@ -151,6 +158,7 @@
         const res = await Ajax.post(Api.unifiedorder, {
           orderNum: this.orderNum,
           userId: 88441358,
+          redirectUrl: this.redirectUrl,
         })
         if (res.code === 1000) {
           const data = JSON.parse(JSON.stringify(res.data));
@@ -161,13 +169,20 @@
             serviceCharge: Number(data.serviceCharge),
             orientIntergral: Number(data.dirIntegral),
             dooolyIntergral: Number(data.userIntegral),
+            payId: data.payId,
+            isPayPassword: data.isPayPassword,
+            productType: data.productType,
             supportOrientIntergral: true,
-            supportHybrid: true, // 默认可以
+            supportHybrid: true,
             supportDooolyIntergral: true,
             supportWechat: true,
             supportAlipay: true,
-            payId: data.payId,
-            isPayPassword: data.isPayPassword,
+            dirIntegralSwitch: false,
+            commonIntegralSwitch: false,
+          }
+          // 若后端有返回 redirect地址 就用后端返回的
+          if (res.data && res.data.redirectUrl) {
+            this.redirectUrl = res.data.redirectUrl;
           }
           this.supportPayType(data.payMethod);
           // 初始化 支付方式列表
@@ -362,7 +377,6 @@
       },
       // 兜礼积分： 支付方式
       initDooolyIntergral() {
-        // debugger
         // 判断是否支持兜礼积分支付并且余额大于0 如果大于0则一定会默认选中兜礼积分
         if (this.usableOptions.supportDooolyIntergral && this.usableOptions.dooolyIntergral > 0) {
           this.result.dooolyIntergralFlag = true // 选中兜礼积分
@@ -442,7 +456,6 @@
 
         orientIntergralItem = this.selectedPayList.filter(payItem => payItem.name == 'orientIntergral')
         dooolyIntergralItem = this.selectedPayList.filter(payItem => payItem.name == 'dooolyIntergral')
-        // debugger
         if (orientIntergralItem.length > 0) {
           orientIntergralPayAmount = orientIntergralItem[0].payAmount
         }
@@ -605,7 +618,7 @@
         //
         this.initUseAblePayList();
         // 切换后的  付款方式。
-        this.initDefaultPayType(optionsClone)
+        this.initDefaultPayType(optionsClone);
       },
       // 关闭 键盘页面
       handleCloseKeyboard(v) {
@@ -628,10 +641,17 @@
        * 
        * */
       handleConfirmPay() {
-        // 判断交易平台的tradeType:类型
-        this.doThingsByBrowserName();
         // 判断payType类型,选中的支付列表 并做出对应的支付情况
         this.payTypeByselectedPayList();
+        // 判断交易平台的tradeType:类型
+        this.tradeTypeByBrowserName();
+        // 如果 积分支付，倒计时在 60s 内，重新打开键盘页面，不重复发送 短信
+        if (!this.payType) {
+          if (this.$refs.keybordItem.countdownNum > 0 && this.$refs.keybordItem.countdownNum < 60) {
+            this.isShowKeyboard = true;
+            return
+          }
+        }
         // 确认订单情况
         this.confirmOrder();
       },
@@ -642,17 +662,21 @@
        * */
       payTypeByselectedPayList() {
         if (!this.selectedPayList.length) return false;
+        this.integralList = this.selectedPayList.filter(payItem => payItem.id < 3);
         this.selectedPayList.forEach(obj => {
-          if (obj.name === 'orientIntergral' || obj.name === 'dooolyIntergral') { // 积分支付:0
+          if (obj.name === 'orientIntergral' || obj.name === 'dooolyIntergral') { // 定向 积分支付:0
             this.payType = 0;
             this.defaultOptions.dirIntegralSwitch = true;
-          } else if (this.defaultOptions.dirIntegralSwitch && obj.name === 'wechat') { // 微信混合:2
+          } else if (obj.name === 'dooolyIntergral') { // 兜里 积分支付:0
+            this.payType = 0;
+            this.defaultOptions.commonIntegralSwitch = true;
+          } else if (this.integralList.length && obj.name === 'wechat') { // 微信积分混合:2
             this.payType = 2;
-          } else if (this.defaultOptions.dirIntegralSwitch && obj.name === 'alipay') { // 支付宝混合:11
+          } else if (this.integralList.length && obj.name === 'alipay') { // 支付宝积分混合:11
             this.payType = 11;
-          } else if (!this.defaultOptions.dirIntegralSwitch && obj.name === 'wechat') { // 微信支付:1
+          } else if (!this.integralList.length && obj.name === 'wechat') { // 微信支付:1
             this.payType = 1;
-          } else if (!this.defaultOptions.dirIntegralSwitch && obj.name === 'alipay') { // 支付宝支付:6
+          } else if (!this.integralList.length && obj.name === 'alipay') { // 支付宝支付:6
             this.payType = 6;
           }
         })
@@ -666,15 +690,15 @@
           orderNum: this.orderNum,
           userId: 88441358,
           payId: this.defaultOptions.payId,
-          dirIntegralSwitch: this.defaultOptions.dirIntegralSwitch ? '1' : '0',
           tradeType: this.tradeType,
           payType: this.payType, // 0积分支付 1微信支付 2积分微信混合支付 6 支付宝
           redirectUrl: this.redirectUrl,
+          commonIntegralSwitch: this.defaultOptions.commonIntegralSwitch ? '1' : '0',
+          dirIntegralSwitch: this.defaultOptions.dirIntegralSwitch ? '1' : '0',
         }
         const res = await Ajax.post(Api.getPayForm, formObj);
-
         if (res.code === 1000) {
-          if ((this.selectedPayList.filter(payItem => payItem.id < 3)).length) { // 只要含有积分,就键盘弹出 倒计时计数 
+          if (this.integralList.length) { // 只要含有积分,就键盘弹出 倒计时计数 
             this.isShowKeyboard = true;
             this.$refs.keybordItem.handleCountdownNum();
           } else if (this.payType === 1) { // 微信接口支付
@@ -689,7 +713,29 @@
           });
         }
       },
-
+      /**
+       * 判断当前 浏览器内核；然后根据不同的内核 做些事情： 
+       * 1.tradeType类型，返回给后端的字段 【DOOOLY_APP，DOOOLY_JS,WISCO_APP,WISCO_JS其中之一】
+       * 确认用户订单信息 是否有效
+       * */
+      tradeTypeByBrowserName() {
+        const browser = GlobalProperty.browserName; // Mobile Safari
+        if (browser === 'WeChat') {
+          if (localStorage.token == localStorage.wiscoToken) {
+            this.tradeType = 'WISCO_JS'
+          } else {
+            this.tradeType = 'DOOOLY_JS'
+          }
+        } else if (browser == 'WebKit' || browser == 'Chrome WebView') {
+          this.tradeType = 'DOOOLY_APP'; // 兜礼 app
+        } else if (browser == 'otherAPPAndroid' || browser == 'otherAPPIos') {
+          this.tradeType = 'WISCO_APP'; // 其他第三方app
+        } else if (this.payType === 1 || this.payType === 2) { // 含微信的支付，不在微信和app中，用微信h5调起微信
+          this.tradeType = 'DOOOLY_H5'
+        } else {
+          this.tradeType = 'DOOOLY_JS'; // 默认
+        }
+      },
       /**
        * 子传父组件：确认支付按钮
        * 1.根据密码/验证码 确认付款。
@@ -697,7 +743,7 @@
        * */
       async handlePayBtn(code) {
         if (this.defaultOptions.isPayPassword === '2') { // 密码输入 需要加密
-          code = Encrypt(code);
+          code = UtilsFunction.encrypt(code);
         }
         const orderPayObj = {
           payId: this.defaultOptions.payId,
@@ -716,7 +762,6 @@
           } else {
             this.payResponseMsg(); // 付款成功后返回的消息 跳转
           }
-          console.log(res.code);
         } else {
           MintUI.Toast.open({
             message: res.msg,
@@ -726,19 +771,36 @@
 
       // 支付宝支付跳转接口
       apliyPayOrder(data) {
-        dooolyAPP.APPpay(data, "payResponseMsg", 'zfb');
+        dooolyAPP.appPay(data, "payResponseMsg", 'zfb');
       },
       // 微信支付跳转接口
       wechatPayOrder(data) {
         if (GlobalProperty.browserName === 'WeChat') { // 微信支付
           this.wechatBridgePay(data);
         } else if (this.tradeType == 'DOOOLY_H5') { // 微信公众号
-          let redirectUrl = window.encodeURIComponent(
-            `${GlobalProperty.apiDomain.doooly}/cardBuyPayResultH5/${this.orderNum}`)
-          // TODO: 美团h5支付是是吗情况？？
-          window.location.href = redirectUrl;
+
+          let redirect_url = window.encodeURIComponent(
+            `${GlobalProperty.apiDomain.doooly}/cardBuyPayResultH5/${this.orderNum}/${this.defaultOptions.productType}`
+          )
+          // 判断 unifiedorder接口获取的地址 
+          if (this.responseRedirectUrl) {
+            redirect_url = window.encodeURIComponent(
+              `${Api.currentBaseUrl}/middle?redirect_url=${window.encodeURIComponent(this.redirectUrl)}`)
+            window.location.href = data.mwebUrl + '&redirect_url=' + redirect_url;
+            return
+          }
+          // 判断 美团h5支付，支付完成去return_url
+          if (this.handleThirdJudge()) {
+            redirect_url = window.encodeURIComponent(
+              `${this.$Constant.currentBaseUrl}/middle?redirect_url=${window.encodeURIComponent(this.meituanInfo.return_url)}`
+            )
+            window.location.href = data.mwebUrl + '&redirect_url=' + redirect_url;
+            return
+          }
+          window.location.href = data.mwebUrl + '&redirect_url=' + redirect_url;
+
         } else {
-          dooolyAPP.APPpay(data, "payResponseMsg", 'wx') // doooly app
+          dooolyAPP.appPay(data, "payResponseMsg", 'wx') // doooly app
         }
 
       },
@@ -774,45 +836,45 @@
       },
       /**
        * 付款成功后返回的值
-       * 1. 根据接口返回的code 和data 实现 外部链接跳转
+       *
        * */
       async payResponseMsg() {
-        console.log(arguments)
-        debugger
         const obj = {
-          bigOrderNumber: this.orderNum,
           orderNum: this.orderNum,
         };
         const res = await Ajax.post(Api.getPayResult, obj);
-        // 接口有值，直接跳接口的
-        // TODO: 成功之后 跳转到成功页面
-        if (res.code === 1000) {
-          Toast.open({
-            message: res.data.result,
-          });
+        console.log(res, '支付成功****')
+        if (res.code === 1000 || res.code === 1001) {
+          // 外表链接跳转
+          if (res.data && res.data.redirectUrl) { // 接口有值，直接跳接口的
+            dooolyAPP.gotoJumpJq(this.$router, res.data.redirectUrl);
+          } else if (this.handleThirdJudge()) { // 若有美团接口 之间跳转美团
+            dooolyApp.gotoJumpJq(this.$router, this.meituanInfo.return_url)
+          } else { // 支付结果页面 
+            dooolyAPP.gotoJumpJq(this.$router, `/cardBuyPayResult/${this.orderNum}`)
+          }
+
         } else {
-          Toast.open({
+          MintUI.Toast.open({
             message: res.msg,
           });
         }
       },
       /**
-       * 判断当前 浏览器内核；然后根据不同的内核 做些事情： 
-       * 1.tradeType类型，返回给后端的字段 【DOOOLY_APP，DOOOLY_JS,WISCO_APP,WISCO_JS其中之一】
-       * 确认用户订单信息 是否有效
+       * 判断第三方 美团支付付款情况
        * */
-      doThingsByBrowserName() {
-        const browser = GlobalProperty.browserName; // Mobile Safari
-        if (browser === 'WeChat') {
-          this.tradeType = 'DOOOLY_JS'; // 微信平台
-        } else if (browser == 'WebKit' || browser == 'Chrome WebView') {
-          this.tradeType = 'DOOOLY_APP'; // 兜礼 app
-        } else if (browser == 'otherAPPAndroid' || browser == 'otherAPPIos') {
-          this.tradeType = 'WISCO_APP'; // 其他第三方app
-        } else {
-          this.tradeType = 'DOOOLY_JS'; // 默认
+      handleThirdJudge() {
+        if (UtilsFunction.getUrlParams('orderSource') === 'meituan') { // 若是美团支付 需把信息集合
+          this.meituanObj = {
+            userId: UtilsFunction.getUrlParams('userId'),
+            orderSource: UtilsFunction.getUrlParams('orderSource'),
+            return_url: UtilsFunction.getUrlParams('return_url'),
+          }
+          return true;
         }
+        return false;
       },
+
     },
 
   }

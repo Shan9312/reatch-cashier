@@ -2,7 +2,7 @@ import CryptoJS from 'crypto-js';
 import JSEncrypt from 'jsencrypt';
 
 
-const CryptoFunction = {
+const UtilsFunction = {
   // encryptor加密（RSA）
   encryptors: (word) => {
     const url = window.location.href;
@@ -41,10 +41,38 @@ const CryptoFunction = {
       mode: CryptoJS.mode.ECB,
       padding: CryptoJS.pad.Pkcs7
     })
-    const resword = encrypted.toString()
+    const resword = UtilsFunction.encrypted.toString()
     return encryptors(resword)
-  }
+  },
+
+  handleUrlParams: () => {
+    let url = window.location.href;
+    url = url.replace(/^((http|https):\/\/|\/)\S+\?(\S+)$/, '$3')
+    if (url.indexOf('=') > -1) {
+      let parmasList = url.split('&')
+      return parmasList.map((item, index) => {
+        if (item.indexOf('=') > -1) {
+          let temp = item.split('=')
+          return {
+            key: temp[0],
+            value: temp[1]
+          }
+        }
+      })
+    }
+  },
+  getUrlParams: (name) => {
+    let paramsArr = UtilsFunction.handleUrlParams() || []
+    let value = ''
+    paramsArr.map((item, index) => {
+      if (item.key == name) {
+        value = item.value
+      }
+    })
+    return window.decodeURIComponent(value)
+  },
 }
+
 export {
-  CryptoFunction
+  UtilsFunction,
 }

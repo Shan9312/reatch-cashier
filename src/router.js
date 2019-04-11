@@ -47,13 +47,13 @@ const router = new VueRouter({
         title: '微信支付结果'
       }
     },
-    {
-      path: '*',
-      redirect: {
-        // name: 'Payment',
-        path: '/cardBuyPay/:orderNum',
-      }
-    }
+    // {
+    //   path: '*',
+    //   redirect: {
+    //     // name: 'Payment',
+    //     path: '/cardBuyPay/:orderNum',
+    //   }
+    // }
   ]
 })
 

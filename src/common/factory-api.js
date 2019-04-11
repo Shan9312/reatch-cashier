@@ -8,6 +8,7 @@ const Api = {
   getPayForm: `${GlobalProperty.apiDomain.doooly}jersey/doooly/payment/getPayForm/V2`, // 检查订单id是否有效
   integralPay: `${GlobalProperty.apiDomain.doooly}jersey/doooly/payment/integralPay/V2`, // 兜礼积分支付接口
   getPayResult: `${GlobalProperty.apiDomain.doooly}jersey/doooly/payment/getPayResult/V2`, // 查询支付结果
+  currentBaseUrl: window.location.href.substring(0, window.location.href.indexOf('#') + 1), // 
 }
 
 export default Api;
