@@ -17,7 +17,10 @@
     props: {
       payItem: {
         type: Object,
-      }
+      },
+      handlerChoosePay: {
+        type: Function,
+      },
     },
     data() {
       return {};

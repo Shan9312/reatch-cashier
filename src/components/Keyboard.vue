@@ -46,7 +46,9 @@
 </template>
 
 <script>
-  import Api from '@/common/factory-api';
+  import {
+    GlobalProperty
+  } from '@/common/global'
 
   export default {
     name: 'keyboard',
@@ -54,6 +56,15 @@
       isPayPassword: {
         type: String,
       }, // 1: 短信 ,2: 密码支付,默认显示1
+      handlerCloseKeyboard: {
+        type: Function,
+      },
+      handlerPayOrderBtn: {
+        type: Function,
+      },
+      confirmOrder: {
+        type: Function,
+      },
     },
     data() {
       return {
@@ -70,7 +81,7 @@
        * */
       handlerPayBtn() {
         if (!this.verificationCodeArr || this.verificationCodeArr.length != 6) return false
-        this.$emit('handlerPayBtn', this.verificationCodeArr.join(''));
+        this.$emit('handlerPayOrderBtn', this.verificationCodeArr.join(''));
       },
       /**
        * 手动输入密码
@@ -91,7 +102,8 @@
        * 忘记密码 就调用外链接跳转
        * */
       handlerForgetPassword() {
-        dooolyAPP.gotoJumpJq(this.$router, Api.webSite);
+        const webSite = `${GlobalProperty.apiDomain.butterfly}dist/#/`;
+        dooolyAPP.gotoJumpJq(this.$router, webSite);
       },
       /**
        * 若是积分付款则 60s倒计时

@@ -57,9 +57,9 @@
     </div>
 
     <!-- 键盘页面 -->
-    <Keyboard ref="keybordItem" v-show="isShowKeyboard" :isShowKeyboard="isShowKeyboard"
-      :isPayPassword="defaultOptions.isPayPassword" @handlerCloseKeyboard="handlerCloseKeyboard"
-      @handlerPayBtn="handlerPayBtn" @confirmOrder="confirmOrder">
+    <Keyboard ref="keybordItem" v-show="isShowKeyboard" :isPayPassword="defaultOptions.isPayPassword"
+      @handlerCloseKeyboard="handlerCloseKeyboard" @handlerPayOrderBtn="handlerPayOrderBtn"
+      @confirmOrder="confirmOrder">
     </Keyboard>
     <!-- 键盘页面 end-->
   </div>
@@ -143,7 +143,7 @@
         isShowKeyboard: false, // 是否显示 键盘页面
         redirectUrl: `${GlobalProperty.apiDomain.doooly}cardBuyPayResult`, // TODO:支付成功页面；从接口取得返回地址，接口有值给后台就传接口的值
         responseRedirectUrl: false, // 判断 unifiedorder接口获取的地址是否有
-        tradeType: 'DOOOLY_JS', // 设置交易类型
+        tradeType: 'DOOOLY_JS', // 设置交易类型 默认 DOOOLY_JS
         payType: 0, // 设置付款类型
         meituanObj: {}, // 美团支付信息
       };
@@ -744,7 +744,7 @@
        * 1.根据密码/验证码 确认付款。
        * 2.根据后端返回的数据 是支付混合 还是 微信混合 在各自调用 方式
        * */
-      async handlerPayBtn(code) {
+      async handlerPayOrderBtn(code) {
         if (this.defaultOptions.isPayPassword === '2') { // 密码输入 需要加密
           code = UtilsFunction.encrypt(code);
         }
@@ -785,15 +785,16 @@
           )
           // 判断 unifiedorder接口获取的地址 
           if (this.responseRedirectUrl) {
+            const currentBaseUrl = window.location.href.substring(0, window.location.href.indexOf('#') + 1);
             redirect_url = window.encodeURIComponent(
-              `${Api.currentBaseUrl}/middle?redirect_url=${window.encodeURIComponent(this.redirectUrl)}`)
+              `${currentBaseUrl}/middle?redirect_url=${window.encodeURIComponent(this.redirectUrl)}`)
             window.location.href = data.mwebUrl + '&redirect_url=' + redirect_url;
             return
           }
           // 判断 美团h5支付，支付完成去return_url
           if (this.handlerThirdJudge()) {
             redirect_url = window.encodeURIComponent(
-              `${this.$Constant.currentBaseUrl}/middle?redirect_url=${window.encodeURIComponent(this.meituanInfo.return_url)}`
+              `${currentBaseUrl}/middle?redirect_url=${window.encodeURIComponent(this.meituanInfo.return_url)}`
             )
             window.location.href = data.mwebUrl + '&redirect_url=' + redirect_url;
             return
