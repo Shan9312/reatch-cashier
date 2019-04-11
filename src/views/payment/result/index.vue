@@ -1,22 +1,90 @@
 <template>
-  <div class="pay-result-warpper">
+  <div class="pay-result-warpper" id="paymentResult">
     <!-- 大华0元礼包 -->
     <div>
-      <div class="pay-success">
+      <div class="confirm_order" v-if="false">
+        <div class="titeleView">
+          <img class="titleImg" src="@/assets/images/checkout-counter/pay_succeed.png">
+          <div class="titleText">领取成功</div>
+          <div class="titleToast"><img class="titleImg"
+              src="@/assets/images/checkout-counter/icon_gift.png">您的礼物正在火速打包中…
+          </div>
+          <ul class="label">
+            <li>继续逛逛</li>
+            <li>查看详情</li>
+          </ul>
+        </div>
+        <div class="line"></div>
+        <div class="myorder">
+          <div class="order">
+            <div>订单编号</div>
+            <div>{{'1223'}}</div>
+          </div>
+          <div class="order">
+            <div>兑换时间</div>
+            <div>{{'myorderDetail.orderDate'}}</div>
+          </div>
+          <div class="order">
+            <div>收货人</div>
+            <div>{{'myorderDetail.consigneeName'}}</div>
+          </div>
+          <div class="order">
+            <div>联系方式</div>
+            <div>{{'myorderDetail.consigneeMobile'}}</div>
+          </div>
+          <div class="order">
+            <div>收货地址</div>
+            <div>{{'myorderDetail.consigneeAddr'}}</div>
+          </div>
+        </div>
+        <img class="banner" v-show="true" src="@/assets/images/checkout-counter/banner.png">
+        <div class="toast">
+          <b>重要提示：</b>您的礼品将在<span>10个工作日发货</span>，您可至大华福利平台—“我的”—“我的订单”查看物流单号<br>
+          有任何疑问请咨询客服电话：<span>400-158-2212</span>
+        </div>
+      </div>
+      <!--  -->
+      <div v-else-if="true">
         <div class="title">
-          <img class="pay-success-icon" src="@/assets/images/checkout-counter/pay_succeed.png" alt=""><span>支付成功</span>
+          <span>支付成功</span>
         </div>
         <div class="price">
-          <span class="mark">￥</span>{{0.03}}
+          <span class="mark">￥</span>{{totalAmount}}
         </div>
         <ul class="label">
-          <li>查看列表</li>
-          <li>返回首页</li>
+          <li @click="link">查看列表</li>
+          <li @click="goIndex">返回首页</li>
+        </ul>
+      </div>
+      <div v-else>
+        <div class="title error">
+          <span>支付失败</span>
+        </div>
+        <div class="price">
+          <span class="mark">￥</span>{{totalAmount}}
+        </div>
+        <ul class="label">
+          <li class="error" @click="link">重新支付</li>
         </ul>
       </div>
     </div>
-    <!-- 大华0元礼包 end-->
+    <!-- 活动pop -->
+    <div class="pop-wrap" :class="{'fix-iphonex-bottom': false}" v-if="false">
+      <div class="pop-content">
+        <h2 class="title-bold">关注兜礼公众号</h2>
+        <h2 class="title-bold-red">代金券、全年员工折扣价马上拥有</h2>
+        <p class="img-wrap">
+          <img v-if="false" class="qrcode" src="@/assets/images/checkout-counter/qrcode.png" alt="">
+          <img v-else class="qrcode" src="@/assets/images/checkout-counter/qrcode_christmas.png" alt="">
+        </p>
+        <p class="qrcode-word">长按保存图片，在微信识别</p>
+        <p class="qrcode-word">或微信搜索关注公众号“兜礼”</p>
+        <!-- <p>关注兜礼公众号</p> -->
+        <p class="tip-grey">注：已关注兜礼的用户，请扫描二维码获得礼品</p>
+      </div>
+    </div>
   </div>
+  <!-- 大华0元礼包 end-->
 </template>
 
 <script>
@@ -32,12 +100,6 @@
   .pay-result-warpper {
     overflow: hidden;
     min-height: 100%;
-
-    .pay-success-icon {
-      width: 0.23rem;
-      vertical-align: middle;
-      margin-right: 0.05rem;
-    }
 
     .title {
       margin-top: 0.8rem;

@@ -26,7 +26,7 @@
     mounted() {},
     methods: {
       handlerChoose(v) {
-        this.$emit("handleChoosePay", v);
+        this.$emit("handlerChoosePay", v);
       }
     },
     computed: {},

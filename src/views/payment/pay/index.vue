@@ -15,7 +15,7 @@
         <div class="line" v-if="item.id === 1">
           <div class="center direct">
             <span class="fl direct-left names">{{item.text}}
-              <img class="direct-pic" @click="handleWhatOrientIntergral"
+              <img class="direct-pic" @click="handlerWhatOrientIntergral"
                 src="@/assets/images/checkout-counter/icon_why.png" alt="定向积分疑问">
             </span>
             <span class="fr direct-available">可抵扣余额:
@@ -23,7 +23,7 @@
             </span>
           </div>
           <!-- 支付选中的状态样式组件 -->
-          <checkout-btn :payItem="item" @handleChoosePay="handleChoosePay">
+          <checkout-btn :payItem="item" @handlerChoosePay="handlerChoosePay">
           </checkout-btn>
         </div>
         <!--  -->
@@ -45,21 +45,21 @@
                 需支付：<label class="point">{{item.payAmount.toFixed(2) }}</label></span>
             </div>
             <!-- 支付选中的状态样式组件 -->
-            <checkout-btn :payItem="item" @handleChoosePay="handleChoosePay">
+            <checkout-btn :payItem="item" @handlerChoosePay="handlerChoosePay">
             </checkout-btn>
           </div>
         </section>
       </div>
     </div>
     <!-- 底部确认支付按钮 -->
-    <div class="footer" @click="handleConfirmPay">
+    <div class="footer" @click="handlerConfirmPay">
       确认支付
     </div>
 
     <!-- 键盘页面 -->
     <Keyboard ref="keybordItem" v-show="isShowKeyboard" :isShowKeyboard="isShowKeyboard"
-      :isPayPassword="defaultOptions.isPayPassword" @handleCloseKeyboard="handleCloseKeyboard"
-      @handlePayBtn="handlePayBtn" @confirmOrder="confirmOrder">
+      :isPayPassword="defaultOptions.isPayPassword" @handlerCloseKeyboard="handlerCloseKeyboard"
+      @handlerPayBtn="handlerPayBtn" @confirmOrder="confirmOrder">
     </Keyboard>
     <!-- 键盘页面 end-->
   </div>
@@ -68,8 +68,12 @@
 <script>
   import Keyboard from '@/components/Keyboard'; // 手机号验证的 键盘弹框
   import CheckoutBtn from '@/components/CheckoutButton'; // 支付选中的状态样式
-  import Ajax from '@/common/ajax';
-  import Api from '@/common/factory-api'; // 接口api 
+  import {
+    unifiedorder,
+    getPayForm,
+    integralPay,
+    getPayResult,
+  } from '@/service'; // 接口调试方法
   import Cookies from 'js-cookie';
   import {
     UtilsFunction
@@ -94,12 +98,11 @@
         // 集中获取 被选中的支付列表
         return this.useAblePayList.filter(payItem => payItem.selected)
       },
-
     },
     data() {
       return {
         orderNum: this.$route.params.orderNum, // 订单号
-        userId: localStorage.userId || Cookies.get('userId') || UtilsFunction.getUrlParams('userId'),
+        userId: 88441358, //localStorage.userId || Cookies.get('userId') || UtilsFunction.getUrlParams('userId'),
         defaultOptions: {
           needPayAmount: 100, // 需支付金额
           realPayAmount: 100, // 实际支付金额 传入值跟需支付金额一样即可
@@ -155,11 +158,7 @@
        * 并且根据 返回的paymethods 的值 判断付款列表
        * */
       async getPayContentByUserId() {
-        const res = await Ajax.post(Api.unifiedorder, {
-          orderNum: this.orderNum,
-          userId: 88441358,
-          redirectUrl: this.redirectUrl,
-        })
+        const res = await unifiedorder(this.orderNum, this.userId, this.redirectUrl);
         if (res.code === 1000) {
           const data = JSON.parse(JSON.stringify(res.data));
           // 初始化订单信息值
@@ -189,8 +188,13 @@
           this.initUseAblePayList();
           // 初始化 用户默认支付方式
           this.initDefaultPayType();
+        } else {
+          MintUI.Toast.open({
+            message: res.msg
+          })
         }
       },
+
       //根据 返回的paymethods 的值 判断付款列表
       supportPayType(payMethod) {
         const arr = payMethod.split(",");
@@ -450,7 +454,7 @@
        * 点击切换支付方式
        * 
        * */
-      handleChoosePay(item) {
+      handlerChoosePay(item) {
         let orientIntergralItem, dooolyIntergralItem, wechatItem, alipayItem,
           orientIntergralPayAmount, dooolyIntergralPayAmount
 
@@ -621,7 +625,7 @@
         this.initDefaultPayType(optionsClone);
       },
       // 关闭 键盘页面
-      handleCloseKeyboard(v) {
+      handlerCloseKeyboard(v) {
         this.isShowKeyboard = v;
       },
 
@@ -629,7 +633,7 @@
        * 定向积分定义解释
        * 
        * */
-      handleWhatOrientIntergral() {
+      handlerWhatOrientIntergral() {
         MintUI.MessageBox.open({
           title: '什么是定向积分？',
           message: '定向积分是只能在兜礼固定商品分类、固定商户才能消费的特殊积分，它是企业对员工的另一种特殊关怀。当该商品支持定向积分时，可用余额默认勾选，你可以选择使用或者不使用。当该商品不支持定向积分时，可用余额显示不可用。',
@@ -640,7 +644,7 @@
        * 点击确定付款
        * 
        * */
-      handleConfirmPay() {
+      handlerConfirmPay() {
         // 判断payType类型,选中的支付列表 并做出对应的支付情况
         this.payTypeByselectedPayList();
         // 判断交易平台的tradeType:类型
@@ -686,21 +690,21 @@
        *  确认订单OK后：1.判断选中的支付类型 做对于的 付款跳转
        * */
       async confirmOrder() {
-        const formObj = {
-          orderNum: this.orderNum,
-          userId: 88441358,
-          payId: this.defaultOptions.payId,
-          tradeType: this.tradeType,
-          payType: this.payType, // 0积分支付 1微信支付 2积分微信混合支付 6 支付宝
-          redirectUrl: this.redirectUrl,
-          commonIntegralSwitch: this.defaultOptions.commonIntegralSwitch ? '1' : '0',
-          dirIntegralSwitch: this.defaultOptions.dirIntegralSwitch ? '1' : '0',
-        }
-        const res = await Ajax.post(Api.getPayForm, formObj);
+        const res = await getPayForm(
+          this.orderNum,
+          this.userId,
+          this.redirectUrl,
+          this.defaultOptions.payId,
+          this.tradeType,
+          this.payType,
+          this.redirectUrl,
+          this.defaultOptions.commonIntegralSwitch ? '1' : '0',
+          this.defaultOptions.dirIntegralSwitch ? '1' : '0',
+        );
         if (res.code === 1000) {
           if (this.integralList.length) { // 只要含有积分,就键盘弹出 倒计时计数 
             this.isShowKeyboard = true;
-            this.$refs.keybordItem.handleCountdownNum();
+            this.$refs.keybordItem.handlerCountdownNum();
           } else if (this.payType === 1) { // 微信接口支付
             this.wechatPayOrder(res.data);
           } else if (this.payType === 6) { // 支付宝接口支付
@@ -741,18 +745,16 @@
        * 1.根据密码/验证码 确认付款。
        * 2.根据后端返回的数据 是支付混合 还是 微信混合 在各自调用 方式
        * */
-      async handlePayBtn(code) {
+      async handlerPayBtn(code) {
         if (this.defaultOptions.isPayPassword === '2') { // 密码输入 需要加密
           code = UtilsFunction.encrypt(code);
         }
-        const orderPayObj = {
-          payId: this.defaultOptions.payId,
-          payPassword: code,
-          dirIntegralSwitch: this.defaultOptions.supportOrientIntergral ? '1' : '0',
-          orderNum: this.orderNum,
-          userId: 88441358,
-        }
-        const res = await Ajax.post(Api.integralPay, orderPayObj);
+        const res = await integralPay(
+          this.orderNum,
+          this.userId,
+          this.defaultOptions.payId,
+          code,
+          this.defaultOptions.supportOrientIntergral ? '1' : '0', );
         if (res.code === 1000) {
           this.isShowKeyboard = false; // 检验密码通过。可以支付了
           if (this.payType === 2) { // 微信混合支付
@@ -790,7 +792,7 @@
             return
           }
           // 判断 美团h5支付，支付完成去return_url
-          if (this.handleThirdJudge()) {
+          if (this.handlerThirdJudge()) {
             redirect_url = window.encodeURIComponent(
               `${this.$Constant.currentBaseUrl}/middle?redirect_url=${window.encodeURIComponent(this.meituanInfo.return_url)}`
             )
@@ -839,16 +841,13 @@
        *
        * */
       async payResponseMsg() {
-        const obj = {
-          orderNum: this.orderNum,
-        };
-        const res = await Ajax.post(Api.getPayResult, obj);
+        const res = await getPayResult(this.orderNum);
         console.log(res, '支付成功****')
         if (res.code === 1000 || res.code === 1001) {
           // 外表链接跳转
           if (res.data && res.data.redirectUrl) { // 接口有值，直接跳接口的
             dooolyAPP.gotoJumpJq(this.$router, res.data.redirectUrl);
-          } else if (this.handleThirdJudge()) { // 若有美团接口 之间跳转美团
+          } else if (this.handlerThirdJudge()) { // 若有美团接口 之间跳转美团
             dooolyApp.gotoJumpJq(this.$router, this.meituanInfo.return_url)
           } else { // 支付结果页面 
             dooolyAPP.gotoJumpJq(this.$router, `/cardBuyPayResult/${this.orderNum}`)
@@ -863,7 +862,7 @@
       /**
        * 判断第三方 美团支付付款情况
        * */
-      handleThirdJudge() {
+      handlerThirdJudge() {
         if (UtilsFunction.getUrlParams('orderSource') === 'meituan') { // 若是美团支付 需把信息集合
           this.meituanObj = {
             userId: UtilsFunction.getUrlParams('userId'),

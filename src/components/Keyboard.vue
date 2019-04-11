@@ -2,7 +2,7 @@
   <div class='keyboard-page'>
     <div class="content">
       <div class="keyboard-title">
-        <img src="@/assets/images/checkout-counter/icon_close.png" alt="" @click="handleClose">
+        <img src="@/assets/images/checkout-counter/icon_close.png" alt="" @click="handlerClose">
         {{isPayPassword == '1' ? '请输入短信验证码' : '请输入兜礼支付密码'}}
       </div>
       <!-- 密码输入框 -->
@@ -11,7 +11,7 @@
         </span>
       </div>
       <!-- 确认支付 按钮 -->
-      <div class="pay-btn" :class="{'text-color-red':verificationCodeArr.length === 6}" @click="handlePayBtn">
+      <div class="pay-btn" :class="{'text-color-red':verificationCodeArr.length === 6}" @click="handlerPayBtn">
         确认支付
       </div>
       <!-- 短信提示信息 -->
@@ -20,7 +20,7 @@
         <p v-if="isPayPassword === '1'" class="code">
           <span v-if="countdownNum === 0 || countdownNum === 60">
             未收到验证码，请
-            <label class="text-color-red" @click="handleRepeatVerificat">重新获取</label>
+            <label class="text-color-red" @click="handlerRepeatVerificat">重新获取</label>
           </span>
           <span v-else>
             验证码已发送至您的手机,
@@ -29,15 +29,15 @@
           </span>
         </p>
         <p v-else>
-          <label class="text-color-red" @click="handleForgetPassword">忘记密码？</label>
+          <label class="text-color-red" @click="handlerForgetPassword">忘记密码？</label>
         </p>
       </div>
       <!-- 数字键盘 -->
       <ul class="keyboard-num">
-        <li v-for="(item,index) in keyboardNumArr" :key="index" @click="handleEntryNum(item)">{{item}}
+        <li v-for="(item,index) in keyboardNumArr" :key="index" @click="handlerEntryNum(item)">{{item}}
         </li>
         <li>
-          <img class="keyboard-delete" @click="handleDelNum"
+          <img class="keyboard-delete" @click="handlerDelNum"
             src="../assets/images/checkout-counter/keyboard_delete_icon.png">
         </li>
       </ul>
@@ -68,21 +68,21 @@
       /**
        * 确认订单支付按钮： 把密码/验证值 传给父，在父组件中执行订单支付
        * */
-      handlePayBtn() {
+      handlerPayBtn() {
         if (!this.verificationCodeArr || this.verificationCodeArr.length != 6) return false
-        this.$emit('handlePayBtn', this.verificationCodeArr.join(''));
+        this.$emit('handlerPayBtn', this.verificationCodeArr.join(''));
       },
       /**
        * 手动输入密码
        * */
-      handleEntryNum(num) {
+      handlerEntryNum(num) {
         if (this.verificationCodeArr.length >= 6) return;
         this.verificationCodeArr.push(num);
       },
       /**
        * 手动删除输入的数值盘
        * */
-      handleDelNum() {
+      handlerDelNum() {
         if (this.verificationCodeArr.length) {
           this.verificationCodeArr.pop();
         }
@@ -90,13 +90,13 @@
       /**
        * 忘记密码 就调用外链接跳转
        * */
-      handleForgetPassword() {
+      handlerForgetPassword() {
         dooolyAPP.gotoJumpJq(this.$router, Api.webSite);
       },
       /**
        * 若是积分付款则 60s倒计时
        * */
-      handleCountdownNum() {
+      handlerCountdownNum() {
         this.countdownNum--;
         clearInterval(this.verificationTimer)
         this.verificationTimer = null;
@@ -112,14 +112,14 @@
       /**
        * 重新获取手机验证码
        * */
-      handleRepeatVerificat() {
+      handlerRepeatVerificat() {
         this.$emit('confirmOrder', true);
       },
       /**
        * 关闭keyBoard页面
        * */
-      handleClose() {
-        this.$emit('handleCloseKeyboard', false);
+      handlerClose() {
+        this.$emit('handlerCloseKeyboard', false);
       },
     },
     watch: {},
