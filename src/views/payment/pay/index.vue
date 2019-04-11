@@ -697,7 +697,6 @@
           this.defaultOptions.payId,
           this.tradeType,
           this.payType,
-          this.redirectUrl,
           this.defaultOptions.commonIntegralSwitch ? '1' : '0',
           this.defaultOptions.dirIntegralSwitch ? '1' : '0',
         );
