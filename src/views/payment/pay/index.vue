@@ -74,7 +74,6 @@
     integralPay,
     getPayResult,
   } from '@/service'; // 接口调试方法
-  import Cookies from 'js-cookie';
   import {
     UtilsFunction
   } from '@/common/utils.js'; // 引用的数据格式处理的 函数
@@ -82,10 +81,8 @@
     MintUI,
     GlobalProperty,
     GlobalFunction
-  } from '@/common/global' // 引用的组件 函数
-  import {
-    debug
-  } from 'util';
+  } from '@/common/global' // 引用的封装的组件
+
 
   export default {
     name: 'Payment',
@@ -102,7 +99,7 @@
     data() {
       return {
         orderNum: this.$route.params.orderNum, // 订单号
-        userId: 88441358, //localStorage.userId || Cookies.get('userId') || UtilsFunction.getUrlParams('userId'),
+        userId: 88441358, //localStorage.userId || UtilsFunction.getUrlParams('userId'),
         defaultOptions: {
           needPayAmount: 100, // 需支付金额
           realPayAmount: 100, // 实际支付金额 传入值跟需支付金额一样即可

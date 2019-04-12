@@ -2,7 +2,9 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import '@/common/deviceInit' // 移动适配
-import 'mint-ui/lib/style.css'
+import 'mint-ui/lib/style.css' // mint 样式
+
+
 
 
 

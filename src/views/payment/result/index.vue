@@ -1,80 +1,83 @@
 <template>
-  <div class="pay-result-warpper" id="paymentResult">
-    <!-- 大华0元礼包 -->
+  <div class="pay-result-warpper" :class="{'backgroundColor': isShowPayPage === 1}">
     <div>
-      <div class="confirm_order" v-if="false">
-        <div class="titeleView">
-          <img class="titleImg" src="@/assets/images/checkout-counter/pay_succeed.png">
-          <div class="titleText">领取成功</div>
-          <div class="titleToast"><img class="titleImg"
+      <!-- 大华3.8节日-->
+      <div class="confirm-order" v-if="isShowPayPage === 1">
+        <div class="titele-view">
+          <img class="titele-icon" src="@/assets/images/checkout-counter/pay_succeed.png">
+          <div class="titele-text">领取成功</div>
+          <div class="title-toast"><img class="titele-icon"
               src="@/assets/images/checkout-counter/icon_gift.png">您的礼物正在火速打包中…
           </div>
           <ul class="label">
-            <li>继续逛逛</li>
-            <li>查看详情</li>
+            <li @click="handleGoHomePage">继续逛逛</li>
+            <li @click="handlerCheckList">查看详情</li>
           </ul>
         </div>
         <div class="line"></div>
-        <div class="myorder">
+        <div class="order-list">
           <div class="order">
             <div>订单编号</div>
-            <div>{{'1223'}}</div>
+            <div>{{orderInformObj.orderNum}}</div>
           </div>
           <div class="order">
             <div>兑换时间</div>
-            <div>{{'myorderDetail.orderDate'}}</div>
+            <div>{{orderInformObj.orderResp.orderDate}}</div>
           </div>
           <div class="order">
             <div>收货人</div>
-            <div>{{'myorderDetail.consigneeName'}}</div>
+            <div>{{orderInformObj.orderResp.consigneeName}}</div>
           </div>
           <div class="order">
             <div>联系方式</div>
-            <div>{{'myorderDetail.consigneeMobile'}}</div>
+            <div>{{orderInformObj.orderResp.consigneeMobile}}</div>
           </div>
           <div class="order">
             <div>收货地址</div>
-            <div>{{'myorderDetail.consigneeAddr'}}</div>
+            <div>{{orderInformObj.orderResp.consigneeAddr}}</div>
           </div>
         </div>
-        <img class="banner" v-show="true" src="@/assets/images/checkout-counter/banner.png">
+        <img class="banner" src="@/assets/images/checkout-counter/banner.png" v-show="orderInformOb.hasGift == 1"
+          @click="handlerGiftList">
         <div class="toast">
           <b>重要提示：</b>您的礼品将在<span>10个工作日发货</span>，您可至大华福利平台—“我的”—“我的订单”查看物流单号<br>
           有任何疑问请咨询客服电话：<span>400-158-2212</span>
         </div>
       </div>
-      <!--  -->
-      <div v-else-if="true">
+      <!-- 支付成功 -->
+      <div v-else-if="isShowPayPage === 2">
         <div class="title">
           <span>支付成功</span>
         </div>
         <div class="price">
-          <span class="mark">￥</span>{{totalAmount}}
+          <span class="mark">￥</span>{{orderInformObj.totalAmount}}
         </div>
         <ul class="label">
-          <li @click="link">查看列表</li>
-          <li @click="goIndex">返回首页</li>
+          <li @click="handlerCheckList">查看列表</li>
+          <li @click="handlerReturnHomePage">返回首页</li>
         </ul>
       </div>
-      <div v-else>
+      <!-- 支付失败  -->
+      <div v-else-if="isShowPayPage === 3">
         <div class="title error">
           <span>支付失败</span>
         </div>
         <div class="price">
-          <span class="mark">￥</span>{{totalAmount}}
+          <span class="mark">￥</span>{{orderInformObj.totalAmount}}
         </div>
         <ul class="label">
-          <li class="error" @click="link">重新支付</li>
+          <li class="error">重新支付</li>
         </ul>
       </div>
     </div>
-    <!-- 活动pop -->
-    <div class="pop-wrap" :class="{'fix-iphonex-bottom': false}" v-if="false">
+    <!-- 活动类型-->
+    <div class="pop-wrap" :class="{'fix-iphonex-bottom': true}"
+      v-if="activityName && (isShowPayPage === 2 || isShowPayPage === 3)">
       <div class="pop-content">
         <h2 class="title-bold">关注兜礼公众号</h2>
         <h2 class="title-bold-red">代金券、全年员工折扣价马上拥有</h2>
         <p class="img-wrap">
-          <img v-if="false" class="qrcode" src="@/assets/images/checkout-counter/qrcode.png" alt="">
+          <img v-if="true" class="qrcode" src="@/assets/images/checkout-counter/qrcode.png" alt="">
           <img v-else class="qrcode" src="@/assets/images/checkout-counter/qrcode_christmas.png" alt="">
         </p>
         <p class="qrcode-word">长按保存图片，在微信识别</p>
@@ -84,22 +87,136 @@
       </div>
     </div>
   </div>
-  <!-- 大华0元礼包 end-->
 </template>
 
 <script>
+  import {
+    getPayResult
+  } from '@/service'
+  import {
+    MintUI,
+    GlobalProperty,
+  } from '@/common/global' // 引用的封装的组件
+
   export default {
     name: 'PaymentResult',
     data() {
-      return {};
+      return {
+        webSite: 'http://localhost:8081/#', //window.location.href.substring(0, window.location.href.indexOf('#') + 1),
+        orderNum: this.$route.params.orderNum,
+        orderInformObj: {}, // 订单信息
+        isShowPayPage: 0, // 大华:1, 支付成功:2, 支付失败:3,
+        umengNameObj: {
+          'AirportActivity': '机场活动',
+          'ChristmasActivity': '圣诞平安夜'
+        }, // 活动名称对象
+        activityName: '', // 活动名称
+      };
+    },
+    created() {
+      // 订单详情 判断显示页面
+      this.getPayOrder();
+      // 判断活动二维码是否显示
+      this.isShowActivityPage();
+      // 设置头部标题
+      dooolyAPP.initTitle('支付结果', '2', 'golastPage()');
+    },
+    methods: {
+      /**
+       * 获取订单金额 信息
+       * */
+      async getPayOrder() {
+        const res = await getPayResult(this.orderNum);
+        if (res.code === 1000 || res.code === 1001) { // 表示成功code
+          this.orderInformObj = JSON.parse(JSON.stringify(res.data));
+          // 判断isShowPayPage  显示哪个页面
+          this.isShowPayResultPage(res.code, this.orderInformObj);
+        } else {
+          MintUI.Toast.open({
+            message: res.msg
+          })
+        }
+      },
+      /**
+       * 判断 显示哪个页面： 大华/支付成功/支付失败
+       * 
+       * */
+      isShowPayResultPage(code, obj) {
+        // 支付成功
+        if (code === 1000) {
+          this.isShowPayPage = 2;
+        }
+        // 支付失败
+        else if (code === 1001) {
+          this.isShowPayPage = 3;
+        }
+        // 大华女神节
+        else if (obj.orderResp && obj.orderResp.orderId && obj.orderType === '1') {
+          this.isShowPayPage = 1;
+        }
+      },
+      /**
+       * 判断 是否显示活动页面，根据localStorage是否存在 activeName
+       * 
+       * */
+      isShowActivityPage() {
+        let localStorageStr = localStorage.activity || '{}';
+        // 已存的活动对象 找到订单号对应的 活动名称
+        this.activityName = JSON.parse(localStorageStr)[this.orderNum];
+        if (this.activityName) {
+          // this.$BaiduStats(this.umengNameObj[this.activityName] + "支付成功");
+        }
+      },
+      /**
+       * 点击返回2级
+       * */
+      golastPage() {
+        dooolyAPP.goBackPageIndex('2');
+
+      },
+      /**
+       *TODO: 大华点击: 继续逛逛 跳转
+       * 
+       * */
+      handleGoHomePage() {
+
+      },
+      /**
+       *TODO: 大华广告页点击跳转
+       * 
+       * */
+      handlerGiftList() {
+
+      },
+      /**
+       * 查看列表
+       * */
+      handlerCheckList() {
+        // this.$BaiduStats("支付成功-查看详情");
+        // dooolyAPP.jumpIndexPage(this.$router, '/myOrderList/1/all');
+        window.location.href = `${this.webSite}/nav/newHome`;
+      },
+      /**
+       * 返回首页
+       * */
+      handlerReturnHomePage() {
+        localStorage.removeItem('isWeChatH5');
+        dooolyAPP.gotoJumpJq(this.$router, `${this.webSite}/nav/newHome`);
+      },
+
     },
   }
 </script>
 
 <style lang="less" scoped>
+  .backgroundColor {
+    background-color: #f5f5f5 !important;
+  }
+
   .pay-result-warpper {
     overflow: hidden;
     min-height: 100%;
+    background: #fff;
 
     .title {
       margin-top: 0.8rem;
@@ -208,25 +325,25 @@
       }
     }
 
-    .confirm_order {
+    .confirm-order {
       text-align: center;
 
-      .titeleView {
+      .titele-view {
         background: #fff;
       }
 
-      .titleImg {
+      .titele-icon {
         width: 0.6rem;
         margin: 0.25rem auto 0.16rem auto;
       }
 
-      .titleText {
+      .titele-text {
         font-size: 0.18rem;
         color: #333;
         margin-bottom: 0.12rem;
       }
 
-      .titleToast {
+      .title-toast {
         font-size: 0.14rem;
         color: #999;
         display: flex;
@@ -250,7 +367,7 @@
         background: #f5f5f5;
       }
 
-      .myorder {
+      .order-list {
         padding: 0.12rem 0;
         background: #fff;
 

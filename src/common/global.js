@@ -107,9 +107,12 @@ const MintUI = {
       return MessageBox(Object.assign({}, {
         title: '',
         message: '',
-        showCancelButton: false
+        showCancelButton: false,
       }, options))
-    }
+    },
+    alert() {},
+    confirmm() {},
+    prompt() {},
   },
 }
 
