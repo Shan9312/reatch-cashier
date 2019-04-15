@@ -4,10 +4,10 @@
     <div class="content">
       需支付：
       <span
-        class="amount">{{isShowChargePay?(defaultOptions.needPayAmount + defaultOptions.serviceCharge).toFixed(2):defaultOptions.needPayAmount.toFixed(2)}}</span>
+        class="amount">{{isShowChargePay?(defaultOptions.needPayAmount + defaultOptions.serviceCharge): defaultOptions.needPayAmount | fixedNum }}</span>
       <label class="charge-text" v-show="isShowChargePay
                              && defaultOptions.serviceCharge>0">
-        （含手续费：<span class="charge">{{defaultOptions.serviceCharge.toFixed(2) }}</span>）
+        （含手续费：<span class="charge">{{defaultOptions.serviceCharge | fixedNum }}</span>）
       </label>
     </div>
     <div>
@@ -20,7 +20,7 @@
                 src="@/assets/images/checkout-counter/icon_why.png" alt="定向积分疑问">
             </span>
             <span class="fr direct-available">可抵扣余额:
-              <label> {{item.payAmount > 0? item.payAmount.toFixed(2) : '余额不可用'}}</label>
+              <label> {{item.payAmount > 0? item.payAmount : '余额不可用' | fixedNum }}</label>
             </span>
           </div>
           <!-- 支付选中的状态样式组件 -->
@@ -41,9 +41,9 @@
             <div class="center">
               <span class="type-text fl names">{{item.text}}</span>
               <span class="fr available" v-if="item.id === 2">
-                可用余额：<label class="point">{{item.payAmount.toFixed(2) }}</label></span>
+                可用余额：<label class="point">{{item.payAmount | fixedNum  }}</label></span>
               <span class="fr available" v-if="item.selected  && item.id >2  ">
-                需支付：<label class="point">{{item.payAmount.toFixed(2) }}</label></span>
+                需支付：<label class="point">{{item.payAmount | fixedNum  }}</label></span>
             </div>
             <!-- 支付选中的状态样式组件 -->
             <checkout-btn :payItem="item" @handlerChoosePay="handlerChoosePay">
@@ -117,13 +117,13 @@
     data() {
       return {
         orderNum: this.$route.params.orderNum, // 订单号
-        userId: 88441358, //localStorage.userId || UtilsFunction.getUrlParams('userId'),
+        userId: this.$Cookies.get('userId') || localStorage.userId || UtilsFunction.getUrlParams('userId'),
         defaultOptions: {
-          needPayAmount: 100, // 需支付金额
-          realPayAmount: 100, // 实际支付金额 传入值跟需支付金额一样即可
-          serviceCharge: 2, // 手续费
-          orientIntergral: 20, // 定向积分
-          dooolyIntergral: 30, // 兜礼积分
+          needPayAmount: 0, // 需支付金额
+          realPayAmount: 0, // 实际支付金额 传入值跟需支付金额一样即可
+          serviceCharge: 0, // 手续费
+          orientIntergral: 0, // 定向积分
+          dooolyIntergral: 0, // 兜礼积分
           supportDooolyIntergral: true, // 是否支持兜礼积分
           supportHybrid: true, // 是否支持混合支付
           supportWechat: true, // 是否支持微信支付
@@ -142,20 +142,10 @@
           dooolyIntergralPayAmount: 0 // 兜礼积分需要支付的金额
         },
         isShowChargePay: false, // 是否显示手续费
-        useAblePayList: [
-          // {
-          //   text: '定向积分', // 支付方式的 名称
-          //   name: 'orientIntergral', //支付方式 英文名称
-          //   usable: false, // 表示 当前支付 方式 是否可用
-          //   payAmount: 0, // 支付 金额
-          //   selected: false, // 支付选择框的 状态
-          //   imgSrc: '', // 图片样式
-          //   id: 1, // id 标示唯一的值
-          // }, // 支付方式的属性
-        ], // 支付种类的列表; 如 定积分/兜礼/微信/支付宝 等等
+        useAblePayList: [], // 支付种类的列表; 如 定积分/兜礼/微信/支付宝 等等
         integralList: [], // 含积分的数组
         isShowKeyboard: false, // 是否显示 键盘页面
-        redirectUrl: '', // TODO:支付成功页面；从接口取得返回地址，接口有值给后台就传接口的值
+        redirectUrl: '', // 支付成功页面；从接口取得返回地址，接口有值给后台就传接口的值
         responseRedirectUrl: false, // 判断 unifiedorder接口获取的地址是否有
         tradeType: 'DOOOLY_JS', // 设置交易类型 默认 DOOOLY_JS
         payType: 0, // 设置付款类型
@@ -165,6 +155,11 @@
         promptText: '', // 温馨提示标题
         promptDialog: false, // 温馨提示框
       };
+    },
+    filters: {
+      fixedNum: function (num) {
+        return Number(num).toFixed(2);
+      },
     },
     created() {
       // 获取用户 订单信息
@@ -887,19 +882,28 @@
       // 监听：在浏览添 前进/后退 添加修改记录。
       handlerReplaceState(v) {
         if (this.browserName == 'WeChat' || this.browserName == 'enterpriseWX') {
-          setTimeout(function () {
-            v === 1 ? history.pushState(null, null, document.URL) : history.replaceState(null, null, document.URL);
+          if (v === 1) {
+            setTimeout(function () {
+              history.pushState(null, null, document.URL);
+              window.addEventListener('popstate', function () {
+                this.isShowLeaveBtn = true;
+              }, false);
+            }, 0);
+          } else {
+            setTimeout(function () {
+              history.replaceState(null, null, document.URL)
+            }, 0)
             window.addEventListener('popstate', function () {
               this.isShowLeaveBtn = true;
             }, false);
-          }, 0)
+          }
         }
       },
     },
     destroyed() {
       // 页面销毁，移除监听
       window.removeEventListener('popstate', function () {
-        this.isShowLeaveBtn = true
+        this.isShowLeaveBtn = true;
       }, false);
     },
   }

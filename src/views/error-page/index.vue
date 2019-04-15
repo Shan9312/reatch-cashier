@@ -22,7 +22,7 @@
     },
     methods: {
       goHomePage() {
-        dooolyAPP.jumpIndexPage(this.$router, `${GlobalProperty.frontendDomain.thirdWebSite}`)
+        dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.thirdWebSite}`)
       }
     }
   }
