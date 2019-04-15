@@ -29,6 +29,7 @@ const errorLog = (timestamp, clientChannel, sign, logStr, terminaModel, userId, 
     })
 }
 /**
+ * 获取订单信息
  * @param {*} orderNum: 订单号 
  * @param {*} userId: 用户id 
  * @param {*} redirectUrl: 重定向地址
@@ -41,6 +42,7 @@ const unifiedorder = (orderNum, userId, redirectUrl) => {
     })
 }
 /**
+ * 根据支付列表，点击确认按钮
  * @param {*} orderNum: 订单号
  * @param {*} userId: 用户ID
  * @param {*} redirectUrl: 重定向地址
@@ -62,6 +64,7 @@ const getPayForm = (orderNum, userId, redirectUrl, payId, tradeType, payType, co
     })
 }
 /**
+ * 根据验证码/密码 确认支付
  * @param {*} orderNum: 订单号
  * @param {*} userId: 用户ID
  * @param {*} payId: 预订单ID
@@ -78,6 +81,7 @@ const integralPay = (orderNum, userId, payId, payPassword, dirIntegralSwitch) =>
     })
 }
 /**
+ * 获取订单支付情况
  * @param {*} orderNum: 订单号
  * */
 const getPayResult = (orderNum) => {

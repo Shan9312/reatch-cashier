@@ -102,15 +102,6 @@ const MintUI = {
       }, options))
     }
   },
-  // MessageBox: {
-  //   open(options) {
-  //     return MessageBox(Object.assign({}, {
-  //       title: '',
-  //       message: '',
-  //       showCancelButton: false,
-  //     }, options))
-  //   },
-  // },
   MessageBox,
 }
 

@@ -38,7 +38,7 @@
         </li>
         <li>
           <img class="keyboard-delete" @click="handlerDelNum"
-            src="../assets/images/checkout-counter/keyboard_delete_icon.png">
+            src="@/assets/images/checkout-counter/keyboard_delete_icon.png">
         </li>
       </ul>
     </div>
@@ -74,9 +74,7 @@
         verificationTimer: null,
       };
     },
-    created() {
-      console.log(GlobalProperty.apiDomain);
-    },
+    created() {},
     methods: {
       /**
        * 确认订单支付按钮： 把密码/验证值 传给父，在父组件中执行订单支付
@@ -87,6 +85,7 @@
       },
       /**
        * 手动输入密码
+       * 
        * */
       handlerEntryNum(num) {
         if (this.verificationCodeArr.length >= 6) return;
@@ -94,6 +93,7 @@
       },
       /**
        * 手动删除输入的数值盘
+       * 
        * */
       handlerDelNum() {
         if (this.verificationCodeArr.length) {
@@ -102,12 +102,14 @@
       },
       /**
        * 忘记密码 就调用外链接跳转
+       * 
        * */
       handlerForgetPassword() {
         dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.thirdWebSite}verification/0/2`);
       },
       /**
        * 若是积分付款则 60s倒计时
+       * 
        * */
       handlerCountdownNum() {
         this.countdownNum--;
@@ -124,12 +126,14 @@
       },
       /**
        * 重新获取手机验证码
+       * 
        * */
       handlerRepeatVerificat() {
         this.$emit('confirmOrder', true);
       },
       /**
        * 关闭keyBoard页面
+       * 
        * */
       handlerClose() {
         this.$emit('handlerCloseKeyboard', false);

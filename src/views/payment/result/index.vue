@@ -113,6 +113,8 @@
         activityName: '', // 活动名称
         payVersion: localStorage.payVersion,
         isIphoneX: false, // 兼容iphoneX尺寸
+        browserName: GlobalProperty.browserName, // 浏览器名称
+        isWeChatH5: false, // 判断是否是微信h5
       };
     },
     created() {
@@ -125,9 +127,45 @@
       // 兼容iphoneX尺寸
       this.judgeIsIphoneX();
     },
+    mounted() {
+      debugger
+      // 支付完成后点击返回
+      this.watchHistoryStatus();
+    },
     methods: {
       /**
+       * 支付宝h5、微信h5支付完成后点击返回，去首页
+       * 
+       * */
+      watchHistoryStatus() {
+        // 用完清掉，区分是微信h5支付完成
+        if (localStorage.isWeChatH5) this.isWeChatH5 = true;
+        this.isShowByBrowserName(2);
+        window.onpopstate = function () {
+          this.isShowByBrowserName(1);
+        }
+      },
+      /**
+       * 根据 browserName的环境 判断
+       * 
+       * */
+      isShowByBrowserName(v) {
+        if (/method=alipay/.test(window.location.href) || this.isWeChatH5) {
+          if (this.browserName !== "WeChat" && this.browserName !== "Chrome WebView" && this.browserName !== "WebKit") {
+            window.addEventListener('popstate', this.handlerReturnHomePage, false);
+            if (v === 1) {
+              this.handlerReturnHomePage();
+            } else {
+              setTimeout(function () {
+                history.pushState(null, null, document.URL);
+              }, 0)
+            }
+          }
+        }
+      },
+      /**
        * 获取订单金额 信息
+       * 
        * */
       async getPayOrder() {
         const res = await getPayResult(this.orderNum);
@@ -142,7 +180,7 @@
         }
       },
       /**
-       * 判断 显示哪个页面： 大华/支付成功/支付失败
+       * 根据后端返回的code和data ，判断 显示哪个页面: 大华/支付成功/支付失败
        * 
        * */
       isShowPayResultPage(code, obj) {
@@ -168,11 +206,13 @@
         // 已存的活动对象 找到订单号对应的 活动名称
         this.activityName = JSON.parse(localStorageStr)[this.orderNum];
         if (this.activityName) {
+          // TODO:
           // this.$BaiduStats(this.umengNameObj[this.activityName] + "支付成功");
         }
       },
       /**
        * 点击返回2级
+       * 
        * */
       golastPage() {
         dooolyAPP.goBackPageIndex('2');
@@ -196,6 +236,7 @@
       },
       /**
        * 查看列表
+       * 
        * */
       handlerCheckList() {
         // TODO:this.$BaiduStats("支付成功-查看详情");
@@ -206,9 +247,9 @@
             `${GlobalProperty.frontendDomain.thirdWebSite}myOrderDetail/${this.orderInformObj.orderId}`);
         }
       },
-
       /**
        * 返回首页
+       * 
        * */
       handlerReturnHomePage() {
         localStorage.removeItem('isWeChatH5');
@@ -216,6 +257,7 @@
       },
       /**
        * 判断若是phonex的尺寸
+       * 
        * **/
       judgeIsIphoneX() {
         function testUA(str) {

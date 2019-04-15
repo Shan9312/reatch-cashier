@@ -55,7 +55,24 @@
     <div class="footer" @click="handlerConfirmPay">
       确认支付
     </div>
-
+    <!-- 微信/支付宝/支付的弹出框 -->
+    <div class="leave-box" v-show="isShowLeaveBtn" @touchmove.prevent>
+      <div class="confirm-leave">
+        <p>确定要离开收银台？</p>
+        <div class="input-view">
+          <div @click="dooolyAPP.goBackPageIndex('1')" class="leave-input-btn left">确认离开</div>
+          <div @click="continuePay" class="leave-input-btn right">继续支付</div>
+        </div>
+      </div>
+    </div>
+    <!-- 短信/密码验证错误的弹出框 -->
+    <div v-if="promptDialog" class="toast-bg" @touchmove.prevent>
+      <div class="toast">
+        <p>温馨提示</p>
+        <div class="text">{{promptText}}</div>
+        <div class="input" @click="promptDialog = false">确定</div>
+      </div>
+    </div>
     <!-- 键盘页面 -->
     <Keyboard ref="keybordItem" v-show="isShowKeyboard" :isPayPassword="defaultOptions.isPayPassword"
       @handlerCloseKeyboard="handlerCloseKeyboard" @handlerPayOrderBtn="handlerPayOrderBtn"
@@ -136,18 +153,25 @@
           // }, // 支付方式的属性
         ], // 支付种类的列表; 如 定积分/兜礼/微信/支付宝 等等
         integralList: [], // 含积分的数组
-        errorBulletDialog: false, // 是否显示错误弹窗
         isShowKeyboard: false, // 是否显示 键盘页面
         redirectUrl: '', // TODO:支付成功页面；从接口取得返回地址，接口有值给后台就传接口的值
         responseRedirectUrl: false, // 判断 unifiedorder接口获取的地址是否有
         tradeType: 'DOOOLY_JS', // 设置交易类型 默认 DOOOLY_JS
         payType: 0, // 设置付款类型
         meituanObj: {}, // 美团支付信息
+        isShowLeaveBtn: false,
+        browserName: GlobalProperty.browserName, // 浏览器名称
+        promptText: '', // 温馨提示标题
+        promptDialog: false, // 温馨提示框
       };
     },
     created() {
       // 获取用户 订单信息
       this.getPayContentByUserId();
+    },
+    mounted() {
+      // 监听 且无刷新的 在浏览历史中添加/修改记录
+      this.handlerReplaceState(1);
     },
     methods: {
       /**
@@ -157,7 +181,7 @@
       async getPayContentByUserId() {
         const res = await unifiedorder(this.orderNum, this.userId, this.redirectUrl);
         if (res.code === 1000) {
-          const data = JSON.parse(JSON.stringify(res.data));
+          const data = res.data;
           // 初始化订单信息值
           this.defaultOptions = {
             needPayAmount: Number(data.totalFree),
@@ -176,8 +200,12 @@
             dirIntegralSwitch: false,
             commonIntegralSwitch: false,
           }
+          // 特殊情况：判断 欧飞 公司 不支持 混合
+          if (data.company === '兜礼') {
+            this.defaultOptions.supportHybrid = false;
+          }
           // 若后端有返回 redirect地址 就用后端返回的
-          if (res.data && res.data.redirectUrl) {
+          if (data && data.redirectUrl) {
             this.redirectUrl = res.data.redirectUrl;
           }
           this.supportPayType(data.payMethod);
@@ -191,21 +219,22 @@
           })
         }
       },
-
-      //根据 返回的paymethods 的值 判断付款列表
+      /**
+       * 根据 返回的paymethods 的值 判断付款列表
+       * 
+       * */
       supportPayType(payMethod) {
         const arr = payMethod.split(",");
         arr.forEach(item => {
-          if (item === 0 || item === 2 || item === 11) {
+          if (item === 0 || item === 2 || item === 11) { // 兜礼列表
             this.defaultOptions.supportDooolyIntergral = true;
-          } else if (item === 1 || item === 2) {
+          } else if (item === 1 || item === 2) { // 微信列表
             this.defaultOptions.supportWechat = true;
-          } else if (item === 6 || item === 11) {
+          } else if (item === 6 || item === 11) { // 支付宝列表
             this.defaultOptions.supportAlipay = true;
           }
         });
       },
-
       /**
        * 初始化可使用的 支付方式列表；
        * 
@@ -259,7 +288,6 @@
           })
         }
       },
-
       /**
        * 初始化 推荐 用户默认使用的支付方式
        * 
@@ -269,32 +297,25 @@
         this.calcDisabledPayType(); // 判断计算禁用使用支付情况
         this.calaNeedServiceCharge(); // 判断计算需要手续费情况
         this.orientIntergralPayType(); // 初始化使用支付方式 以及实际支付积分数 或 金额数
-
         let orientIntergralSelected = false
         let orientIntergralPayAmount = 0
         let dooolyIntergralSelected = false
         let dooolyIntergralPayAmount = 0
 
-        if (this.result.orientIntergralFlag) {
-          // 选中定向积分支付及修改需支付金额
+        if (this.result.orientIntergralFlag) { // 选中定向积分支付及修改需支付金额
           orientIntergralSelected = true
           orientIntergralPayAmount = this.result.orientIntergralPayAmount
         }
-        if (this.result.dooolyIntergralFlag) {
-          // 选中兜礼积分支付及修改需支付金额
+        if (this.result.dooolyIntergralFlag) { // 选中兜礼积分支付及修改需支付金额
           dooolyIntergralSelected = true
           dooolyIntergralPayAmount = this.result.dooolyIntergralPayAmount
         }
         this.useAblePayList.map(payType => {
           if (payType.name == 'orientIntergral') {
             payType.selected = orientIntergralSelected
-            // payType.payAmount = orientIntergralPayAmount
           }
-        })
-        this.useAblePayList.map(payType => {
           if (payType.name == 'dooolyIntergral') {
             payType.selected = dooolyIntergralSelected
-            // payType.payAmount = dooolyIntergralPayAmount
           }
         })
         // 重置判断
@@ -305,15 +326,14 @@
           dooolyIntergralPayAmount: 0
         }
       },
-
       /**
        * 判断哪些情况会 被禁止使用
        * 
        * */
       calcDisabledPayType() {
+        let usable = true;
+        let intergralArr = ['orientIntergral', 'dooolyIntergral'];
         // 暂且只有一种情况：不支持混合支付 && 定向积分+兜礼积分 < 实际金额 && 是选中状态;则为 禁用状态；
-        let usable = true
-        let intergralArr = ['orientIntergral', 'dooolyIntergral']
         if (!this.defaultOptions.supportHybrid &&
           ((this.defaultOptions.orientIntergral + this.defaultOptions.dooolyIntergral) <
             (this.defaultOptions.needPayAmount + this.defaultOptions.serviceCharge)) &&
@@ -322,35 +342,23 @@
           usable = false
         }
         this.useAblePayList.map((payItem) => {
-          // 定向积分 判断是否禁用：定向积分数 =0 就禁用
-          if (payItem.name === 'orientIntergral') {
-            if (this.defaultOptions.orientIntergral === 0) {
-              payItem.usable = false;
-            } else {
-              payItem.usable = usable;
-            }
+          if (payItem.name === 'orientIntergral') { //  判断 定向积分 是否禁用：定向积分数 =0 就禁用
+            payItem.usable = this.defaultOptions.orientIntergral ? usable : false;
           }
-          // 兜礼积分 判断是否禁用: 兜礼数值 =0 或 定向积分数值 > 付款实际金额
-          if (payItem.name === 'dooolyIntergral') {
-            if (this.defaultOptions.dooolyIntergral == 0 || this.defaultOptions.orientIntergral >= this
-              .defaultOptions.needPayAmount) {
-              payItem.usable = false;
-            } else {
-              payItem.usable = usable;
-            }
+          if (payItem.name === 'dooolyIntergral') { //  判断 兜礼积分 是否禁用: 兜礼数值 =0
+            payItem.usable = this.defaultOptions.dooolyIntergral ? usable : false;
           }
         })
       },
-
       /**
-       * 判断是否哪种支付方式需要 手续费
+       * 判断是否哪种支付方式需要 手续费 
        * 
        * */
       calaNeedServiceCharge() {
         this.isShowChargePay = false;
         // 不支持兜礼积分或兜礼积分为0 不计算手续费
         if (!this.usableOptions.supportDooolyIntergral || this.usableOptions.dooolyIntergral == 0) return false
-        // 定项积分足够支付时 不计算手续费
+        // 定项积分足够支付 不计算手续费
         if (this.usableOptions.orientIntergral >= this.usableOptions.needPayAmount) return false
         // 定向积分 + 兜礼积分不能支付时，并且不支持混合支付时，这时会采取现金支付，不计算手续费
         if ((this.usableOptions.orientIntergral + this.usableOptions.dooolyIntergral) <
@@ -446,7 +454,6 @@
           throw Error('error')
         }
       },
-
       /**
        * 点击切换支付方式
        * 
@@ -513,7 +520,6 @@
             })
             return false
           }
-
           if (this.defaultOptions.supportHybrid) {
             // 单向积分 都满足的足够的情况下再选现金支付，直接切换为现金支付
             if (orientIntergralPayAmount >= this.defaultOptions.needPayAmount &&
@@ -543,11 +549,7 @@
                   payItem.payAmount = 0;
                 }
               })
-
             }
-            // // 定向积分+兜礼积分组合 不够的情况下，选择现金支付，使用定向+ 兜礼+ 现金 
-            // else if ((orientIntergralPayAmount + dooolyIntergralPayAmount) < (this.defaultOptions.needPayAmount + this.defaultOptions.serviceCharge)){
-            // }
           } else { // 不支持混合支付 直接切换为现金支付
             this.useAblePayList.map(payItem => {
               if (!cashTypeArr.includes(payItem.name)) {
@@ -592,7 +594,6 @@
             }
           }
         }
-
         item.selected = !item.selected
         // copy返回的数值
         let optionsClone = JSON.parse(JSON.stringify(this.defaultOptions))
@@ -621,11 +622,14 @@
         // 切换后的  付款方式。
         this.initDefaultPayType(optionsClone);
       },
-      // 关闭 键盘页面
+      /**
+       * 关闭 键盘页面
+       * 
+       * */
       handlerCloseKeyboard(v) {
         this.isShowKeyboard = v;
+        this.$refs.keybordItem.verificationCodeArr = [];
       },
-
       /**
        * 定向积分定义解释
        * 
@@ -659,7 +663,6 @@
       /**
        * 判断 payType 类型 发送给后端 ，及 支付方式
        * 0 积分支付 1微信支付  6 支付宝；
-       * 
        * */
       payTypeByselectedPayList() {
         if (!this.selectedPayList.length) return false;
@@ -716,19 +719,17 @@
       /**
        * 判断当前 浏览器内核；然后根据不同的内核 做些事情： 
        * 1.tradeType类型，返回给后端的字段 【DOOOLY_APP，DOOOLY_JS,WISCO_APP,WISCO_JS其中之一】
-       * 确认用户订单信息 是否有效
        * */
       tradeTypeByBrowserName() {
-        const browser = GlobalProperty.browserName; // Mobile Safari
-        if (browser === 'WeChat') {
+        if (this.browserName === 'WeChat') {
           if (localStorage.token == localStorage.wiscoToken) {
             this.tradeType = 'WISCO_JS'
           } else {
             this.tradeType = 'DOOOLY_JS'
           }
-        } else if (browser == 'WebKit' || browser == 'Chrome WebView') {
+        } else if (this.browserName == 'WebKit' || this.browserName == 'Chrome WebView') {
           this.tradeType = 'DOOOLY_APP'; // 兜礼 app
-        } else if (browser == 'otherAPPAndroid' || browser == 'otherAPPIos') {
+        } else if (this.browserName == 'otherAPPAndroid' || this.browserName == 'otherAPPIos') {
           this.tradeType = 'WISCO_APP'; // 其他第三方app
         } else if (this.payType === 1 || this.payType === 2) { // 含微信的支付，不在微信和app中，用微信h5调起微信
           this.tradeType = 'DOOOLY_H5'
@@ -760,6 +761,13 @@
           } else {
             this.payResponseMsg(); // 付款成功后返回的消息 跳转
           }
+        } else if (res.code === 1016 || res.code === 1017) { // 1016:手机验证码失败; 1017:验证码已过期，请重新获取
+          this.promptDialog = true;
+          this.promptText = res.code === 1016 ? '您输入的短信验证码有误，请重新输入（5分钟内有效）！' : '您输入的短信验证码超时，请重新获取！';
+        } else if (res.code === 1007) { // 密码输入错误 
+          MintUI.Toast.open({
+            message: '支付密码错误，请重新输入',
+          });
         } else {
           MintUI.Toast.open({
             message: res.msg,
@@ -774,7 +782,7 @@
       // 微信支付跳转接口
       wechatPayOrder(data) {
         const currentBaseUrl = window.location.href.substring(0, window.location.href.indexOf('#') + 1);
-        if (GlobalProperty.browserName === 'WeChat') { // 微信支付
+        if (this.browserName === 'WeChat') { // 微信支付
           this.wechatBridgePay(data);
         } else if (this.tradeType == 'DOOOLY_H5') { // 微信公众号
           let redirect_url = window.encodeURIComponent(
@@ -797,7 +805,6 @@
         }
 
       },
-
       // 若是 微信环境 则微信接口跳转支付接口
       wechatBridgePay(data) {
         const _this = this;
@@ -860,9 +867,7 @@
           });
         }
       },
-      /**
-       * 判断第三方 美团支付付款情况
-       * */
+      // 判断第三方 美团支付付款情况
       handlerThirdJudge() {
         if (UtilsFunction.getUrlParams('orderSource') === 'meituan') { // 若是美团支付 需把信息集合
           this.meituanObj = {
@@ -872,11 +877,30 @@
           }
           return true;
         }
-        return false;
       },
-
+      // 点击 继续支付
+      continuePay() {
+        this.isShowLeaveBtn = false;
+        this.handlerReplaceState(2);
+      },
+      // 监听：在浏览添 前进/后退 添加修改记录。
+      handlerReplaceState(v) {
+        if (this.browserName == 'WeChat' || this.browserName == 'enterpriseWX') {
+          setTimeout(function () {
+            v === 1 ? history.pushState(null, null, document.URL) : history.replaceState(null, null, document.URL);
+            window.addEventListener('popstate', function () {
+              this.isShowLeaveBtn = true;
+            }, false);
+          }, 0)
+        }
+      },
     },
-
+    destroyed() {
+      // 页面销毁，移除监听
+      window.removeEventListener('popstate', function () {
+        this.isShowLeaveBtn = true
+      }, false);
+    },
   }
 </script>
 <style lang="less" scoped>
@@ -988,6 +1012,106 @@
       color: #fff;
       font-size: 0.16rem;
       text-align: center;
+    }
+
+    .leave-box {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(51, 51, 51, 0.8);
+      z-index: 9999;
+
+      .confirm-leave {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 2.7rem;
+        height: 1.6rem;
+        background: #fff;
+        transform: translate(-50%, -50%);
+        border-radius: 0.1rem;
+
+        p {
+          font-size: 0.18rem;
+          padding: 0.4rem 0.1rem 0;
+          color: #333;
+        }
+
+        .input-view {
+          display: flex;
+          position: absolute;
+          left: 0;
+          bottom: 0;
+          width: 100%;
+          height: 0.5rem;
+          border-top: 1px solid #ececec;
+
+          .leave-input-btn {
+            flex: 1;
+            text-align: center;
+            font-size: 0.18rem;
+            line-height: 0.5rem;
+          }
+
+          .left {
+            color: #333;
+            border-right: 1px solid #ececec;
+          }
+
+          .right {
+            color: #ee3f44;
+          }
+        }
+      }
+    }
+
+    .toast-bg {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(51, 51, 51, 0.8);
+      z-index: 9999;
+
+      .toast {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 2.7rem;
+        height: 1.78rem;
+        background: #fff;
+        transform: translate(-50%, -50%);
+        border-radius: 0.1rem;
+        text-align: center;
+
+        p {
+          font-size: 0.18rem;
+          padding-top: 0.36rem;
+          color: #333;
+          font-weight: bold;
+        }
+
+        .text {
+          font-size: 0.14rem;
+          color: #999;
+          padding: 0.2rem 0.1rem;
+        }
+
+        .input {
+          width: 100%;
+          height: 0.5rem;
+          line-height: 0.5rem;
+          position: absolute;
+          left: 0;
+          bottom: 0;
+          border-top: 1px solid #ececec;
+          font-size: 0.18rem;
+          color: #ee3f44;
+        }
+      }
     }
   }
 </style>
