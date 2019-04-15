@@ -8,6 +8,10 @@
   </div>
 </template>
 <script>
+  import {
+    GlobalProperty
+  } from '@/common/global'
+
   export default {
     name: 'ErrorPage',
     data() {
@@ -18,8 +22,7 @@
     },
     methods: {
       goHomePage() {
-        // TODO: 页面跳转
-        // dooolyAPP.jumpIndexPage(this.$Constant.webSite)
+        dooolyAPP.jumpIndexPage(this.$router, `${GlobalProperty.frontendDomain.thirdWebSite}`)
       }
     }
   }

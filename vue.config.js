@@ -15,7 +15,11 @@ module.exports = {
                 return args
             })
 
+    },
+    devServer: {
+        port: 8005, // can be overwritten by process.env.PORT, if port is in use, a free one will be determined
     }
+
 }
 
 function addStyleResource(rule) {

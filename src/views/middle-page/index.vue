@@ -20,7 +20,7 @@
 
     },
     created() {
-      if (this.link) window.location.replace(url);
+      if (this.link) window.location.replace(this.link);
     },
 
     methods: {},

@@ -53,7 +53,7 @@
           <span class="mark">￥</span>{{orderInformObj.totalAmount}}
         </div>
         <ul class="label">
-          <li @click="handlerCheckList">查看列表</li>
+          <li @click="handlerCheckList">{{payVersion? '查看列表' :'查看详情'}}</li>
           <li @click="handlerReturnHomePage">返回首页</li>
         </ul>
       </div>
@@ -66,18 +66,19 @@
           <span class="mark">￥</span>{{orderInformObj.totalAmount}}
         </div>
         <ul class="label">
-          <li class="error">重新支付</li>
+          <li class="error" @click="handlerCheckList">重新支付</li>
         </ul>
       </div>
     </div>
     <!-- 活动类型-->
-    <div class="pop-wrap" :class="{'fix-iphonex-bottom': true}"
+    <div class="pop-wrap" :class="{'fix-iphonex-bottom': isIphoneX}"
       v-if="activityName && (isShowPayPage === 2 || isShowPayPage === 3)">
       <div class="pop-content">
         <h2 class="title-bold">关注兜礼公众号</h2>
         <h2 class="title-bold-red">代金券、全年员工折扣价马上拥有</h2>
         <p class="img-wrap">
-          <img v-if="true" class="qrcode" src="@/assets/images/checkout-counter/qrcode.png" alt="">
+          <img v-if="activityName === 'AirportActivity'" class="qrcode"
+            src="@/assets/images/checkout-counter/qrcode.png" alt="">
           <img v-else class="qrcode" src="@/assets/images/checkout-counter/qrcode_christmas.png" alt="">
         </p>
         <p class="qrcode-word">长按保存图片，在微信识别</p>
@@ -102,7 +103,6 @@
     name: 'PaymentResult',
     data() {
       return {
-        webSite: 'http://localhost:8081/#', //window.location.href.substring(0, window.location.href.indexOf('#') + 1),
         orderNum: this.$route.params.orderNum,
         orderInformObj: {}, // 订单信息
         isShowPayPage: 0, // 大华:1, 支付成功:2, 支付失败:3,
@@ -111,6 +111,8 @@
           'ChristmasActivity': '圣诞平安夜'
         }, // 活动名称对象
         activityName: '', // 活动名称
+        payVersion: localStorage.payVersion,
+        isIphoneX: false, // 兼容iphoneX尺寸
       };
     },
     created() {
@@ -120,6 +122,8 @@
       this.isShowActivityPage();
       // 设置头部标题
       dooolyAPP.initTitle('支付结果', '2', 'golastPage()');
+      // 兼容iphoneX尺寸
+      this.judgeIsIphoneX();
     },
     methods: {
       /**
@@ -172,38 +176,55 @@
        * */
       golastPage() {
         dooolyAPP.goBackPageIndex('2');
-
       },
       /**
-       *TODO: 大华点击: 继续逛逛 跳转
+       *大华点击: 继续逛逛 跳转
        * 
        * */
       handleGoHomePage() {
-
+        localStorage.removeItem('isWeChatH5');
+        // TODO: this.$BaiduStats("大华活动-支付成功-继续逛逛");
+        dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.thirdWebSite}nav/newHome`);
       },
       /**
-       *TODO: 大华广告页点击跳转
+       *大华广告页点击跳转
        * 
        * */
       handlerGiftList() {
-
+        // TODO:this.$BaiduStats("大华活动-支付成功-查看更多礼包");
+        dooolyAPP.redirectActivity(`${GlobalProperty.frontendDomain.activity}giftList`);
       },
       /**
        * 查看列表
        * */
       handlerCheckList() {
-        // this.$BaiduStats("支付成功-查看详情");
-        // dooolyAPP.jumpIndexPage(this.$router, '/myOrderList/1/all');
-        window.location.href = `${this.webSite}/nav/newHome`;
+        // TODO:this.$BaiduStats("支付成功-查看详情");
+        if (this.payVersion === 'payV2') {
+          dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.thirdWebSite}myOrderList/1/all`);
+        } else {
+          dooolyAPP.gotoJumpJq(this.$router,
+            `${GlobalProperty.frontendDomain.thirdWebSite}myOrderDetail/${this.orderInformObj.orderId}`);
+        }
       },
+
       /**
        * 返回首页
        * */
       handlerReturnHomePage() {
         localStorage.removeItem('isWeChatH5');
-        dooolyAPP.gotoJumpJq(this.$router, `${this.webSite}/nav/newHome`);
+        dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.thirdWebSite}nav/newHome`);
       },
-
+      /**
+       * 判断若是phonex的尺寸
+       * **/
+      judgeIsIphoneX() {
+        function testUA(str) {
+          return navigator.userAgent.indexOf(str) > -1
+        }
+        let isIphoneX = window.devicePixelRatio && window.devicePixelRatio === 3 && window.screen.width === 375 &&
+          testUA('iPhone');
+        this.isIphoneX = isIphoneX;
+      },
     },
   }
 </script>
@@ -223,7 +244,7 @@
       margin-bottom: 0.3rem;
       height: 0.24rem;
       line-height: 0.24rem;
-      background: url('~/assets/images/checkout-counter/pay_succeed.png') no-repeat 1.34rem;
+      background: url('../../../assets/images/checkout-counter/pay_succeed.png') no-repeat 1.34rem;
       background-size: auto 100%;
       color: #333;
       font-size: 0.18rem;
@@ -231,7 +252,7 @@
       text-indent: 0.34rem;
 
       &.error {
-        background-image: url('~/assets/images/checkout-counter/pay_error.png');
+        background-image: url('../../../assets/images/checkout-counter/pay_error.png');
       }
     }
 
@@ -280,7 +301,6 @@
       width: 100%;
 
       &.fix-iphonex-bottom {
-        // padding-bottom: 34px;
         bottom: 34px;
       }
 
@@ -308,7 +328,6 @@
       .img-wrap {
         overflow: hidden;
 
-        // padding-bottom: 0.34rem;
         img {
           width: 1.44rem;
         }

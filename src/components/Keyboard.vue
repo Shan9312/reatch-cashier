@@ -74,7 +74,9 @@
         verificationTimer: null,
       };
     },
-    created() {},
+    created() {
+      console.log(GlobalProperty.apiDomain);
+    },
     methods: {
       /**
        * 确认订单支付按钮： 把密码/验证值 传给父，在父组件中执行订单支付
@@ -102,8 +104,7 @@
        * 忘记密码 就调用外链接跳转
        * */
       handlerForgetPassword() {
-        const webSite = `${GlobalProperty.apiDomain.butterfly}dist/#/`;
-        dooolyAPP.gotoJumpJq(this.$router, webSite);
+        dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.thirdWebSite}verification/0/2`);
       },
       /**
        * 若是积分付款则 60s倒计时

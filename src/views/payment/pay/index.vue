@@ -138,7 +138,7 @@
         integralList: [], // 含积分的数组
         errorBulletDialog: false, // 是否显示错误弹窗
         isShowKeyboard: false, // 是否显示 键盘页面
-        redirectUrl: `${GlobalProperty.apiDomain.doooly}cardBuyPayResult`, // TODO:支付成功页面；从接口取得返回地址，接口有值给后台就传接口的值
+        redirectUrl: '', // TODO:支付成功页面；从接口取得返回地址，接口有值给后台就传接口的值
         responseRedirectUrl: false, // 判断 unifiedorder接口获取的地址是否有
         tradeType: 'DOOOLY_JS', // 设置交易类型 默认 DOOOLY_JS
         payType: 0, // 设置付款类型
@@ -230,7 +230,7 @@
             usable: this.defaultOptions.dooolyIntergral > 0,
             payAmount: this.defaultOptions.dooolyIntergral,
             selected: true,
-            imgSrc: require('@/assets/images/checkout-counter/icon_dooly.png'),
+            imgSrc: require('@/assets/images/checkout-counter/icon_doooly.png'),
             id: 2,
           })
         }
@@ -631,7 +631,7 @@
        * 
        * */
       handlerWhatOrientIntergral() {
-        MintUI.MessageBox.open({
+        MintUI.MessageBox({
           title: '什么是定向积分？',
           message: '定向积分是只能在兜礼固定商品分类、固定商户才能消费的特殊积分，它是企业对员工的另一种特殊关怀。当该商品支持定向积分时，可用余额默认勾选，你可以选择使用或者不使用。当该商品不支持定向积分时，可用余额显示不可用。',
           showCancelButton: false,
@@ -773,30 +773,24 @@
       },
       // 微信支付跳转接口
       wechatPayOrder(data) {
+        const currentBaseUrl = window.location.href.substring(0, window.location.href.indexOf('#') + 1);
         if (GlobalProperty.browserName === 'WeChat') { // 微信支付
           this.wechatBridgePay(data);
         } else if (this.tradeType == 'DOOOLY_H5') { // 微信公众号
-
           let redirect_url = window.encodeURIComponent(
-            `${GlobalProperty.apiDomain.doooly}/cardBuyPayResultH5/${this.orderNum}/${this.defaultOptions.productType}`
-          )
-          // 判断 unifiedorder接口获取的地址 
-          if (this.responseRedirectUrl) {
-            const currentBaseUrl = window.location.href.substring(0, window.location.href.indexOf('#') + 1);
+            `${currentBaseUrl}/cardBuyPayResultH5/${this.orderNum}/${this.defaultOptions.productType}`)
+          if (this.responseRedirectUrl) { // 判断 unifiedorder接口获取的地址
             redirect_url = window.encodeURIComponent(
               `${currentBaseUrl}/middle?redirect_url=${window.encodeURIComponent(this.redirectUrl)}`)
-            window.location.href = data.mwebUrl + '&redirect_url=' + redirect_url;
-            return
-          }
-          // 判断 美团h5支付，支付完成去return_url
-          if (this.handlerThirdJudge()) {
+            window.location.href = `${data.mwebUrl}&redirect_url=${redirect_url}`;
+          } else if (this.handlerThirdJudge()) { // 判断 美团h5支付，支付完成去return_url
             redirect_url = window.encodeURIComponent(
               `${currentBaseUrl}/middle?redirect_url=${window.encodeURIComponent(this.meituanInfo.return_url)}`
             )
-            window.location.href = data.mwebUrl + '&redirect_url=' + redirect_url;
-            return
+            window.location.href = `${data.mwebUrl}&redirect_url=${redirect_url}`;
+          } else {
+            window.location.href = `${data.mwebUrl}&redirect_url=${redirect_url}`;
           }
-          window.location.href = data.mwebUrl + '&redirect_url=' + redirect_url;
 
         } else {
           dooolyAPP.appPay(data, "payResponseMsg", 'wx') // doooly app
@@ -839,15 +833,25 @@
        * */
       async payResponseMsg() {
         const res = await getPayResult(this.orderNum);
-        console.log(res, '支付成功****')
         if (res.code === 1000 || res.code === 1001) {
-          // 外表链接跳转
+          // 根据支付环境 跳转到不同的页面
           if (res.data && res.data.redirectUrl) { // 接口有值，直接跳接口的
             dooolyAPP.gotoJumpJq(this.$router, res.data.redirectUrl);
           } else if (this.handlerThirdJudge()) { // 若有美团接口 之间跳转美团
             dooolyApp.gotoJumpJq(this.$router, this.meituanInfo.return_url)
+          } else if (this.defaultOptions.productType == 7) { // 活动页面
+            const {
+              code,
+              totalAmount,
+              orderId,
+              orderNum,
+              activityParam
+            } = res.data;
+            dooolyAPP.gotoJumpJq(this.$router,
+              `${GlobalProperty.frontendDomain.thirdWebSite}activity_cardBuyPayResult/${code}/${totalAmount}/${orderId}/${orderNum}/${activityParam}/${this.defaultOptions.productType}`
+            )
           } else { // 支付结果页面 
-            dooolyAPP.gotoJumpJq(this.$router, `/cardBuyPayResult/${this.orderNum}`)
+            dooolyAPP.gotoJumpVue(this.$router, `/cardBuyPayResult/${this.orderNum}`)
           }
 
         } else {
