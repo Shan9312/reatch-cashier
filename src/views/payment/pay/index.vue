@@ -3,7 +3,8 @@
     <!-- 支付总金额提示 -->
     <div class="content">
       需支付：
-      <span class="amount">{{defaultOptions.needPayAmount}}</span>
+      <span
+        class="amount">{{isShowChargePay?(defaultOptions.needPayAmoun+defaultOptions.serviceCharge).toFixed(2):defaultOptions.needPayAmount.toFixed(2)}}</span>
       <label class="charge-text" v-show="isShowChargePay
                              && defaultOptions.serviceCharge>0">
         （含手续费：<span class="charge">{{defaultOptions.serviceCharge.toFixed(2) }}</span>）
