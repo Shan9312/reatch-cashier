@@ -14,7 +14,6 @@ const defaultOptions = {
 
 const request = (method, url, data, options = {}) => {
   let browserName, storage, headers, token, groupId, channel
-  // debugger
   browserName = GlobalProperty.browserName
   storage = GlobalProperty.localStorage
   headers = GlobalProperty.headers
@@ -29,7 +28,6 @@ const request = (method, url, data, options = {}) => {
     data,
   }, options)
   // set http request headers
-  // debugger
   if (token) options.headers['token'] = token
   if (groupId) options.headers['groupId'] = groupId
   if (channel) options.headers['channel'] = channel

@@ -113,7 +113,7 @@
        * */
       handlerCountdownNum() {
         this.countdownNum--;
-        clearInterval(this.verificationTimer)
+        clearInterval(this.verificationTimer);
         this.verificationTimer = null;
         this.verificationTimer = setInterval(() => {
           this.countdownNum--;
@@ -129,6 +129,7 @@
        * 
        * */
       handlerRepeatVerificat() {
+        this.verificationCodeArr = [];
         this.$emit('confirmOrder', true);
       },
       /**

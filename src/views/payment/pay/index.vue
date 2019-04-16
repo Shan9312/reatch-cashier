@@ -1,12 +1,11 @@
 <template>
   <div class="pay-warpper">
-    <!-- 支付总金额提示 -->
     <div class="content">
       需支付：
-      <span
-        class="amount">{{isShowChargePay?(defaultOptions.needPayAmount + defaultOptions.serviceCharge): defaultOptions.needPayAmount | fixedNum }}</span>
-      <label class="charge-text" v-show="isShowChargePay
-                             && defaultOptions.serviceCharge>0">
+      <span class="amount">
+        {{isShowChargePay?(defaultOptions.needPayAmount + defaultOptions.serviceCharge): defaultOptions.needPayAmount | fixedNum }}
+      </span>
+      <label class="charge-text" v-show="isShowChargePay && defaultOptions.serviceCharge>0">
         （含手续费：<span class="charge">{{defaultOptions.serviceCharge | fixedNum }}</span>）
       </label>
     </div>
@@ -23,11 +22,10 @@
               <label> {{item.payAmount > 0? item.payAmount : '余额不可用' | fixedNum }}</label>
             </span>
           </div>
-          <!-- 支付选中的状态样式组件 -->
+          <!-- 支付选择状态 组件 -->
           <checkout-btn :payItem="item" @handlerChoosePay="handlerChoosePay">
           </checkout-btn>
         </div>
-        <!--  -->
       </div>
       <!-- 兜礼付款方式提醒 -->
       <div class="pay-title">
@@ -45,7 +43,7 @@
               <span class="fr available" v-if="item.selected  && item.id >2  ">
                 需支付：<label class="point">{{item.payAmount | fixedNum  }}</label></span>
             </div>
-            <!-- 支付选中的状态样式组件 -->
+            <!-- 支付选择状态 组件 -->
             <checkout-btn :payItem="item" @handlerChoosePay="handlerChoosePay">
             </checkout-btn>
           </div>
@@ -66,7 +64,7 @@
         </div>
       </div>
     </div>
-    <!-- 短信/密码验证错误的弹出框 -->
+    <!-- 短信/密码验证 错误的弹出框 -->
     <div v-if="promptDialog" class="toast-bg" @touchmove.prevent>
       <div class="toast">
         <p>温馨提示</p>
@@ -74,18 +72,17 @@
         <div class="input" @click="promptDialog = false">确定</div>
       </div>
     </div>
-    <!-- 键盘页面 -->
+    <!-- 键盘页面 组件-->
     <Keyboard ref="keybordItem" v-show="isShowKeyboard" :isPayPassword="defaultOptions.isPayPassword"
       @handlerCloseKeyboard="handlerCloseKeyboard" @handlerPayOrderBtn="handlerPayOrderBtn"
       @confirmOrder="confirmOrder">
     </Keyboard>
-    <!-- 键盘页面 end-->
   </div>
 </template>
 
 <script>
-  import Keyboard from '@/components/Keyboard'; // 手机号验证的 键盘弹框
-  import CheckoutBtn from '@/components/CheckoutButton'; // 支付选中的状态样式
+  import Keyboard from '@/components/Keyboard';
+  import CheckoutBtn from '@/components/CheckoutButton';
   import {
     unifiedorder,
     getPayForm,
@@ -100,6 +97,9 @@
     GlobalProperty,
     GlobalFunction
   } from '@/common/global' // 引用的封装的组件
+  import {
+    clearInterval
+  } from 'timers';
 
 
   export default {
@@ -117,7 +117,7 @@
     data() {
       return {
         orderNum: this.$route.params.orderNum, // 订单号
-        userId: this.$Cookies.get('userId') || localStorage.userId || UtilsFunction.getUrlParams('userId'),
+        userId: this.$Cookies.get('userId') || localStorage.userId || UtilsFunction.getUrlParams('userId'), // 用户ID
         defaultOptions: {
           needPayAmount: 0, // 需支付金额
           realPayAmount: 0, // 实际支付金额 传入值跟需支付金额一样即可
@@ -134,7 +134,7 @@
           commonIntegralSwitch: false, // 支付方式为 兜礼积分，发给后端字段
           productType: '', // 后端返回的 商品类型
         },
-        usableOptions: {}, // 实际的支付对象
+        useAbleOptions: {}, // 实际的支付对象列表
         result: {
           orientIntergralFlag: false, // 是否添加定向积分支付
           dooolyIntergralFlag: false, // 是否添加兜礼积分支付
@@ -143,7 +143,6 @@
         },
         isShowChargePay: false, // 是否显示手续费
         useAblePayList: [], // 支付种类的列表; 如 定积分/兜礼/微信/支付宝 等等
-        integralList: [], // 含积分的数组
         isShowKeyboard: false, // 是否显示 键盘页面
         redirectUrl: '', // 支付成功页面；从接口取得返回地址，接口有值给后台就传接口的值
         responseRedirectUrl: false, // 判断 unifiedorder接口获取的地址是否有
@@ -164,10 +163,11 @@
     created() {
       // 获取用户 订单信息
       this.getPayContentByUserId();
+      console.log("***hss**")
     },
     mounted() {
       // 监听 且无刷新的 在浏览历史中添加/修改记录
-      this.handlerReplaceState(1);
+      this.handlerMonitorState(1);
     },
     methods: {
       /**
@@ -203,6 +203,7 @@
           // 若后端有返回 redirect地址 就用后端返回的
           if (data && data.redirectUrl) {
             this.redirectUrl = res.data.redirectUrl;
+            this.responseRedirectUrl = true;
           }
           this.supportPayType(data.payMethod);
           // 初始化 支付方式列表
@@ -289,15 +290,13 @@
        * 
        * */
       initDefaultPayType(options) {
-        this.usableOptions = options || JSON.parse(JSON.stringify(this.defaultOptions));
+        this.useAbleOptions = options || JSON.parse(JSON.stringify(this.defaultOptions));
         this.calcDisabledPayType(); // 判断计算禁用使用支付情况
         this.calaNeedServiceCharge(); // 判断计算需要手续费情况
         this.orientIntergralPayType(); // 初始化使用支付方式 以及实际支付积分数 或 金额数
-        let orientIntergralSelected = false
-        let orientIntergralPayAmount = 0
-        let dooolyIntergralSelected = false
-        let dooolyIntergralPayAmount = 0
-
+        let [orientIntergralSelected, dooolyIntergralSelected, orientIntergralPayAmount, dooolyIntergralPayAmount] = [
+          false, false, 0, 0
+        ];
         if (this.result.orientIntergralFlag) { // 选中定向积分支付及修改需支付金额
           orientIntergralSelected = true
           orientIntergralPayAmount = this.result.orientIntergralPayAmount
@@ -353,26 +352,26 @@
       calaNeedServiceCharge() {
         this.isShowChargePay = false;
         // 不支持兜礼积分或兜礼积分为0 不计算手续费
-        if (!this.usableOptions.supportDooolyIntergral || this.usableOptions.dooolyIntergral == 0) return false
+        if (!this.useAbleOptions.supportDooolyIntergral || this.useAbleOptions.dooolyIntergral == 0) return false
         // 定项积分足够支付 不计算手续费
-        if (this.usableOptions.orientIntergral >= this.usableOptions.needPayAmount) return false
+        if (this.useAbleOptions.orientIntergral >= this.useAbleOptions.needPayAmount) return false
         // 定向积分 + 兜礼积分不能支付时，并且不支持混合支付时，这时会采取现金支付，不计算手续费
-        if ((this.usableOptions.orientIntergral + this.usableOptions.dooolyIntergral) <
-          (this.usableOptions.needPayAmount + this.usableOptions.serviceCharge) &&
-          !this.usableOptions.supportHybrid) return false
-        this.usableOptions.realPayAmount = this.usableOptions.needPayAmount + this.usableOptions.serviceCharge;
+        if ((this.useAbleOptions.orientIntergral + this.useAbleOptions.dooolyIntergral) <
+          (this.useAbleOptions.needPayAmount + this.useAbleOptions.serviceCharge) &&
+          !this.useAbleOptions.supportHybrid) return false
+        this.useAbleOptions.realPayAmount = this.useAbleOptions.needPayAmount + this.useAbleOptions.serviceCharge;
         this.isShowChargePay = true;
       },
       // 定向积分： 支付方式
       orientIntergralPayType() {
         // 定向积分大于0，默认一定会选中定向积分
-        if (this.usableOptions.orientIntergral > 0) {
+        if (this.useAbleOptions.orientIntergral > 0) {
           this.result.orientIntergralFlag = true // 选中定向积分
           // 如果定向积分足够支付 则默认只选择定向积分 定向积分需支付金额为实际需支付金额
-          if (this.usableOptions.orientIntergral >= this.usableOptions.realPayAmount) {
-            this.result.orientIntergralPayAmount = this.usableOptions.realPayAmount
+          if (this.useAbleOptions.orientIntergral >= this.useAbleOptions.realPayAmount) {
+            this.result.orientIntergralPayAmount = this.useAbleOptions.realPayAmount
           } else {
-            this.result.orientIntergralPayAmount = this.usableOptions.orientIntergral // 定向积分不够时需支付金额为全部定向积分
+            this.result.orientIntergralPayAmount = this.useAbleOptions.orientIntergral // 定向积分不够时需支付金额为全部定向积分
             this.initDooolyIntergral() // 往下判断兜礼积分支付
           }
         } else {
@@ -383,14 +382,15 @@
       // 兜礼积分： 支付方式
       initDooolyIntergral() {
         // 判断是否支持兜礼积分支付并且余额大于0 如果大于0则一定会默认选中兜礼积分
-        if (this.usableOptions.supportDooolyIntergral && this.usableOptions.dooolyIntergral > 0) {
+        if (this.useAbleOptions.supportDooolyIntergral && this.useAbleOptions.dooolyIntergral > 0) {
           this.result.dooolyIntergralFlag = true // 选中兜礼积分
           // 判断定向积分+兜礼积分是否足够支付，足够的话兜礼积分需支付积分则为 realPayAmount - orientIntergral
-          if ((this.usableOptions.orientIntergral + this.usableOptions.dooolyIntergral) >=
-            (this.usableOptions.needPayAmount + this.usableOptions.serviceCharge)) {
-            this.result.dooolyIntergralPayAmount = this.usableOptions.realPayAmount - this.usableOptions.orientIntergral
+          if ((this.useAbleOptions.orientIntergral + this.useAbleOptions.dooolyIntergral) >=
+            (this.useAbleOptions.needPayAmount + this.useAbleOptions.serviceCharge)) {
+            this.result.dooolyIntergralPayAmount = this.useAbleOptions.realPayAmount - this.useAbleOptions
+              .orientIntergral
           } else {
-            this.result.dooolyIntergralPayAmount = this.usableOptions.dooolyIntergral // 兜礼积分不够时需支付金额为全部兜礼积分
+            this.result.dooolyIntergralPayAmount = this.useAbleOptions.dooolyIntergral // 兜礼积分不够时需支付金额为全部兜礼积分
             this.initHybrid() //往下判断混合支付
           }
         } else {
@@ -401,7 +401,7 @@
       // 混合支付方式
       initHybrid() {
         // 定向积分+兜礼积分<需支付总金额并且不支持混合支付时，不选中定向积分及兜礼积分
-        if (!this.usableOptions.supportHybrid) {
+        if (!this.useAbleOptions.supportHybrid) {
           this.result.orientIntergralFlag = false
           this.result.dooolyIntergralFlag = false
         }
@@ -409,13 +409,13 @@
       },
       // 微信： 支付方式
       initWechat() {
-        if (this.usableOptions.supportWechat) {
+        if (this.useAbleOptions.supportWechat) {
           let wechatPayAmount = 0
-          if (this.usableOptions.supportHybrid) {
-            wechatPayAmount = this.usableOptions.realPayAmount - this.result.orientIntergralPayAmount - this.result
+          if (this.useAbleOptions.supportHybrid) {
+            wechatPayAmount = this.useAbleOptions.realPayAmount - this.result.orientIntergralPayAmount - this.result
               .dooolyIntergralPayAmount
           } else {
-            wechatPayAmount = this.usableOptions.realPayAmount
+            wechatPayAmount = this.useAbleOptions.realPayAmount
           }
           // 选中微信支付及修改需支付金额
           this.useAblePayList.map(payType => {
@@ -431,13 +431,13 @@
       // 支付宝： 支付方式
       initAlipay() {
         // 判断是否支持支付宝支付
-        if (this.usableOptions.supportAlipay) {
+        if (this.useAbleOptions.supportAlipay) {
           let alipayPayAmount = 0
-          if (this.usableOptions.supportHybrid) {
-            alipayPayAmount = this.usableOptions.realPayAmount - this.result.orientIntergralPayAmount - this.result
+          if (this.useAbleOptions.supportHybrid) {
+            alipayPayAmount = this.useAbleOptions.realPayAmount - this.result.orientIntergralPayAmount - this.result
               .dooolyIntergralPayAmount
           } else {
-            alipayPayAmount = this.usableOptions.realPayAmount
+            alipayPayAmount = this.useAbleOptions.realPayAmount
           }
           // 选中支付宝支付及修改需支付金额
           this.useAblePayList.map(payType => {
@@ -456,8 +456,7 @@
        * */
       handlerChoosePay(item) {
         let orientIntergralItem, dooolyIntergralItem, wechatItem, alipayItem,
-          orientIntergralPayAmount, dooolyIntergralPayAmount
-
+          orientIntergralPayAmount, dooolyIntergralPayAmount;
         orientIntergralItem = this.selectedPayList.filter(payItem => payItem.name == 'orientIntergral')
         dooolyIntergralItem = this.selectedPayList.filter(payItem => payItem.name == 'dooolyIntergral')
         if (orientIntergralItem.length > 0) {
@@ -469,9 +468,7 @@
         // 当前支付方式不可用则直接返回
         if (!item.usable) return false
         // 当前只选中一种支付方式的情况下不允许取消选中
-        if (this.selectedPayList.length == 1 &&
-          this.selectedPayList[0].name == item.name &&
-          item.selected) {
+        if (this.selectedPayList.length == 1 && this.selectedPayList[0].name == item.name && item.selected) {
           return false
         }
         let cashTypeArr = ['wechat', 'alipay'] //现金支付类型
@@ -662,7 +659,7 @@
        * */
       payTypeByselectedPayList() {
         if (!this.selectedPayList.length) return false;
-        this.integralList = this.selectedPayList.filter(payItem => payItem.id < 3);
+        let integralList = this.selectedPayList.filter(payItem => payItem.id < 3);
         this.selectedPayList.forEach(obj => {
           if (obj.name === 'orientIntergral' || obj.name === 'dooolyIntergral') { // 定向 积分支付:0
             this.payType = 0;
@@ -670,47 +667,16 @@
           } else if (obj.name === 'dooolyIntergral') { // 兜里 积分支付:0
             this.payType = 0;
             this.defaultOptions.commonIntegralSwitch = true;
-          } else if (this.integralList.length && obj.name === 'wechat') { // 微信积分混合:2
+          } else if (integralList.length && obj.name === 'wechat') { // 微信积分混合:2
             this.payType = 2;
-          } else if (this.integralList.length && obj.name === 'alipay') { // 支付宝积分混合:11
+          } else if (integralList.length && obj.name === 'alipay') { // 支付宝积分混合:11
             this.payType = 11;
-          } else if (!this.integralList.length && obj.name === 'wechat') { // 微信支付:1
+          } else if (!integralList.length && obj.name === 'wechat') { // 微信支付:1
             this.payType = 1;
-          } else if (!this.integralList.length && obj.name === 'alipay') { // 支付宝支付:6
+          } else if (!integralList.length && obj.name === 'alipay') { // 支付宝支付:6
             this.payType = 6;
           }
         })
-      },
-      /**
-       * 首次点击确认按钮，先去 查询订单是否有效
-       *  确认订单OK后：1.判断选中的支付类型 做对于的 付款跳转
-       * */
-      async confirmOrder() {
-        const res = await getPayForm(
-          this.orderNum,
-          this.userId,
-          this.redirectUrl,
-          this.defaultOptions.payId,
-          this.tradeType,
-          this.payType,
-          this.defaultOptions.commonIntegralSwitch ? '1' : '0',
-          this.defaultOptions.dirIntegralSwitch ? '1' : '0',
-        );
-        if (res.code === 1000) {
-          if (this.integralList.length) { // 只要含有积分,就键盘弹出 倒计时计数 
-            this.isShowKeyboard = true;
-            this.$refs.keybordItem.handlerCountdownNum();
-          } else if (this.payType === 1) { // 微信接口支付
-            this.wechatPayOrder(res.data);
-          } else if (this.payType === 6) { // 支付宝接口支付
-            this.apliyPayOrder(res.data);
-          }
-        } else {
-          // 订单 无效 则返回数据 做弹窗 提示 信息
-          MintUI.Toast.open({
-            message: res.msg,
-          });
-        }
       },
       /**
        * 判断当前 浏览器内核；然后根据不同的内核 做些事情： 
@@ -734,6 +700,37 @@
         }
       },
       /**
+       * 首次点击确认按钮，先去 查询订单是否有效
+       *  确认订单OK后：1.判断选中的支付类型 做对于的 付款跳转
+       * */
+      async confirmOrder() {
+        const res = await getPayForm(
+          this.orderNum,
+          this.userId,
+          this.redirectUrl,
+          this.defaultOptions.payId,
+          this.tradeType,
+          this.payType,
+          this.defaultOptions.commonIntegralSwitch ? '1' : '0',
+          this.defaultOptions.dirIntegralSwitch ? '1' : '0',
+        );
+        if (res.code === 1000) {
+          if (!this.payType) { // 只要含有积分,就键盘弹出 倒计时计数 
+            this.isShowKeyboard = true;
+            this.$refs.keybordItem.handlerCountdownNum();
+          } else if (this.payType === 1) { // 微信接口支付
+            this.wechatPayOrder(res.data);
+          } else if (this.payType === 6) { // 支付宝接口支付
+            this.apliyPayOrder(res.data);
+          }
+        } else {
+          // 订单 无效 则返回数据 做弹窗 提示 信息
+          MintUI.Toast.open({
+            message: res.msg,
+          });
+        }
+      },
+      /**
        * 子传父组件：确认支付按钮
        * 1.根据密码/验证码 确认付款。
        * 2.根据后端返回的数据 是支付混合 还是 微信混合 在各自调用 方式
@@ -749,7 +746,7 @@
           code,
           this.defaultOptions.supportOrientIntergral ? '1' : '0', );
         if (res.code === 1000) {
-          this.isShowKeyboard = false; // 检验密码通过。可以支付了
+          this.isShowKeyboard = false;
           if (this.payType === 2) { // 微信混合支付
             this.wechatPayOrder(res.data);
           } else if (this.payType === 11) { // 支付宝混合支付
@@ -877,10 +874,10 @@
       // 点击 继续支付
       continuePay() {
         this.isShowLeaveBtn = false;
-        this.handlerReplaceState(2);
+        this.handlerMonitorState(2);
       },
       // 监听：在浏览添 前进/后退 添加修改记录。
-      handlerReplaceState(v) {
+      handlerMonitorState(v) {
         if (this.browserName == 'WeChat' || this.browserName == 'enterpriseWX') {
           if (v === 1) {
             setTimeout(function () {
