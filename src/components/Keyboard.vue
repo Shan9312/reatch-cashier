@@ -55,7 +55,7 @@
     props: {
       isPayPassword: {
         type: String,
-      }, // 1: 短信 ,2: 密码支付,默认显示1
+      }, // 1: 短信 ,2: 密码支付,
       handlerCloseKeyboard: {
         type: Function,
       },
