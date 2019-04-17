@@ -109,8 +109,8 @@
       CheckoutBtn
     },
     computed: {
+      // 集中获取 被选中的支付列表
       selectedPayList() {
-        // 集中获取 被选中的支付列表
         return this.useAblePayList.filter(payItem => payItem.selected)
       },
     },
@@ -163,7 +163,7 @@
     created() {
       // 获取用户 订单信息
       this.getPayContentByUserId();
-      console.log("***hss**");
+      console.log(GlobalProperty.localStorage);
     },
     mounted() {
       // 监听 且无刷新的 在浏览历史中添加/修改记录
@@ -328,7 +328,7 @@
       calcDisabledPayType() {
         let usable = true;
         let intergralArr = ['orientIntergral', 'dooolyIntergral'];
-        // 暂且只有一种情况：不支持混合支付 && 定向积分+兜礼积分 < 实际金额 && 是选中状态;则为 禁用状态；
+        // 暂且只有一种情况：不支持混合支付 && 定向积分+兜礼积分 < 实际金额 && 选中现金支付;则积分为禁用状态；
         if (!this.defaultOptions.supportHybrid &&
           ((this.defaultOptions.orientIntergral + this.defaultOptions.dooolyIntergral) <
             (this.defaultOptions.needPayAmount + this.defaultOptions.serviceCharge)) &&
@@ -610,7 +610,7 @@
         } else {
           optionsClone.supportWechat = false
         }
-        //
+        // 初始化 支付列表
         this.initUseAblePayList();
         // 切换后的  付款方式。
         this.initDefaultPayType(optionsClone);
@@ -679,8 +679,8 @@
         })
       },
       /**
-       * 判断当前 浏览器内核；然后根据不同的内核 做些事情： 
-       * 1.tradeType类型，返回给后端的字段 【DOOOLY_APP，DOOOLY_JS,WISCO_APP,WISCO_JS其中之一】
+       * 判断当前 支付平台 ；然后根据不同的类型 ： 
+       * 判断tradeType类型，返回给后端的字段 【DOOOLY_APP，DOOOLY_JS,WISCO_APP,WISCO_JS其中之一】
        * */
       tradeTypeByBrowserName() {
         if (this.browserName === 'WeChat') {
@@ -784,7 +784,7 @@
             redirect_url = window.encodeURIComponent(
               `${currentBaseUrl}/middle?redirect_url=${window.encodeURIComponent(this.redirectUrl)}`)
             window.location.href = `${data.mwebUrl}&redirect_url=${redirect_url}`;
-          } else if (this.handlerThirdJudge()) { // 判断 美团h5支付，支付完成去return_url
+          } else if (this.handlerThirdJudge()) { // 判断 美团h5支付，支付完成跳转页面
             redirect_url = window.encodeURIComponent(
               `${currentBaseUrl}/middle?redirect_url=${window.encodeURIComponent(this.meituanInfo.return_url)}`
             )
@@ -871,12 +871,12 @@
           return true;
         }
       },
-      // 点击 继续支付
+      // 微信/支付宝 点击 继续支付
       continuePay() {
         this.isShowLeaveBtn = false;
         this.handlerMonitorState(2);
       },
-      // 监听：在浏览添 前进/后退 添加修改记录。
+      // 监听：在浏览添 前进/后退 添加修改记录。 无刷新跳转页面
       handlerMonitorState(v) {
         if (this.browserName == 'WeChat' || this.browserName == 'enterpriseWX') {
           if (v === 1) {

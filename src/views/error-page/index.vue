@@ -21,6 +21,7 @@
       dooolyAPP.initTitle('出错啦')
     },
     methods: {
+      // 跳转首页
       goHomePage() {
         dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.thirdWebSite}`)
       }
