@@ -1,6 +1,6 @@
 // 百度统计
 var _hmt = _hmt || [];
-(function() {
+(function () {
   var secretKey = '5ddfc967a5eaf4d32a89559e293bb979'; // 百度统计测试
   var test = window.location.href;
   var isReach_dist =
@@ -8,9 +8,9 @@ var _hmt = _hmt || [];
   var isReachtest = test.indexOf('reachtest') > 0;
   if (isReach_dist || isReachtest) {
     // 测试
-    secretKey = isReach_dist
-      ? 'cc6fe667a6867c9cf9d34ce786116ee4'
-      : 'd0c3ce75fb2e96dfd25e01947cf960a6';
+    secretKey = isReach_dist ?
+      'cc6fe667a6867c9cf9d34ce786116ee4' :
+      'd0c3ce75fb2e96dfd25e01947cf960a6';
   } else {
     // 生产环境
     secretKey = '4b4ed8d0c62facfd2787cafd8ff71657';
@@ -21,7 +21,7 @@ var _hmt = _hmt || [];
   s.parentNode.insertBefore(hm, s);
 })();
 
-var baiduStats = function(name,operation, label) {
+var baiduStats = function (name, operation, label) {
   var browserName = globalProperties.getBrowserName();
   if (label) {
     label = name + '-' + label;
@@ -46,3 +46,6 @@ var baiduStats = function(name,operation, label) {
     _hmt.push(['_trackEvent', sort, operation, label]);
   }
 };
+
+const BaiduStats = baiduStats;
+export default BaiduStats;

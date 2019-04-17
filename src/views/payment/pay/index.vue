@@ -163,7 +163,8 @@
     created() {
       // 获取用户 订单信息
       this.getPayContentByUserId();
-      console.log("***hss**");
+      console.log("***hss-cashier**");
+
     },
     mounted() {
       // 监听 且无刷新的 在浏览历史中添加/修改记录
