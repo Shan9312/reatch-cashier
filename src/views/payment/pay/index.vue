@@ -715,8 +715,7 @@
           this.defaultOptions.dirIntegralSwitch ? '1' : '0',
         );
         if (res.code === 1000) {
-          debugger;
-          if (!this.payType) { // 只要含有积分,就键盘弹出 倒计时计数 
+          if (this.selectedPayList.filter(payItem => payItem.id < 3).length) { // 只要含有积分,就键盘弹出 倒计时计数 
             this.isShowKeyboard = true;
             this.$refs.keybordItem.handlerCountdownNum();
           } else if (this.payType === 1) { // 微信接口支付
