@@ -134,7 +134,7 @@
           commonIntegralSwitch: false, // 支付方式为 兜礼积分，发给后端字段
           productType: '', // 后端返回的 商品类型
         },
-        usableOptions: {}, // 实际的支付对象列表 
+        usableOptions: {}, // 实际的支付对象列表
         result: {
           orientIntergralFlag: false, // 是否添加定向积分支付
           dooolyIntergralFlag: false, // 是否添加兜礼积分支付
@@ -164,7 +164,6 @@
       // 获取用户 订单信息
       this.getPayContentByUserId();
       console.log("***hss-cashier**");
-
     },
     mounted() {
       // 监听 且无刷新的 在浏览历史中添加/修改记录
