@@ -163,7 +163,7 @@
     created() {
       // 获取用户 订单信息
       this.getPayContentByUserId();
-      console.log('***hss-cashiser***')
+      console.log('***hss-cashiser***');
     },
     mounted() {
       // 监听 且无刷新的 在浏览历史中添加/修改记录
@@ -916,7 +916,7 @@
       padding: 0.14rem 0.15rem 0.36rem;
       font-size: 0.16rem;
       color: #333;
-      background: #fff url('~/assets/images/checkout-counter/title_background.png') repeat-x 0 bottom;
+      background: #fff url('../../../assets/images/checkout-counter/title_background.png') repeat-x 0 bottom;
       background-size: auto 0.15rem;
 
       .amount {
