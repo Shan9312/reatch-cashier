@@ -128,7 +128,6 @@
       this.judgeIsIphoneX();
     },
     mounted() {
-      debugger
       // 支付完成后点击返回
       this.watchHistoryStatus();
     },

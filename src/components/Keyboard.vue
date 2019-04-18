@@ -55,7 +55,7 @@
     props: {
       isPayPassword: {
         type: String,
-      }, // 1: 短信 ,2: 密码支付,默认显示1
+      }, // 1: 短信 ,2: 密码支付,
       handlerCloseKeyboard: {
         type: Function,
       },
@@ -113,7 +113,7 @@
        * */
       handlerCountdownNum() {
         this.countdownNum--;
-        clearInterval(this.verificationTimer)
+        clearInterval(this.verificationTimer);
         this.verificationTimer = null;
         this.verificationTimer = setInterval(() => {
           this.countdownNum--;
@@ -129,6 +129,7 @@
        * 
        * */
       handlerRepeatVerificat() {
+        this.verificationCodeArr = [];
         this.$emit('confirmOrder', true);
       },
       /**

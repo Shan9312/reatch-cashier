@@ -21,8 +21,9 @@
       dooolyAPP.initTitle('出错啦')
     },
     methods: {
+      // 跳转首页
       goHomePage() {
-        dooolyAPP.jumpIndexPage(this.$router, `${GlobalProperty.frontendDomain.thirdWebSite}`)
+        dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.thirdWebSite}`)
       }
     }
   }
