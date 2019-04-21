@@ -46,6 +46,3 @@ var baiduStats = function (name, operation, label) {
     _hmt.push(['_trackEvent', sort, operation, label]);
   }
 };
-
-const BaiduStats = baiduStats;
-export default BaiduStats;

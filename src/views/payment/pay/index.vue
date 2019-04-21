@@ -164,7 +164,7 @@
         browserName: GlobalProperty.browserName, // 浏览器名称
         promptText: '', // 温馨提示标题
         promptDialog: false, // 温馨提示框
-        specialProduct: false, // 特殊产品 加手续费 TODO:
+        specialProduct: true, // 特殊产品 加手续费 TODO:
         realServiceCharge: 0, // 实际需要支付的手续费  TODO:
       };
     },
@@ -199,7 +199,7 @@
           const data = res.data;
 
           //TODO:
-          if (!this.specialProduct) {
+          if (this.specialProduct) {
             data.totalFree = 30;
             data.dirIntegral = 100;
             data.userIntegral = 2.9;
@@ -322,6 +322,7 @@
        * 
        * */
       initDefaultPayType(options) {
+        debugger
         this.usableOptions = options || JSON.parse(JSON.stringify(this.defaultOptions));
         this.calcDisabledPayType(); // 判断计算禁用使用支付情况
         this.calaNeedServiceCharge(); // 判断计算需要手续费情况 TODO:
@@ -481,13 +482,16 @@
             }
 
           } else {
+            console.log(this.usableOptions.orientIntergral);
             // 判断定向积分+兜礼积分是否足够支付，足够的话兜礼积分需支付积分则为 realPayAmount - orientIntergral
             if ((this.usableOptions.orientIntergral + this.usableOptions.dooolyIntergral) >=
-              (this.usableOptions.needPayAmount, this.usableOptions.serviceCharge)
+              (this.usableOptions.needPayAmount + this.usableOptions.serviceCharge)
             ) {
               this.result.dooolyIntergralPayAmount = this.usableOptions.realPayAmount - this.usableOptions
                 .orientIntergral;
             } else {
+              // debugger
+              console.log(this.usableOptions.realPayAmount, '888');
               this.result.dooolyIntergralPayAmount = this.usableOptions
                 .dooolyIntergral; // 兜礼积分不够时需支付金额为全部兜礼积分
               this.initHybrid() //往下判断混合支付
@@ -775,20 +779,39 @@
         dooolyIntergralItem = this.selectedPayList.filter(payItem => payItem.name == 'dooolyIntergral')
         wechatItem = this.selectedPayList.filter(payItem => payItem.name == 'wechat')
         alipayItem = this.selectedPayList.filter(payItem => payItem.name == 'alipay')
+        // TODO:
+
         // 初始化 付款方式
         if (!orientIntergralItem.length) {
           optionsClone.orientIntergral = 0
+        } else {
+          // 当前选中了定向积分，&& 定向积分够付 && 兜礼积分不够付的情况 && 支持混合的情况
+          //点击兜礼积分取消定向积分，选中兜礼积分，并选中微信或者支付宝
+          if (
+            this.defaultOptions.orientIntergral >= (this.defaultOptions.needPayAmount + this.defaultOptions
+              .serviceCharge) &&
+            this.defaultOptions.dooolyIntergral < (this.defaultOptions.needPayAmount + this.defaultOptions
+              .serviceCharge) &&
+            this.usableOptions.supportHybrid
+          ) {
+            this.usablePayList.map(payItem => {
+              if (payItem.name === 'dooolyIntergral') {
+                if (item.name === payItem.name) {
+                  payItem.selected = true;
+                  optionsClone.orientIntergral = 0;
+                }
+              }
+            })
+          }
         }
 
         if (!dooolyIntergralItem.length) {
-          optionsClone.dooolyIntergral = 0
+          optionsClone.dooolyIntergral = 0;
         }
-        if (!wechatItem.length) {
-          optionsClone.supportWechat = false
+        if (!wechatItem.length && alipayItem.length) {
+          optionsClone.supportWechat = false;
         }
-        if (!alipayItem.length) {
-          optionsClone.supportAlipay = false
-        }
+
         // 初始化 支付列表
         this.initUseAblePayList();
         // 切换后的  付款方式。

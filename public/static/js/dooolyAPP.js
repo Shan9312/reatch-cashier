@@ -1,5 +1,3 @@
-import globalProperties from './globalProperties'
-
 //兜礼app 安卓与ios方法封装
 var dooolyAPP = function () {
   this.allConfig = {
@@ -856,5 +854,3 @@ var dooolyAPP = new dooolyAPP()
 function goLastPage() {
   dooolyAPP.goBackPageIndex(1)
 }
-
-export default dooolyAPP;

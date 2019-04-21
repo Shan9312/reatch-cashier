@@ -2,7 +2,6 @@
  * The global properties of doooly
  * 兜礼全局属性
  */
-import UAParser from './ua-parser'
 
 const globalProperties = {
   /**
@@ -339,5 +338,3 @@ const globalProperties = {
     return headers
   }
 }
-
-export default globalProperties;
