@@ -68,12 +68,12 @@
     <div class="footer" @click="handlerConfirmPay">
       确认支付
     </div>
-    <!-- 微信/支付宝/支付的弹出框 -->
+    <!-- 现金支付的弹出框 -->
     <div class="leave-box" v-show="isShowLeaveBtn" @touchmove.prevent>
       <div class="confirm-leave">
         <p>确定要离开收银台？</p>
         <div class="input-view">
-          <div @click="dooolyAPP.goBackPageIndex('1')" class="leave-input-btn left">确认离开</div>
+          <div @click="handlerReturnPrePage" class="leave-input-btn left">确认离开</div>
           <div @click="continuePay" class="leave-input-btn right">继续支付</div>
         </div>
       </div>
@@ -164,7 +164,7 @@
         browserName: GlobalProperty.browserName, // 浏览器名称
         promptText: '', // 温馨提示标题
         promptDialog: false, // 温馨提示框
-        specialProduct: true, // 特殊产品 加手续费 TODO:
+        specialProduct: false, // 特殊产品 加手续费 TODO:
         realServiceCharge: 0, // 实际需要支付的手续费  TODO:
       };
     },
@@ -186,9 +186,13 @@
     },
     mounted() {
       // 监听 且无刷新的 在浏览历史中添加/修改记录
-      this.handlerMonitorState(1);
+      this.handlerMonitorState();
     },
     methods: {
+      // 点击返回上一页
+      handlerReturnPrePage() {
+        dooolyAPP.goBackPageIndex('1');
+      },
       /**
        * 根据用户的信息 获取付款页面的内容
        * 并且根据 返回的paymethods 的值 判断付款列表
@@ -322,7 +326,6 @@
        * 
        * */
       initDefaultPayType(options) {
-        debugger
         this.usableOptions = options || JSON.parse(JSON.stringify(this.defaultOptions));
         this.calcDisabledPayType(); // 判断计算禁用使用支付情况
         this.calaNeedServiceCharge(); // 判断计算需要手续费情况 TODO:
@@ -490,8 +493,6 @@
               this.result.dooolyIntergralPayAmount = this.usableOptions.realPayAmount - this.usableOptions
                 .orientIntergral;
             } else {
-              // debugger
-              console.log(this.usableOptions.realPayAmount, '888');
               this.result.dooolyIntergralPayAmount = this.usableOptions
                 .dooolyIntergral; // 兜礼积分不够时需支付金额为全部兜礼积分
               this.initHybrid() //往下判断混合支付
@@ -562,7 +563,6 @@
        * 
        * */
       handlerChoosePay(item) {
-        // debugger
         let orientIntergralItem,
           dooolyIntergralItem,
           wechatItem,
@@ -1076,26 +1076,15 @@
       // 微信/支付宝 点击 继续支付
       continuePay() {
         this.isShowLeaveBtn = false;
-        this.handlerMonitorState(2);
+        history.pushState(null, null, document.URL);
       },
       // 监听：在浏览添 前进/后退 添加修改记录。 无刷新跳转页面
-      handlerMonitorState(v) {
+      handlerMonitorState() {
         if (this.browserName == 'WeChat' || this.browserName == 'enterpriseWX') {
-          if (v === 1) {
-            setTimeout(function () {
-              history.pushState(null, null, document.URL);
-              window.addEventListener('popstate', function () {
-                this.isShowLeaveBtn = true;
-              }, false);
-            }, 0);
-          } else {
-            setTimeout(function () {
-              history.replaceState(null, null, document.URL)
-            }, 0)
-            window.addEventListener('popstate', function () {
-              this.isShowLeaveBtn = true;
-            }, false);
-          }
+          history.pushState(null, null, document.URL);
+          window.addEventListener('popstate', () => {
+            this.isShowLeaveBtn = true;
+          }, false);
         }
       },
     },

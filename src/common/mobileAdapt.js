@@ -1,4 +1,3 @@
-;
 (function (win) {
   var doc = win.document;
   var docEl = doc.documentElement;
@@ -30,7 +29,7 @@
   if (!metaEl) {
     metaEl = doc.createElement('meta');
     metaEl.setAttribute('name', 'viewport');
-    metaEl.setAttribute('content', 'initial-scale=' + scale + ', maximum-scale=' + scale + ', minimum-scale=' + scale + ', user-scalable=no');
+    metaEl.setAttribute('content', 'initial-scale=' + scale + ', maximum-scale=' + scale + ', minimum-scale=' + scale + ', user-scalable=no' + ',width=device-width');
     if (docEl.firstElementChild) {
       docEl.firstElementChild.appendChild(metaEl);
     } else {

@@ -83,7 +83,6 @@
         </p>
         <p class="qrcode-word">长按保存图片，在微信识别</p>
         <p class="qrcode-word">或微信搜索关注公众号“兜礼”</p>
-        <!-- <p>关注兜礼公众号</p> -->
         <p class="tip-grey">注：已关注兜礼的用户，请扫描二维码获得礼品</p>
       </div>
     </div>
@@ -113,8 +112,9 @@
         activityName: '', // 活动名称
         payVersion: localStorage.payVersion,
         isIphoneX: false, // 兼容iphoneX尺寸
-        browserName: GlobalProperty.browserName, // 浏览器名称
         isWeChatH5: false, // 判断是否是微信h5
+        browserName: GlobalProperty.browserName, // 浏览器名称
+        backLock: false,
       };
     },
     created() {
@@ -137,28 +137,13 @@
        * 
        * */
       watchHistoryStatus() {
-        // 用完清掉，区分是微信h5支付完成
         if (localStorage.isWeChatH5) this.isWeChatH5 = true;
-        this.isShowByBrowserName(2);
-        window.onpopstate = function () {
-          this.isShowByBrowserName(1);
-        }
-      },
-      /**
-       * 根据 browserName的环境 判断
-       * 
-       * */
-      isShowByBrowserName(v) {
         if (/method=alipay/.test(window.location.href) || this.isWeChatH5) {
           if (this.browserName !== "WeChat" && this.browserName !== "Chrome WebView" && this.browserName !== "WebKit") {
-            window.addEventListener('popstate', this.handlerReturnHomePage, false);
-            if (v === 1) {
+            history.pushState(null, null, document.URL);
+            window.addEventListener('popstate', () => {
               this.handlerReturnHomePage();
-            } else {
-              setTimeout(function () {
-                history.pushState(null, null, document.URL);
-              }, 0)
-            }
+            }, false);
           }
         }
       },
@@ -205,8 +190,7 @@
         // 已存的活动对象 找到订单号对应的 活动名称
         this.activityName = JSON.parse(localStorageStr)[this.orderNum];
         if (this.activityName) {
-          // TODO:
-          // this.$BaiduStats(this.umengNameObj[this.activityName] + "支付成功");
+          baiduStats(this.umengNameObj[this.activityName] + "支付成功");
         }
       },
       /**
@@ -222,7 +206,7 @@
        * */
       handleGoHomePage() {
         localStorage.removeItem('isWeChatH5');
-        // TODO: this.$BaiduStats("大华活动-支付成功-继续逛逛");
+        baiduStats("大华活动-支付成功-继续逛逛");
         dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.thirdWebSite}nav/newHome`);
       },
       /**
@@ -230,7 +214,7 @@
        * 
        * */
       handlerGiftList() {
-        // TODO:this.$BaiduStats("大华活动-支付成功-查看更多礼包");
+        baiduStats("大华活动-支付成功-查看更多礼包");
         dooolyAPP.redirectActivity(`${GlobalProperty.frontendDomain.activity}giftList`);
       },
       /**
@@ -238,13 +222,8 @@
        * 
        * */
       handlerCheckList() {
-        // TODO:this.$BaiduStats("支付成功-查看详情");
-        if (this.payVersion === 'payV2') {
-          dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.thirdWebSite}myOrderList/1/all`);
-        } else {
-          dooolyAPP.gotoJumpJq(this.$router,
-            `${GlobalProperty.frontendDomain.thirdWebSite}myOrderDetail/${this.orderInformObj.orderId}`);
-        }
+        baiduStats("支付成功-查看详情");
+        dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.thirdWebSite}myOrderList/1/all`);
       },
       /**
        * 返回首页
@@ -267,6 +246,23 @@
         this.isIphoneX = isIphoneX;
       },
     },
+    destroyed() {
+      // 页面销毁，移除监听
+      window.removeEventListener('popstate', function () {
+        this.handlerReturnHomePage();
+      }, false);
+    },
+    beforeRouteLeave(to, from, next) {
+      if (this.browserName !== "Chrome WebView" && this.browserName !== "WebKit") {
+        if (this.browserName == "WeChat" && to.name == "Payment") {
+          debugger
+          window.history.go(-2);
+        } else {
+          window.history.go(-1);
+        }
+      }
+      next();
+    }
   }
 </script>
 

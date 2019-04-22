@@ -141,6 +141,10 @@
       },
     },
     watch: {},
+    destroyed() {
+      clearInterval(this.verificationTimer);
+      this.verificationTimer = null;
+    }
   }
 </script>
 
