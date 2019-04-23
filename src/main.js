@@ -5,7 +5,6 @@ import Cookies from 'js-cookie'
 import '@/common/mobileAdapt' // 移动适配
 import 'mint-ui/lib/style.css' // mint 样式
 
-
 Vue.config.productionTip = false;
 Vue.prototype.$Cookies = Cookies;
 

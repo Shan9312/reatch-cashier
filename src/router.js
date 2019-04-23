@@ -47,17 +47,18 @@ const router = new VueRouter({
         title: '微信支付结果'
       }
     },
+    {
+      path: '*',
+      redirect: {
+        path: '/error'
+      }
+    }
   ]
 })
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.title)) {
     document.title = to.meta.title
-  }
-  if (!to.matched.length) { //匹配前往的路由不存在
-    from.name ? next({
-      name: from.name
-    }) : next('/error'); // 断此跳转路由的来源路由是否存在，存在的情况跳转到来源路由，否则跳转到404页面
   }
   next();
 })
