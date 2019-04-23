@@ -663,6 +663,7 @@
 
         // 微信选中时点击支付宝则切换到支付宝并取消微信选中，反之一样
         if (cashTypeArr.includes(item.name) && !item.selected) {
+          // debugger
           let cashItem = this.selectedPayList.filter(payItem => cashTypeArr.includes(payItem.name))
           // 当我已经选中微信/支付宝时，这个时候为切换现金支付方式
           if (cashItem.length > 0) {
@@ -829,10 +830,10 @@
                 payItem.payAmount = 0;
               }
             })
-          } else if ((dooolyIntergralPayAmount >= UtilsFunction.converNumber(this.defaultOptions.needPayAmount, this
-              .defaultOptions
-              .dooolyServiceCharge) || orientIntergralPayAmount >= (this.defaultOptions.needPayAmount + this
-              .defaultOptions.orientServiceCharge))) {
+          }
+          if ((dooolyIntergralPayAmount >= UtilsFunction.converNumber(this.defaultOptions.needPayAmount, this
+              .defaultOptions.dooolyServiceCharge) || orientIntergralPayAmount >= (this.defaultOptions.needPayAmount +
+              this.defaultOptions.orientServiceCharge))) {
             // 定向 或者 兜里 单个积分大于需要付款时, 清除当前的积分值
             this.usablePayList.map(payItem => {
               if (payItem.name == 'dooolyIntergral' || payItem.name == 'orientIntergral') {
@@ -852,7 +853,8 @@
                 payItem.payAmount = 0;
               }
             })
-          } else if (dooolyIntergralPayAmount >= (this.defaultOptions.needPayAmount + this.defaultOptions
+          }
+          if (dooolyIntergralPayAmount >= (this.defaultOptions.needPayAmount + this.defaultOptions
               .serviceCharge) || orientIntergralPayAmount >= this.defaultOptions.needPayAmount) {
             // 定向 或者 兜里 单个积分大于需要付款时, 清除当前的积分值
             this.usablePayList.map(payItem => {
