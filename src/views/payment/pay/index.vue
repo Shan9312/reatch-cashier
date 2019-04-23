@@ -204,8 +204,9 @@
         if (res.code === 1000) {
           const data = res.data;
           // 若返回的serviceCharge =0 ,则是特殊商品 考虑3%手续费
-          if (data.serviceCharge = 0) {
+          if (!data.serviceCharge) {
             this.specialProduct = true;
+            console.log('特殊商品');
             // data.totalAmount = 0.9;
             // data.userIntegral = 10;
             // data.dirIntegral = 100;
