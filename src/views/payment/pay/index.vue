@@ -17,10 +17,7 @@
           {{ (defaultOptions.needPayAmount + realServiceCharge)| fixedNum }}
         </span>
         <span class="charge-text" v-show="realServiceCharge>0">
-          （ <img class="charge-img" @click="handlerWhatOrientIntergral"
-            src="@/assets/images/checkout-counter/icon_why.png" alt="定向积分疑问"> 含手续费：
-          <span class="charge">{{realServiceCharge | fixedNum }}</span>
-          ）
+          （含手续费：<span class="charge">{{realServiceCharge | fixedNum }}</span>）
         </span>
       </span>
     </div>
@@ -287,7 +284,7 @@
             name: 'dooolyIntergral',
             usable: this.defaultOptions.dooolyIntergral > 0,
             payAmount: this.defaultOptions.dooolyIntergral,
-            selected: true,
+            selected: false,
             imgSrc: require('@/assets/images/checkout-counter/icon_doooly.png'),
             id: 2,
           })
@@ -360,14 +357,16 @@
       calcDisabledPayType() {
         let [orientUsable, dooolyUsable] = [true, true];
         let intergralArr = ['orientIntergral', 'dooolyIntergral'];
+
         if (!this.defaultOptions.supportHybrid) {
           if (this.specialProduct) {
-            [orientUsable, dooolyUsable] = this.disabledPayTypeBySpecailProduct(orientUsable, dooolyUsable);
+            [orientUsable, dooolyUsable] = this.disabledPayTypeBySpecailProduct();
+
           } else {
             // 暂且只有一种情况：不支持混合支付 && 定向积分+兜礼积分 < 实际金额 && 则积分为禁用状态；
             if ((UtilsFunction.converNumber(this.defaultOptions.orientIntergral, this.defaultOptions.dooolyIntergral) <
                 UtilsFunction.converNumber(this.defaultOptions.needPayAmount, this.defaultOptions.serviceCharge))) {
-              [orientUsable, dooolyUsable] = [false, false]
+              [orientUsable, dooolyUsable] = [false, false];
             }
             // 有一项积分 > 实际金额 而 另一个小于 总金额 的情况
             else if (this.defaultOptions.orientIntergral < this.defaultOptions.needPayAmount &&
@@ -392,13 +391,12 @@
         })
       },
       // 判断特殊商品 哪些情况会被禁用使用
-      disabledPayTypeBySpecailProduct(orientUsable, dooolyUsable) {
-        let realServiceCharge = UtilsFunction.converNumber(this.usableOptions.orientServiceCharge, this.usableOptions
-          .dooolyServiceCharge);
+      disabledPayTypeBySpecailProduct() {
+        let [orientUsable, dooolyUsable] = [true, true];
         // 暂且只有一种情况：不支持混合支付 && 定向积分+兜礼积分 < 实际金额 && 则积分为禁用状态；
         if ((UtilsFunction.converNumber(this.defaultOptions.orientIntergral, this.defaultOptions.dooolyIntergral) <
-            UtilsFunction.converNumber(this.defaultOptions.needPayAmount, realServiceCharge))) {
-          return [orientUsable, dooolyUsable] = [false, false]
+            UtilsFunction.converNumber(this.defaultOptions.needPayAmount, this.defaultOptions.totalServiceCharge))) {
+          return [orientUsable, dooolyUsable] = [false, false];
         }
         // 有一项积分 > 实际金额 而 另一个小于 总金额 的情况
         else if (this.defaultOptions.orientIntergral < UtilsFunction.converNumber(this.defaultOptions.needPayAmount,
@@ -527,7 +525,8 @@
           this.realServiceCharge = this.usableOptions.dooolyServiceCharge;
           // 如果2个积分总和 足够
         } else if (UtilsFunction.converNumber(this.usableOptions.orientIntergral, this.usableOptions.dooolyIntergral) >=
-          UtilsFunction.converNumber(this.usableOptions.needPayAmount, this.realServiceCharge)) {
+          UtilsFunction.converNumber(this.usableOptions.needPayAmount, this.realServiceCharge) && this.defaultOptions
+          .supportHybrid) {
           this.result.dooolyIntergralPayAmount = this.usableOptions.realPayAmount - this.usableOptions
             .orientIntergral - this.usableOptions.orientServiceCharge;
           this.realServiceCharge = this.usableOptions.orientServiceCharge + this.usableOptions.dooolyServiceCharge;
@@ -663,7 +662,6 @@
 
         // 微信选中时点击支付宝则切换到支付宝并取消微信选中，反之一样
         if (cashTypeArr.includes(item.name) && !item.selected) {
-          // debugger
           let cashItem = this.selectedPayList.filter(payItem => cashTypeArr.includes(payItem.name))
           // 当我已经选中微信/支付宝时，这个时候为切换现金支付方式
           if (cashItem.length > 0) {
@@ -860,8 +858,8 @@
         this.payTypeByselectedPayList();
         // 判断交易平台的tradeType:类型
         this.tradeTypeByBrowserName();
-        // 如果 积分支付，倒计时在 60s 内，重新打开键盘页面，不重复发送 短信
-        if (!this.payType) {
+        // 如果含有积分支付，倒计时在 60s 内，重新打开键盘页面，不重复发送 短信
+        if (this.selectedPayList.filter(payItem => payItem.id < 3).length) {
           if (this.$refs.keybordItem.countdownNum > 0 && this.$refs.keybordItem.countdownNum < 60) {
             this.isShowKeyboard = true;
             return
@@ -878,7 +876,7 @@
         if (!this.selectedPayList.length) return false;
         let integralList = this.selectedPayList.filter(payItem => payItem.id < 3);
         this.selectedPayList.forEach(obj => {
-          if (obj.name === 'orientIntergral' || obj.name === 'dooolyIntergral') { // 定向 积分支付:0
+          if (obj.name === 'orientIntergral') { // 定向 积分支付:0
             this.payType = 0;
             this.defaultOptions.dirIntegralSwitch = true;
           } else if (obj.name === 'dooolyIntergral') { // 兜里 积分支付:0
@@ -921,6 +919,7 @@
        *  确认订单OK后：1.判断选中的支付类型 做对于的 付款跳转
        * */
       async confirmOrder() {
+
         const res = await getPayForm(
           this.orderNum,
           this.userId,
