@@ -16,7 +16,9 @@
 }
 
 /*mint-ui修改*/
-
+.mint-toast-text {
+  font-size: 0.14rem !important;
+}
 
 .mint-indicator-wrapper {
   padding: 0.2rem 0.35rem !important;
