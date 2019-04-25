@@ -204,6 +204,7 @@
           if (!data.serviceCharge) {
             this.specialProduct = true;
           }
+          console.log(data);
           // 初始化订单信息值
           this.defaultOptions = {
             needPayAmount: UtilsFunction.converNumber(data.totalFree),
@@ -225,13 +226,14 @@
             dooolyServiceCharge: UtilsFunction.converNumber(data.commonIntegralServiceCharge), // 兜里积分足够的 服务费
             totalServiceCharge: UtilsFunction.converNumber(data.totalServiceCharge),
           }
+          console.log(this.defaultOptions);
           // 特殊情况：判断 欧飞 公司 不支持 混合
           if (data.company === '兜礼') {
             this.defaultOptions.supportHybrid = false;
           }
           // 若后端有返回 redirect地址 就用后端返回的
           if (data && data.redirectUrl) {
-            this.redirectUrl = res.data.redirectUrl;
+            this.redirectUrl = data.redirectUrl;
             this.responseRedirectUrl = true;
           }
           this.supportPayType(data.payMethod);
