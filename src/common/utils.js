@@ -72,7 +72,8 @@ const UtilsFunction = {
     return window.decodeURIComponent(value)
   },
   converNumber: (num1, num2) => {
-    if (!num2) num2 = 0;
+    if (!Number(num1)) num1 = 0;
+    if (!Number(num2)) num2 = 0;
     return Number((Number(num1) + Number(num2)).toFixed(2));
   }
 }
