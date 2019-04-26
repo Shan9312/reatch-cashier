@@ -304,7 +304,8 @@
           })
         }
         // 支付宝：后台可配置是否显示
-        if (this.defaultOptions.supportAlipay) {
+        // 若是微信环境 则无支付宝列表线上
+        if (this.defaultOptions.supportAlipay && this.browserName !== 'WeChat') {
           this.usablePayList.push({
             text: '支付宝支付',
             name: 'alipay',

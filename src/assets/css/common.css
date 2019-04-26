@@ -58,6 +58,10 @@
   font-size: 0.18rem;
 }
 
+.mint-msgbox-cancel {
+  font-size: 0.18rem !important;
+}
+
 .mint-msgbox-title {
   height: 0.4rem !important;
   line-height: 0.4rem !important;
