@@ -41,8 +41,8 @@ const UtilsFunction = {
       mode: CryptoJS.mode.ECB,
       padding: CryptoJS.pad.Pkcs7
     })
-    const resword = UtilsFunction.encrypted.toString()
-    return encryptors(resword)
+    const resword = encrypted.toString()
+    return UtilsFunction.encryptors(resword);
   },
 
   handleUrlParams: () => {
