@@ -227,7 +227,7 @@
           }
           // data.company = '兜礼';
           // 特殊情况：判断 欧飞 公司 不支持 混合
-          if (data.company === '兜礼') {
+          if (data.company === '兜礼' || data.company === '欧·飞') {
             this.defaultOptions.supportHybrid = false;
             console.log('不支持混合');
           }
@@ -976,6 +976,7 @@
           code,
           this.defaultOptions.supportOrientIntergral ? '1' : '0',
         );
+        this.$refs.keybordItem.verificationCodeArr = [];
         if (res.code === 1000) {
           this.isShowKeyboard = false;
           if (this.payType === 2) { // 微信混合支付
@@ -987,7 +988,7 @@
           }
         } else if (res.code === 1016 || res.code === 1017) { // 1016:手机验证码失败; 1017:验证码已过期，请重新获取
           this.promptDialog = true;
-          this.promptText = res.code === 1017 ? '您输入的短信验证码有误，请重新输入（5分钟内有效）！' : '您输入的短信验证码超时，请重新获取！';
+          this.promptText = res.code === 1016 ? '您输入的短信验证码有误，请重新输入（5分钟内有效）！' : '您输入的短信验证码超时，请重新获取！';
         } else if (res.code === 1007) { // 密码输入错误 
           MintUI.Toast.open({
             message: '支付密码错误，请重新输入',
