@@ -635,15 +635,13 @@
         if (item.selected && cashTypeArr.includes(item.name)) return false
         // 定向积分+兜礼积分点击 取消时
         if (item.selected && !cashTypeArr.includes(item.name)) {
-          if (this.specialProduct) {
-            // 单项积分足够时，可以取消另一项
-            if ((this.defaultOptions.orientIntergral >=
+          // 单项积分足够时，可以取消另一项
+          if (((this.defaultOptions.orientIntergral >=
                 UtilsFunction.converNumber(this.defaultOptions.needPayAmount, this.defaultOptions
                   .dooolyServiceCharge) && item.name == 'dooolyIntergral') ||
               (this.defaultOptions.dooolyIntergral >= UtilsFunction.converNumber(this.defaultOptions.needPayAmount, this
-                .defaultOptions.orientServiceCharge) && item.name == 'orientIntergral')) {
-              (this.usablePayList.filter(payItem => payItem.id === item.id)).selected = false;
-            }
+                .defaultOptions.orientServiceCharge) && item.name == 'orientIntergral')) && this.specialProduct) {
+            (this.usablePayList.filter(payItem => payItem.id === item.id)).selected = false;
           } else if (!this.specialProduct && (this.defaultOptions.orientIntergral >= this.defaultOptions
               .needPayAmount && item.name == 'dooolyIntergral') ||
             (this.defaultOptions.dooolyIntergral >=
