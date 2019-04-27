@@ -1,7 +1,7 @@
 <template>
   <div class="pay-warpper">
     <div class="content">
-      需支付：
+      需支付金额：
       <!-- 日常的商品手续费 -->
       <span v-if="!specialProduct">
         <span class="amount">
@@ -109,13 +109,6 @@
     GlobalProperty,
     GlobalFunction
   } from '@/common/global' // 引用的封装的组件
-  import {
-    clearInterval
-  } from 'timers';
-  import {
-    constants
-  } from 'crypto';
-
 
   export default {
     name: 'Payment',
@@ -221,15 +214,16 @@
             supportAlipay: true,
             dirIntegralSwitch: false,
             commonIntegralSwitch: false,
-            orientServiceCharge: UtilsFunction.converNumber(data.dirIntegralServiceCharge), // 定向积分足够 服务费
-            dooolyServiceCharge: UtilsFunction.converNumber(data.commonIntegralServiceCharge), // 兜里积分足够的 服务费
-            totalServiceCharge: UtilsFunction.converNumber(data.totalServiceCharge),
+            orientServiceCharge: UtilsFunction.converNumber(data.serviceCharge) ? 0 : UtilsFunction.converNumber(
+              data.dirIntegralServiceCharge), // 定向积分足够 服务费
+            dooolyServiceCharge: UtilsFunction.converNumber(data.serviceCharge) ? UtilsFunction.converNumber(data
+              .serviceCharge) : UtilsFunction.converNumber(data.commonIntegralServiceCharge), // 兜里积分足够的 服务费
+            totalServiceCharge: UtilsFunction.converNumber(data.serviceCharge) ? 0 : UtilsFunction.converNumber(data
+              .totalServiceCharge),
           }
-          // data.company = '兜礼';
           // 特殊情况：判断 欧飞 公司 不支持 混合
           if (data.company === '兜礼' || data.company === '欧·飞') {
             this.defaultOptions.supportHybrid = false;
-            console.log('不支持混合');
           }
           // 若后端有返回 redirect地址 就用后端返回的
           if (data && data.redirectUrl) {
@@ -365,40 +359,24 @@
             orientIntergral,
             dooolyIntergral,
             needPayAmount,
-            serviceCharge,
-            totalServiceCharge
+            totalServiceCharge,
+            orientServiceCharge,
+            dooolyServiceCharge,
           } = this.defaultOptions;
-          // 暂且只有一种情况：不支持混合支付 && 定向积分+兜礼积分 < 实际金额 && 则积分为禁用状态；并且当前选中的是现金支付
-          let [specailType, orientType, dooolyType] = [false, false, false];
-          if (this.specailProduct) {
-            // 特殊商品的判断
-            if ((UtilsFunction.converNumber(orientIntergral, dooolyIntergral) <
-                UtilsFunction.converNumber(needPayAmount, totalServiceCharge))) {
-              specailType = true;
-            }
-            if (orientIntergral < UtilsFunction.converNumber(needPayAmount, orientServiceCharge) &&
-              dooolyIntergral >= UtilsFunction.converNumber(needPayAmount, dooolyServiceCharge)) {
-              orientType = true;
-            }
-            if (orientIntergral < UtilsFunction.converNumber(needPayAmount, orientServiceCharge) &&
-              dooolyIntergral < UtilsFunction.converNumber(needPayAmount, dooolyServiceCharge)) {
-              dooolyType = true;
-            }
-          }
-          if (((UtilsFunction.converNumber(orientIntergral, dooolyIntergral) <
-              UtilsFunction.converNumber(needPayAmount, serviceCharge))) || specailType) {
+          // 如果两个都小于 总金额
+          if ((UtilsFunction.converNumber(orientIntergral, dooolyIntergral) <
+              UtilsFunction.converNumber(needPayAmount, totalServiceCharge))) {
             [orientUsable, dooolyUsable] = [false, false];
           }
           // 有一项积分 > 实际金额 而 另一个小于 总金额 的情况
-          else if (orientIntergral < needPayAmount && dooolyIntergral >= UtilsFunction.converNumber(needPayAmount,
-              serviceCharge)) {
+          else if (orientIntergral < UtilsFunction.converNumber(needPayAmount, orientServiceCharge) &&
+            dooolyIntergral >= UtilsFunction.converNumber(needPayAmount, dooolyServiceCharge)) {
             [orientUsable, dooolyUsable] = [false, true];
-          } else if (orientIntergral >= needPayAmount &&
-            dooolyIntergral < UtilsFunction.converNumber(needPayAmount, serviceCharge) || orientType) {
+          } else if (orientIntergral >= UtilsFunction.converNumber(needPayAmount, orientServiceCharge) &&
+            dooolyIntergral < UtilsFunction.converNumber(needPayAmount, dooolyServiceCharge)) {
             [orientUsable, dooolyUsable] = [true, false];
-            // 如果两个都小于 总金额
-          } else if ((orientIntergral < needPayAmount && dooolyIntergral < UtilsFunction.converNumber(needPayAmount,
-              serviceCharge)) || dooolyType) {
+          } else if (orientIntergral < UtilsFunction.converNumber(needPayAmount, orientServiceCharge) &&
+            dooolyIntergral < UtilsFunction.converNumber(needPayAmount, dooolyServiceCharge)) {
             [orientUsable, dooolyUsable] = [false, false];
           }
         }
@@ -418,37 +396,21 @@
        * */
       calaNeedServiceCharge() {
         this.isShowChargePay = false;
-        // 如果是特殊产品 则需要 定向+兜礼 都需要积分
-        if (this.specialProduct) {
-          this.serviceChargeBySpecialProduct();
-        } else {
-
-          // 不支持兜礼积分或兜礼积分为0 不计算手续费
-          if (!this.usableOptions.supportDooolyIntergral || this.usableOptions.dooolyIntergral == 0) return false
-          // 定项积分足够支付 不计算手续费
-          if (this.usableOptions.orientIntergral >= this.usableOptions.needPayAmount) return false;
-          // 定向积分 + 兜礼积分不能支付时，并且不支持混合支付时，这时会采取现金支付，不计算手续费
-          if (UtilsFunction.converNumber(this.usableOptions.orientIntergral, this.usableOptions.dooolyIntergral) <
-            UtilsFunction.converNumber(this.usableOptions.needPayAmount, this.usableOptions.serviceCharge) &&
-            !this.usableOptions.supportHybrid) return false;
-          // 兜礼 积分不足够且不支持混合 不计算手续费
-          if (this.usableOptions.dooolyIntergral < UtilsFunction.converNumber(this.usableOptions.needPayAmount, this
-              .usableOptions.serviceCharge) && !this.defaultOptions.supportHybrid) return false;
-
-          // 选中兜礼 则有手续费
-          this.usableOptions.realPayAmount = this.usableOptions.needPayAmount + this.usableOptions.serviceCharge;
-          this.isShowChargePay = true;
-        }
-      },
-      //  判断 特殊产品 需要支付的手续费
-      serviceChargeBySpecialProduct() {
-        // 不支持 积分或 积分为0 不计算手续费(兜礼 + 定向)
-        if (!this.usableOptions.supportDooolyIntergral || !this.usableOptions.supportOrientIntergral || !this
-          .usableOptions.dooolyIntergral || !this.usableOptions.orientIntergral) return false;
+        // 不支持兜礼积分或兜礼积分为0 不计算手续费
+        if (!this.usableOptions.supportDooolyIntergral || this.usableOptions.dooolyIntergral == 0) return false;
+        // 定项积分足够支付 不计算手续费
+        if (this.usableOptions.orientIntergral >= this.usableOptions.needPayAmount && !this.specialProduct)
+          return false;
         // 定向积分 + 兜礼积分不能支付时，并且不支持混合支付时，这时会采取现金支付，不计算手续费
         if (UtilsFunction.converNumber(this.usableOptions.orientIntergral, this.usableOptions.dooolyIntergral) <
-          UtilsFunction.converNumber(this.usableOptions.totalServiceCharge, this.usableOptions.needPayAmount) &&
+          UtilsFunction.converNumber(this.usableOptions.needPayAmount, this.usableOptions.totalServiceCharge) &&
           !this.usableOptions.supportHybrid) return false;
+        // 兜礼 积分不足够且不支持混合 不计算手续费
+        if (this.usableOptions.dooolyIntergral < UtilsFunction.converNumber(this.usableOptions.needPayAmount, this
+            .usableOptions.dooolyServiceCharge) && !this.defaultOptions.supportHybrid) return false;
+
+        this.usableOptions.realPayAmount = this.usableOptions.needPayAmount + this.usableOptions.serviceCharge;
+        this.isShowChargePay = true;
       },
       // 定向积分： 支付方式
       orientIntergralPayType() {
@@ -456,37 +418,22 @@
         // 定向积分大于0，默认一定会选中定向积分
         if (this.usableOptions.orientIntergral > 0 && orientIntergralArr[0].usable) {
           this.result.orientIntergralFlag = true // 选中定向积分
-          if (this.specialProduct) {
-            // 特殊3%的商品
-            this.orientIntergralPayTypeBySpecailProduct();
+          // 如果定向积分足够支付 则默认只选择定向积分 
+          if (this.usableOptions.orientIntergral >= UtilsFunction.converNumber(this.usableOptions.realPayAmount, this
+              .usableOptions.orientServiceCharge)) {
+            this.result.orientIntergralPayAmount = this.usableOptions.realPayAmount + this.usableOptions
+              .orientServiceCharge;
+            // 实际支付手续费 = 定向支付的手续费
+            this.realServiceCharge = this.usableOptions.orientServiceCharge;
           } else {
-            // 如果定向积分足够支付 则默认只选择定向积分 定向积分需支付金额为实际需支付金额
-            if (this.usableOptions.orientIntergral >= this.usableOptions.realPayAmount) {
-              this.result.orientIntergralPayAmount = this.usableOptions.realPayAmount;
-            } else {
-              this.result.orientIntergralPayAmount = this.usableOptions.orientIntergral; // 定向积分不够时需支付金额为全部定向积分
-              this.initDooolyIntergral() // 往下判断兜礼积分支付
-            }
+            // 定向积分不够时需支付金额为全部定向积分
+            this.result.orientIntergralPayAmount = this.usableOptions.orientIntergral;
+            if (this.result.orientIntergralFlag) this.realServiceCharge = this.defaultOptions.orientServiceCharge;
+            this.initDooolyIntergral(); // 往下判断兜礼积分支付   
           }
         } else {
           this.result.orientIntergralFlag = false // 定向积分不足时不选中
           this.initDooolyIntergral() // 往下判断兜礼积分支付
-        }
-      },
-      // 判断特殊商品 定向积分的支付方式
-      orientIntergralPayTypeBySpecailProduct() {
-        // 如果定向积分足够支付 则默认只选择定向积分 
-        if (this.usableOptions.orientIntergral >= UtilsFunction.converNumber(this.usableOptions.realPayAmount, this
-            .usableOptions.orientServiceCharge)) {
-          this.result.orientIntergralPayAmount = this.usableOptions.realPayAmount + this.usableOptions
-            .orientServiceCharge;
-          // 实际支付手续费 = 定向支付的手续费
-          this.realServiceCharge = this.usableOptions.orientServiceCharge;
-        } else {
-          // 定向积分不够时需支付金额为全部定向积分
-          this.result.orientIntergralPayAmount = this.usableOptions.orientIntergral;
-          this.realServiceCharge = this.defaultOptions.orientServiceCharge;
-          this.initDooolyIntergral(); // 往下判断兜礼积分支付   
         }
       },
       // 兜礼积分： 支付方式
@@ -496,57 +443,40 @@
         if (this.usableOptions.supportDooolyIntergral && this.usableOptions.dooolyIntergral && dooolyIntergralArr[0]
           .usable) {
           this.result.dooolyIntergralFlag = true
-          // 特殊商品的兜礼积分大于0 的支付方式
-          if (this.specialProduct) {
-            this.initDooolyIntergralBySpecailProduct();
+          // 兜礼实际支付 
+          this.result.dooolyIntergralPayAmount = this.usableOptions.needPayAmount + this.usableOptions
+            .dooolyServiceCharge;
+          // 如果 兜礼积分 大于 实际兜礼支付
+          if (this.usableOptions.dooolyIntergral >= this.result.dooolyIntergralPayAmount && this.result
+            .orientIntergralFlag) {
+            //  实际总支付手续费 = 定向混合积分 + 兜礼手续费
+            this.realServiceCharge = this.usableOptions.orientServiceCharge + this.usableOptions.dooolyServiceCharge;
+          } // 如果定向积分没选中 兜里积分足够的情况 
+          else if (this.usableOptions.dooolyIntergral >= this.result.dooolyIntergralPayAmount && !this.result
+            .orientIntergralFlag) {
+            this.realServiceCharge = this.usableOptions.dooolyServiceCharge;
+            // 如果2个积分总和 足够
+          } else if (UtilsFunction.converNumber(this.usableOptions.orientIntergral, this.usableOptions
+              .dooolyIntergral) >=
+            UtilsFunction.converNumber(this.usableOptions.needPayAmount, this.realServiceCharge) && this.defaultOptions
+            .supportHybrid) {
+            this.result.dooolyIntergralPayAmount = this.usableOptions.realPayAmount - this.usableOptions
+              .orientIntergral - this.usableOptions.orientServiceCharge;
+            this.realServiceCharge = this.usableOptions.orientServiceCharge + this.usableOptions.dooolyServiceCharge;
           } else {
-            // 判断定向积分+兜礼积分是否足够支付，足够的话兜礼积分需支付积分则为 realPayAmount - orientIntergral
-            if (UtilsFunction.converNumber(this.usableOptions.orientIntergral, this.usableOptions.dooolyIntergral) >=
-              UtilsFunction.converNumber(this.usableOptions.needPayAmount, this.usableOptions.serviceCharge)) {
-              this.result.dooolyIntergralPayAmount = this.usableOptions.realPayAmount - this.usableOptions
-                .orientIntergral;
+            //如果 兜礼积分不够的情况下 
+            this.result.dooolyIntergralPayAmount = this.usableOptions.dooolyIntergral;
+            if (this.result.orientIntergralFlag) {
+              this.realServiceCharge = this.usableOptions.totalServiceCharge;
             } else {
-              this.result.dooolyIntergralPayAmount = this.usableOptions
-                .dooolyIntergral; // 兜礼积分不够时需支付金额为全部兜礼积分
-              this.initHybrid() //往下判断混合支付
+              this.realServiceCharge = this.usableOptions.dooolyServiceCharge;
             }
+            this.initHybrid() //往下判断混合支付
           }
         } else {
           this.result.dooolyIntergralFlag = false // 不支持兜礼积分支付时不选中
           if (!this.result.orientIntergralFlag) this.realServiceCharge = 0;
           this.initHybrid();
-        }
-      },
-      // 特殊商品的 兜里支付方式
-      initDooolyIntergralBySpecailProduct() {
-        // 兜礼实际支付 
-        this.result.dooolyIntergralPayAmount = this.usableOptions.needPayAmount + this.usableOptions
-          .dooolyServiceCharge;
-        // 如果 兜礼积分 大于 实际兜礼支付
-        if (this.usableOptions.dooolyIntergral >= this.result.dooolyIntergralPayAmount && this.result
-          .orientIntergralFlag) {
-          //  实际总支付手续费 = 定向混合积分 + 兜礼手续费
-          this.realServiceCharge = this.usableOptions.orientServiceCharge + this.usableOptions.dooolyServiceCharge;
-        } // 如果定向积分没选中 兜里积分足够的情况 
-        else if (this.usableOptions.dooolyIntergral >= this.result.dooolyIntergralPayAmount && !this.result
-          .orientIntergralFlag) {
-          this.realServiceCharge = this.usableOptions.dooolyServiceCharge;
-          // 如果2个积分总和 足够
-        } else if (UtilsFunction.converNumber(this.usableOptions.orientIntergral, this.usableOptions.dooolyIntergral) >=
-          UtilsFunction.converNumber(this.usableOptions.needPayAmount, this.realServiceCharge) && this.defaultOptions
-          .supportHybrid) {
-          this.result.dooolyIntergralPayAmount = this.usableOptions.realPayAmount - this.usableOptions
-            .orientIntergral - this.usableOptions.orientServiceCharge;
-          this.realServiceCharge = this.usableOptions.orientServiceCharge + this.usableOptions.dooolyServiceCharge;
-        } else {
-          //如果 兜礼积分不够的情况下 
-          this.result.dooolyIntergralPayAmount = this.usableOptions.dooolyIntergral;
-          if (this.result.orientIntergralFlag) {
-            this.realServiceCharge = this.usableOptions.totalServiceCharge;
-          } else {
-            this.realServiceCharge = this.usableOptions.dooolyServiceCharge;
-          }
-          this.initHybrid() //往下判断混合支付
         }
       },
       // 混合支付方式
@@ -563,11 +493,10 @@
         if (this.usableOptions.supportWechat) {
           let wechatPayAmount = 0
           if (this.usableOptions.supportHybrid) {
-            wechatPayAmount = this.usableOptions.realPayAmount + this.realServiceCharge - this.result
+            wechatPayAmount = this.usableOptions.realPayAmount - this.result
               .orientIntergralPayAmount - this.result.dooolyIntergralPayAmount;
           } else {
             wechatPayAmount = this.usableOptions.realPayAmount;
-            this.realServiceCharge = 0;
           }
           // 选中微信支付及修改需支付金额
           this.usablePayList.map(payType => {
@@ -586,12 +515,10 @@
         if (this.usableOptions.supportAlipay) {
           let alipayPayAmount = 0;
           if (this.usableOptions.supportHybrid) {
-            alipayPayAmount = this.usableOptions.realPayAmount + this.realServiceCharge - this.result
-              .orientIntergralPayAmount - this.result
-              .dooolyIntergralPayAmount;
+            alipayPayAmount = this.usableOptions.realPayAmount - this.result
+              .orientIntergralPayAmount - this.result.dooolyIntergralPayAmount;
           } else {
             alipayPayAmount = this.usableOptions.realPayAmount;
-            this.realServiceCharge = 0;
           }
           // 选中支付宝支付及修改需支付金额
           this.usablePayList.map(payType => {
@@ -615,6 +542,14 @@
           alipayItem,
           orientIntergralPayAmount,
           dooolyIntergralPayAmount;
+        let {
+          orientIntergral,
+          dooolyIntergral,
+          needPayAmount,
+          totalServiceCharge,
+          orientServiceCharge,
+          dooolyServiceCharge,
+        } = this.defaultOptions;
 
         orientIntergralItem = this.selectedPayList.filter(payItem => payItem.name == 'orientIntergral')
         dooolyIntergralItem = this.selectedPayList.filter(payItem => payItem.name == 'dooolyIntergral')
@@ -637,17 +572,10 @@
         // 定向积分+兜礼积分点击 取消时
         if (item.selected && !cashTypeArr.includes(item.name)) {
           // 单项积分足够时，可以取消另一项
-          if (((this.defaultOptions.orientIntergral >=
-                UtilsFunction.converNumber(this.defaultOptions.needPayAmount, this.defaultOptions
-                  .dooolyServiceCharge) && item.name == 'dooolyIntergral') ||
-              (this.defaultOptions.dooolyIntergral >= UtilsFunction.converNumber(this.defaultOptions.needPayAmount, this
-                .defaultOptions.orientServiceCharge) && item.name == 'orientIntergral')) && this.specialProduct) {
-            (this.usablePayList.filter(payItem => payItem.id === item.id)).selected = false;
-          } else if (!this.specialProduct && (this.defaultOptions.orientIntergral >= this.defaultOptions
-              .needPayAmount && item.name == 'dooolyIntergral') ||
-            (this.defaultOptions.dooolyIntergral >=
-              UtilsFunction.converNumber(this.defaultOptions.needPayAmount, this.defaultOptions.serviceCharge) &&
-              item.name == 'orientIntergral')) {
+          if ((orientIntergral >= UtilsFunction.converNumber(needPayAmount, orientServiceCharge) && item.name ==
+              'dooolyIntergral') ||
+            (dooolyIntergral >= UtilsFunction.converNumber(needPayAmount, dooolyServiceCharge) && item.name ==
+              'orientIntergral')) {
             // 单项积分足够时，可以取消另一项
             (this.usablePayList.filter(payItem => payItem.id === item.id)).selected = false;
           } else {
@@ -688,11 +616,8 @@
           }
           if (this.defaultOptions.supportHybrid) {
             // 定向积分+兜礼积分组合够的情况下，选择现金支付，默认取消兜礼，使用定向+现金
-            if ((UtilsFunction.converNumber(orientIntergralPayAmount, dooolyIntergralPayAmount) >=
-                UtilsFunction.converNumber(this.defaultOptions.needPayAmount, this.usableOptions.totalServiceCharge)) ||
-              ((orientIntergralPayAmount + dooolyIntergralPayAmount) >=
-                UtilsFunction.converNumber(this.defaultOptions.needPayAmount, this.defaultOptions.serviceCharge) && this
-                .specialProduct)) {
+            if ((orientIntergralPayAmount + dooolyIntergralPayAmount) >=
+              UtilsFunction.converNumber(needPayAmount, totalServiceCharge)) {
               this.usablePayList.map(payItem => {
                 if (payItem.name == 'dooolyIntergral') {
                   payItem.selected = false
@@ -701,9 +626,8 @@
               })
             }
             // 定向 或者 兜里 单个积分大于需要付款时, 清除当前的积分值
-            if ((dooolyIntergralPayAmount >= UtilsFunction.converNumber(this.defaultOptions.needPayAmount, this
-                .defaultOptions.serviceCharge)) || (dooolyIntergralPayAmount >= UtilsFunction.converNumber(this
-                .defaultOptions.needPayAmount, this.usableOptions.dooolyServiceCharge && this.specialProduct))) {
+            if ((dooolyIntergralPayAmount >= UtilsFunction.converNumber(needPayAmount, totalServiceCharge)) ||
+              dooolyIntergralPayAmount >= UtilsFunction.converNumber(needPayAmount, dooolyServiceCharge)) {
               this.usablePayList.map(payItem => {
                 if (payItem.name == 'dooolyIntergral') {
                   payItem.selected = false;
@@ -711,9 +635,7 @@
                 }
               })
             }
-            if ((orientIntergralPayAmount >= this.defaultOptions.needPayAmount) ||
-              (orientIntergralPayAmount >= UtilsFunction.converNumber(this.usableOptions.orientServiceCharge, this
-                .usableOptions.needPayAmount) && this.specialProduct)) {
+            if (orientIntergralPayAmount >= UtilsFunction.converNumber(orientServiceCharge, needPayAmount)) {
               this.usablePayList.map(payItem => {
                 if (payItem.name == 'orientIntergral') {
                   payItem.selected = false;
@@ -734,7 +656,38 @@
 
         // 不支持混合支付时当前选中现金支付时切换到积分支付
         if (!item.selected && !cashTypeArr.includes(item.name)) {
-          this.handlerChoosePayBySpeacilProduct(this.specialProduct, item);
+          // 定向积分或着兜礼积分单项满足时，可以直接选中单项
+          if ((item.name == 'orientIntergral' && orientIntergral >=
+              UtilsFunction.converNumber(needPayAmount, orientServiceCharge)) ||
+            item.name == 'dooolyIntergral' && dooolyIntergral >=
+            UtilsFunction.converNumber(needPayAmount, dooolyServiceCharge)) {
+            if (item.name == 'dooolyIntergral') {
+              this.usablePayList.map(payItem => {
+                if (payItem.name == 'orientIntergral') {
+                  payItem.selected = false
+                }
+              })
+            }
+          } else {
+            //  定向+兜礼 大于 实际付款
+            if (UtilsFunction.converNumber(orientIntergral, dooolyIntergral) >=
+              UtilsFunction.converNumber(needPayAmount, totalServiceCharge)) {
+              if (item.name == 'orientIntergral') {
+                // 点击定向积分时 顺带打开兜礼积分
+                this.usablePayList.map(payItem => {
+                  if (payItem.name == 'dooolyIntergral') {
+                    payItem.selected = true;
+                  }
+                })
+              } else {
+                this.usablePayList.map(payItem => {
+                  if (payItem.name == 'orientIntergral') {
+                    payItem.selected = true;
+                  }
+                });
+              }
+            }
+          }
         }
         item.selected = !item.selected
         // copy返回的数值
@@ -754,14 +707,8 @@
         } else {
           // 当前选中了定向积分，&& 定向积分够付 && 兜礼积分不够付的情况 && 支持混合的情况
           //点击兜礼积分取消定向积分，选中兜礼积分，并选中微信或者支付宝
-          if (((this.defaultOptions.orientIntergral >= this.defaultOptions.needPayAmount && this.defaultOptions
-                .dooolyIntergral <
-                UtilsFunction.converNumber(this.defaultOptions.needPayAmount, this.defaultOptions.serviceCharge) && this
-                .usableOptions.supportHybrid) ||
-              (this.specialProduct && this.defaultOptions.orientIntergral >= UtilsFunction.converNumber(this
-                  .defaultOptions.needPayAmount, this.defaultOptions.orientServiceCharge) &&
-                this.defaultOptions.orientIntergral < UtilsFunction.converNumber(this.defaultOptions.dooolyIntergral,
-                  this.defaultOptions.dooolyServiceCharge))) &&
+          if ((orientIntergral >= UtilsFunction.converNumber(needPayAmount, orientServiceCharge) &&
+              orientIntergral < UtilsFunction.converNumber(dooolyIntergral, dooolyServiceCharge)) &&
             this.usableOptions.supportHybrid) {
             this.usablePayList.map(payItem => {
               if (payItem.name === 'dooolyIntergral') {
@@ -776,7 +723,6 @@
               }
             })
           }
-
         }
         if (!dooolyIntergralItem.length) {
           optionsClone.dooolyIntergral = 0;
@@ -784,67 +730,10 @@
         if (!alipayItem.length) {
           optionsClone.supportAlipay = false
         }
-
         // 初始化 支付列表
         this.initUseAblePayList();
         // 切换后的  付款方式。
         this.initDefaultPayType(optionsClone);
-      },
-      // 用户切换支付时， 特殊产品的 积分判断
-      handlerChoosePayBySpeacilProduct(product, item) {
-        let [intergralType, enoughIntergralType] = [false, false];
-        // 特殊品类的 定向或着兜礼 单项满足时，可以直接选中单项
-        if (((item.name == 'orientIntergral' && this.defaultOptions.orientIntergral >=
-              UtilsFunction.converNumber(this.defaultOptions.needPayAmount, this.defaultOptions.orientServiceCharge)) ||
-            item.name == 'dooolyIntergral' && this.defaultOptions && this.defaultOptions.dooolyIntergral >=
-            UtilsFunction.converNumber(this.defaultOptions.needPayAmount, this.defaultOptions.dooolyServiceCharge)) &&
-          product) {
-          intergralType = true;
-        }
-        //特殊品类的 积分单向不满足 则 点击定向 让兜里也选中
-        if ((item.name == 'orientIntergral' && this.defaultOptions.orientIntergral >= UtilsFunction.converNumber(this
-              .defaultOptions.needPayAmount, this.defaultOptions.orientServiceCharge) ||
-            item.name == 'dooolyIntergral' && this.defaultOptions && this.defaultOptions.dooolyIntergral >=
-            UtilsFunction.converNumber(this.defaultOptions.needPayAmount, this.defaultOptions.dooolyServiceCharge)) &&
-          product) {
-          enoughIntergralType = true;
-        }
-
-        // 定向积分或着兜礼积分单项满足时，可以直接选中单项
-        if (((item.name == 'orientIntergral' && this.defaultOptions.orientIntergral >= this.defaultOptions
-              .needPayAmount) ||
-            item.name == 'dooolyIntergral' && this.defaultOptions && this.defaultOptions.dooolyIntergral >=
-            UtilsFunction.converNumber(this.defaultOptions.needPayAmount, this.defaultOptions.serviceCharge)) ||
-          intergralType) {
-          if (item.name == 'dooolyIntergral') {
-            this.usablePayList.map(payItem => {
-              if (payItem.name == 'orientIntergral') {
-                payItem.selected = false
-              }
-            })
-          }
-        } else {
-          //  定向+兜礼 大于 实际付款
-          if ((UtilsFunction.converNumber(this.defaultOptions.orientIntergral, this.defaultOptions.dooolyIntergral) >=
-              UtilsFunction.converNumber(this.defaultOptions.needPayAmount, this.defaultOptions.serviceCharge)) &&
-            enoughIntergralType) {
-            if (item.name == 'orientIntergral') {
-              // 点击定向积分时 顺带打开兜礼积分
-              this.usablePayList.map(payItem => {
-                if (payItem.name == 'dooolyIntergral') {
-                  payItem.selected = true;
-                }
-              })
-            } else {
-              this.usablePayList.map(payItem => {
-                if (payItem.name == 'orientIntergral') {
-                  payItem.selected = true;
-                }
-              });
-            }
-          }
-        }
-
       },
       /**
        * 关闭 键盘页面
@@ -1111,7 +1000,7 @@
       },
       // 监听：在浏览添 前进/后退 添加修改记录。 无刷新跳转页面
       handlerMonitorState() {
-        if (this.browserName == 'WeChat' || this.browserName == 'enterpriseWX') {
+        if (this.browserName != 'WeChat' || this.browserName != 'Chrome WebView' || this.browserName != 'WebKit') {
           history.pushState(null, null, document.URL);
           window.addEventListener('popstate', () => {
             this.isShowLeaveBtn = true;
