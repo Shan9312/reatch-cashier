@@ -1000,7 +1000,7 @@
       },
       // 监听：在浏览添 前进/后退 添加修改记录。 无刷新跳转页面
       handlerMonitorState() {
-        if (this.browserName != 'WeChat' || this.browserName != 'Chrome WebView' || this.browserName != 'WebKit') {
+        if (this.browserName == 'WeChat' || this.browserName != 'enterpriseWX') {
           history.pushState(null, null, document.URL);
           window.addEventListener('popstate', () => {
             this.isShowLeaveBtn = true;
