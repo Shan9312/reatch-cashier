@@ -207,7 +207,7 @@
       handleGoHomePage() {
         localStorage.removeItem('isWeChatH5');
         baiduStats("大华活动-支付成功-继续逛逛");
-        dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.thirdWebSite}nav/newHome`);
+        dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.m}nav/newHome`);
       },
       /**
        *大华广告页点击跳转
@@ -223,7 +223,13 @@
        * */
       handlerCheckList() {
         baiduStats("支付成功-查看详情");
-        dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.thirdWebSite}myOrderList/1/all`);
+        if (this.payVersion === 'payV2') {
+          dooolyAPP.gotoJumpJq(this.$router,
+            `${GlobalProperty.frontendDomain.m}myOrderList/1/all`);
+        } else {
+          dooolyAPP.gotoJumpJq(this.$router,
+            `${GlobalProperty.frontendDomain.thirdWebSite}myOrderDetail/${this.orderInformObj.orderId}`);
+        }
       },
       /**
        * 返回首页
@@ -231,7 +237,7 @@
        * */
       handlerReturnHomePage() {
         localStorage.removeItem('isWeChatH5');
-        dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.thirdWebSite}nav/newHome`);
+        dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.m}nav/newHome`);
       },
       /**
        * 判断若是phonex的尺寸

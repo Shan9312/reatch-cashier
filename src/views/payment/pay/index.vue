@@ -193,11 +193,11 @@
         if (res.code === 1000) {
           const data = res.data;
           //TODO:
-          data.totalFree = 40;
-          data.serviceCharge = 2;
-          data.dirIntegral = 30;
-          data.userIntegral = 8;
-          data.company = 1;
+          // data.totalFree = 150;
+          // data.serviceCharge = 2;
+          // data.dirIntegral = 30;
+          // data.userIntegral = 8;
+          data.company = '';
           // 初始化订单信息值
           this.defaultOptions = {
             needPayAmount: UtilsFunction.converNumber(data.totalFree),
@@ -215,14 +215,15 @@
             supportAlipay: true,
             dirIntegralSwitch: false,
             commonIntegralSwitch: false,
-            orientServiceCharge: UtilsFunction.converNumber(data.serviceCharge) ? 0 : UtilsFunction.converNumber(
+            orientServiceCharge: UtilsFunction.converNumber(data.serviceCharge) ? UtilsFunction.converNumber(data
+              .serviceCharge) : UtilsFunction.converNumber(
               data.dirIntegralServiceCharge), // 定向积分足够 服务费
             dooolyServiceCharge: UtilsFunction.converNumber(data.serviceCharge) ? UtilsFunction.converNumber(data
               .serviceCharge) : UtilsFunction.converNumber(data.commonIntegralServiceCharge), // 兜里积分足够的 服务费
             totalServiceCharge: UtilsFunction.converNumber(data.serviceCharge) ? 0 : UtilsFunction.converNumber(data
               .totalServiceCharge),
           }
-          // 特殊情况：判断 欧飞 公司 不支持 混合
+          // 特殊情况：判断 不支持混合的公司 测试环境 欧飞 正式环境 是 兜礼
           if (data.company === '兜礼' || data.company === '欧·飞') {
             this.defaultOptions.supportHybrid = false;
           }
@@ -397,26 +398,27 @@
        * */
       calaNeedServiceCharge() {
         this.isShowChargePay = false;
-        // 不支持兜礼积分或兜礼积分为0 不计算手续费
-        if (!this.usableOptions.supportDooolyIntergral || this.usableOptions.dooolyIntergral == 0) return false;
-        // 定项积分足够支付 不计算手续费
-        if (this.usableOptions.orientIntergral >= this.usableOptions.needPayAmount && this.defaultOptions.serviceCharge)
-          return false;
+        // debugger
+        // 不支持兜礼积分或兜礼积分为0 定项积 不计算手续费
+        if ((!this.usableOptions.supportDooolyIntergral || !this.usableOptions.dooolyIntergral) &&
+          (!this.usableOptions.supportOrientIntergral || !this.usableOptions.orientIntergral)) return false;
         // 定向积分 + 兜礼积分不能支付时，并且不支持混合支付时，这时会采取现金支付，不计算手续费
         if (UtilsFunction.converNumber(this.usableOptions.orientIntergral, this.usableOptions.dooolyIntergral) <
           UtilsFunction.converNumber(this.usableOptions.needPayAmount, this.usableOptions.totalServiceCharge) &&
           !this.usableOptions.supportHybrid) return false;
-        // 兜礼 积分不足够且不支持混合 不计算手续费
-        if (this.usableOptions.dooolyIntergral < UtilsFunction.converNumber(this.usableOptions.needPayAmount, this
-            .usableOptions.dooolyServiceCharge) && !this.defaultOptions.supportHybrid) return false;
+        // 兜礼 或者 定向 积分不足够且不支持混合 不计算手续费
+        if ((this.usableOptions.dooolyIntergral < UtilsFunction.converNumber(this.usableOptions.needPayAmount,
+            this.usableOptions.dooolyServiceCharge) || (this.usableOptions.orientIntergral < UtilsFunction
+            .converNumber(this.usableOptions.needPayAmount,
+              this.usableOptions.orientServiceCharge))) && !this.defaultOptions.supportHybrid) return false;
 
-        this.usableOptions.realPayAmount = this.usableOptions.needPayAmount + this.usableOptions.serviceCharge;
         this.isShowChargePay = true;
+        this.usableOptions.realPayAmount = this.usableOptions.needPayAmount + this.usableOptions.serviceCharge;
+
       },
       // 定向积分： 支付方式
       orientIntergralPayType() {
         let orientIntergralArr = this.usablePayList.filter(item => item.name === 'orientIntergral');
-
         // 定向积分大于0，默认一定会选中定向积分
         if (this.usableOptions.orientIntergral > 0 && orientIntergralArr[0].usable) {
           this.result.orientIntergralFlag = true // 选中定向积分
@@ -497,6 +499,8 @@
           if (this.usableOptions.supportHybrid) {
             wechatPayAmount = this.usableOptions.realPayAmount - this.result
               .orientIntergralPayAmount - this.result.dooolyIntergralPayAmount;
+            console.log(this.usableOptions.realPayAmount, this.result);
+            console.log(wechatPayAmount);
           } else {
             wechatPayAmount = this.usableOptions.realPayAmount;
           }
