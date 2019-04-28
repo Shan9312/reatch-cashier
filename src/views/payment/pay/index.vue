@@ -3,7 +3,7 @@
     <div class="content">
       需支付金额：
       <!-- 日常的商品手续费 -->
-      <span v-if="!specialProduct">
+      <span v-if="defaultOptions.serviceCharge">
         <span class="amount">
           {{isShowChargePay?(defaultOptions.needPayAmount + defaultOptions.serviceCharge): defaultOptions.needPayAmount | fixedNum }}
         </span>
@@ -155,7 +155,6 @@
         browserName: GlobalProperty.browserName, // 浏览器名称
         promptText: '', // 温馨提示标题
         promptDialog: false, // 温馨提示框
-        specialProduct: false, // 特殊产品 加手续费 
         realServiceCharge: 0, // 实际需要支付的手续费
       };
     },
@@ -193,10 +192,12 @@
         const res = await unifiedorder(this.orderNum, this.userId, this.redirectUrl);
         if (res.code === 1000) {
           const data = res.data;
-          // 若返回的serviceCharge =0 ,则是特殊商品 考虑3%手续费
-          if (!data.serviceCharge) {
-            this.specialProduct = true;
-          }
+          //TODO:
+          data.totalFree = 40;
+          data.serviceCharge = 2;
+          data.dirIntegral = 30;
+          data.userIntegral = 8;
+          data.company = 1;
           // 初始化订单信息值
           this.defaultOptions = {
             needPayAmount: UtilsFunction.converNumber(data.totalFree),
@@ -399,7 +400,7 @@
         // 不支持兜礼积分或兜礼积分为0 不计算手续费
         if (!this.usableOptions.supportDooolyIntergral || this.usableOptions.dooolyIntergral == 0) return false;
         // 定项积分足够支付 不计算手续费
-        if (this.usableOptions.orientIntergral >= this.usableOptions.needPayAmount && !this.specialProduct)
+        if (this.usableOptions.orientIntergral >= this.usableOptions.needPayAmount && this.defaultOptions.serviceCharge)
           return false;
         // 定向积分 + 兜礼积分不能支付时，并且不支持混合支付时，这时会采取现金支付，不计算手续费
         if (UtilsFunction.converNumber(this.usableOptions.orientIntergral, this.usableOptions.dooolyIntergral) <
@@ -415,6 +416,7 @@
       // 定向积分： 支付方式
       orientIntergralPayType() {
         let orientIntergralArr = this.usablePayList.filter(item => item.name === 'orientIntergral');
+
         // 定向积分大于0，默认一定会选中定向积分
         if (this.usableOptions.orientIntergral > 0 && orientIntergralArr[0].usable) {
           this.result.orientIntergralFlag = true // 选中定向积分
