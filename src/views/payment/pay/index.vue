@@ -193,11 +193,13 @@
         if (res.code === 1000) {
           const data = res.data;
           //TODO:
-          // data.totalFree = 150;
-          // data.serviceCharge = 2;
-          // data.dirIntegral = 30;
-          // data.userIntegral = 8;
-          data.company = '';
+          // data.totalFree = 0.02;
+          // data.serviceCharge = 0;
+          // data.totalServiceCharge = 0;
+          // data.commonIntegralServiceCharge = 0;
+          // data.dirIntegral = 10;
+          // data.userIntegral = 0.01;
+          // data.company = '';
           // 初始化订单信息值
           this.defaultOptions = {
             needPayAmount: UtilsFunction.converNumber(data.totalFree),
@@ -398,7 +400,6 @@
        * */
       calaNeedServiceCharge() {
         this.isShowChargePay = false;
-        // debugger
         // 不支持兜礼积分或兜礼积分为0 定项积 不计算手续费
         if ((!this.usableOptions.supportDooolyIntergral || !this.usableOptions.dooolyIntergral) &&
           (!this.usableOptions.supportOrientIntergral || !this.usableOptions.orientIntergral)) return false;
@@ -413,8 +414,9 @@
               this.usableOptions.orientServiceCharge))) && !this.defaultOptions.supportHybrid) return false;
 
         this.isShowChargePay = true;
-        this.usableOptions.realPayAmount = this.usableOptions.needPayAmount + this.usableOptions.serviceCharge;
-
+        if (this.usableOptions.serviceCharge) {
+          this.usableOptions.realPayAmount = this.usableOptions.needPayAmount + this.usableOptions.serviceCharge;
+        }
       },
       // 定向积分： 支付方式
       orientIntergralPayType() {
@@ -450,20 +452,20 @@
           // 兜礼实际支付 
           this.result.dooolyIntergralPayAmount = this.usableOptions.needPayAmount + this.usableOptions
             .dooolyServiceCharge;
-          // 如果 兜礼积分 大于 实际兜礼支付
+          // 如果 当选中定向 且 兜礼积分 大于 实际兜礼支付 
           if (this.usableOptions.dooolyIntergral >= this.result.dooolyIntergralPayAmount && this.result
             .orientIntergralFlag) {
-            //  实际总支付手续费 = 定向混合积分 + 兜礼手续费
+            //  实际总支付手续费 = 定向手续费+ 兜礼手续费
             this.realServiceCharge = this.usableOptions.orientServiceCharge + this.usableOptions.dooolyServiceCharge;
-          } // 如果定向积分没选中 兜里积分足够的情况 
+          } // 如果当 定向积分没选中 兜里积分足够的情况 
           else if (this.usableOptions.dooolyIntergral >= this.result.dooolyIntergralPayAmount && !this.result
             .orientIntergralFlag) {
             this.realServiceCharge = this.usableOptions.dooolyServiceCharge;
-            // 如果2个积分总和 足够
+            // 如果当 2个积分都选中 且 组合满足支付
           } else if (UtilsFunction.converNumber(this.usableOptions.orientIntergral, this.usableOptions
               .dooolyIntergral) >=
             UtilsFunction.converNumber(this.usableOptions.needPayAmount, this.realServiceCharge) && this.defaultOptions
-            .supportHybrid) {
+            .supportHybrid && this.result.orientIntergralFlag) {
             this.result.dooolyIntergralPayAmount = this.usableOptions.realPayAmount - this.usableOptions
               .orientIntergral - this.usableOptions.orientServiceCharge;
             this.realServiceCharge = this.usableOptions.orientServiceCharge + this.usableOptions.dooolyServiceCharge;
@@ -495,12 +497,13 @@
       // 微信： 支付方式
       initWechat() {
         if (this.usableOptions.supportWechat) {
-          let wechatPayAmount = 0
+          let wechatPayAmount = 0;
+          if (this.defaultOptions.serviceCharge) {
+            this.realServiceCharge = 0;
+          }
           if (this.usableOptions.supportHybrid) {
-            wechatPayAmount = this.usableOptions.realPayAmount - this.result
+            wechatPayAmount = this.usableOptions.realPayAmount + this.realServiceCharge - this.result
               .orientIntergralPayAmount - this.result.dooolyIntergralPayAmount;
-            console.log(this.usableOptions.realPayAmount, this.result);
-            console.log(wechatPayAmount);
           } else {
             wechatPayAmount = this.usableOptions.realPayAmount;
           }
@@ -520,8 +523,11 @@
         // 判断是否支持支付宝支付
         if (this.usableOptions.supportAlipay) {
           let alipayPayAmount = 0;
+          if (this.defaultOptions.serviceCharge) {
+            this.realServiceCharge = 0;
+          }
           if (this.usableOptions.supportHybrid) {
-            alipayPayAmount = this.usableOptions.realPayAmount - this.result
+            alipayPayAmount = this.usableOptions.realPayAmount + this.realServiceCharge - this.result
               .orientIntergralPayAmount - this.result.dooolyIntergralPayAmount;
           } else {
             alipayPayAmount = this.usableOptions.realPayAmount;
@@ -658,6 +664,7 @@
             })
           }
         }
+        // debugger
 
 
         // 不支持混合支付时当前选中现金支付时切换到积分支付
@@ -714,7 +721,7 @@
           // 当前选中了定向积分，&& 定向积分够付 && 兜礼积分不够付的情况 && 支持混合的情况
           //点击兜礼积分取消定向积分，选中兜礼积分，并选中微信或者支付宝
           if ((orientIntergral >= UtilsFunction.converNumber(needPayAmount, orientServiceCharge) &&
-              orientIntergral < UtilsFunction.converNumber(dooolyIntergral, dooolyServiceCharge)) &&
+              dooolyIntergral < UtilsFunction.converNumber(needPayAmount, dooolyServiceCharge)) &&
             this.usableOptions.supportHybrid) {
             this.usablePayList.map(payItem => {
               if (payItem.name === 'dooolyIntergral') {
