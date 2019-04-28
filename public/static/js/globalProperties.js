@@ -214,14 +214,14 @@ const globalProperties = {
       dev: {
         m: 'https://admin.doooly.com/reachtest/dist/#/',
         activity: 'https://admin.doooly.com/reachtest/activity/#/',
-        cashier: 'https://admin.doooly.com/reachtest/cashier/#/',
+        cashier: 'https://admin.doooly.com/reachtest/cashier_v2.2.1/#/',
         thirdWebSite: 'https://admin.doooly.com/reachtest/thirdParty/#/',
         wx: ''
       },
       test: {
         m: 'https://admin.doooly.com/reach_dist/dist/#/',
         activity: 'https://admin.doooly.com/reach_dist/activity/#/',
-        cashier: 'https://admin.doooly.com/reach_dist/cashier/#/',
+        cashier: 'https://admin.doooly.com/reach_dist/cashier_v2.2.1/#/',
         thirdWebSite: 'https://admin.doooly.com/reach_dist/thirdParty/#/',
         wx: ''
       },
