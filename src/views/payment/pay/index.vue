@@ -409,10 +409,9 @@
           !this.usableOptions.supportHybrid) return false;
         // 兜礼 或者 定向 积分不足够且不支持混合 不计算手续费
         if ((this.usableOptions.dooolyIntergral < UtilsFunction.converNumber(this.usableOptions.needPayAmount,
-            this.usableOptions.dooolyServiceCharge) || (this.usableOptions.orientIntergral < UtilsFunction
+            this.usableOptions.dooolyServiceCharge) && (this.usableOptions.orientIntergral < UtilsFunction
             .converNumber(this.usableOptions.needPayAmount,
               this.usableOptions.orientServiceCharge))) && !this.defaultOptions.supportHybrid) return false;
-
         this.isShowChargePay = true;
         if (this.usableOptions.serviceCharge) {
           this.usableOptions.realPayAmount = this.usableOptions.needPayAmount + this.usableOptions.serviceCharge;
