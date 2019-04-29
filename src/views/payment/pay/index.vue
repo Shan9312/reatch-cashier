@@ -193,12 +193,12 @@
         if (res.code === 1000) {
           const data = res.data;
           //TODO:
-          // data.totalFree = 0.02;
+          // data.totalFree = 40.23;
           // data.serviceCharge = 0;
-          // data.totalServiceCharge = 0;
-          // data.commonIntegralServiceCharge = 0;
-          // data.dirIntegral = 10;
-          // data.userIntegral = 0.01;
+          // data.totalServiceCharge = 1;
+          // data.commonIntegralServiceCharge = 1;
+          // data.dirIntegral = 11.00;
+          // data.userIntegral = 30;
           // data.company = '';
           // 初始化订单信息值
           this.defaultOptions = {
@@ -463,7 +463,8 @@
             // 如果当 2个积分都选中 且 组合满足支付
           } else if (UtilsFunction.converNumber(this.usableOptions.orientIntergral, this.usableOptions
               .dooolyIntergral) >=
-            UtilsFunction.converNumber(this.usableOptions.needPayAmount, this.realServiceCharge) && this.defaultOptions
+            UtilsFunction.converNumber(this.usableOptions.needPayAmount, this.usableOptions.totalServiceCharge) && this
+            .defaultOptions
             .supportHybrid && this.result.orientIntergralFlag) {
             this.result.dooolyIntergralPayAmount = this.usableOptions.realPayAmount - this.usableOptions
               .orientIntergral - this.usableOptions.orientServiceCharge;
@@ -663,8 +664,6 @@
             })
           }
         }
-        // debugger
-
 
         // 不支持混合支付时当前选中现金支付时切换到积分支付
         if (!item.selected && !cashTypeArr.includes(item.name)) {
@@ -908,6 +907,7 @@
       },
       // 微信支付跳转接口
       wechatPayOrder(data) {
+        debugger
         const currentBaseUrl = window.location.href.substring(0, window.location.href.indexOf('#') + 1);
         if (this.browserName === 'WeChat') { // 微信支付
           this.wechatBridgePay(data);
