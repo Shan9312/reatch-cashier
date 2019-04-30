@@ -192,14 +192,6 @@
         const res = await unifiedorder(this.orderNum, this.userId, this.redirectUrl);
         if (res.code === 1000) {
           const data = res.data;
-          //TODO:
-          // data.totalFree = 40.23;
-          // data.serviceCharge = 0;
-          // data.totalServiceCharge = 1;
-          // data.commonIntegralServiceCharge = 1;
-          // data.dirIntegral = 11.00;
-          // data.userIntegral = 30;
-          // data.company = '';
           // 初始化订单信息值
           this.defaultOptions = {
             needPayAmount: UtilsFunction.converNumber(data.totalFree),
@@ -470,7 +462,7 @@
               .orientIntergral - this.usableOptions.orientServiceCharge;
             this.realServiceCharge = this.usableOptions.orientServiceCharge + this.usableOptions.dooolyServiceCharge;
           } else {
-            //如果 兜礼积分不够的情况下 
+            //如果 兜礼积分不够的情况下
             this.result.dooolyIntergralPayAmount = this.usableOptions.dooolyIntergral;
             if (this.result.orientIntergralFlag) {
               this.realServiceCharge = this.usableOptions.totalServiceCharge;
