@@ -2,48 +2,7 @@
   <div class="pay-result-warpper" :class="{'backgroundColor': isShowPayPage === 1}">
     <div>
       <!-- 大华3.8节日-->
-      <div class="confirm-order" v-if="isShowPayPage === 1">
-        <div class="titele-view">
-          <img class="titele-icon" src="@/assets/images/checkout-counter/pay_succeed.png">
-          <div class="titele-text">领取成功</div>
-          <div class="title-toast"><img class="titele-icon"
-              src="@/assets/images/checkout-counter/icon_gift.png">您的礼物正在火速打包中…
-          </div>
-          <ul class="label">
-            <li @click="handleGoHomePage">继续逛逛</li>
-            <li @click="handlerCheckList">查看详情</li>
-          </ul>
-        </div>
-        <div class="line"></div>
-        <div class="order-list">
-          <div class="order">
-            <div>订单编号</div>
-            <div>{{orderInformObj.orderNum}}</div>
-          </div>
-          <div class="order">
-            <div>兑换时间</div>
-            <div>{{orderInformObj.orderResp.orderDate}}</div>
-          </div>
-          <div class="order">
-            <div>收货人</div>
-            <div>{{orderInformObj.orderResp.consigneeName}}</div>
-          </div>
-          <div class="order">
-            <div>联系方式</div>
-            <div>{{orderInformObj.orderResp.consigneeMobile}}</div>
-          </div>
-          <div class="order">
-            <div>收货地址</div>
-            <div>{{orderInformObj.orderResp.consigneeAddr}}</div>
-          </div>
-        </div>
-        <img class="banner" src="@/assets/images/checkout-counter/banner.png" v-show="orderInformOb.hasGift == 1"
-          @click="handlerGiftList">
-        <div class="toast">
-          <b>重要提示：</b>您的礼品将在<span>10个工作日发货</span>，您可至大华福利平台—“我的”—“我的订单”查看物流单号<br>
-          有任何疑问请咨询客服电话：<span>400-158-2212</span>
-        </div>
-      </div>
+      <DahuaPage v-if="isShowPayPage === 1" :orderInformObj="orderInformObj"></DahuaPage>
       <!-- 支付成功 -->
       <div v-else-if="isShowPayPage === 2">
         <div class="title">
@@ -71,21 +30,7 @@
       </div>
     </div>
     <!-- 活动类型-->
-    <div class="pop-wrap" :class="{'fix-iphonex-bottom': isIphoneX}"
-      v-if="activityName && (isShowPayPage === 2 || isShowPayPage === 3)">
-      <div class="pop-content">
-        <h2 class="title-bold">关注兜礼公众号</h2>
-        <h2 class="title-bold-red">代金券、全年员工折扣价马上拥有</h2>
-        <p class="img-wrap">
-          <img v-if="activityName === 'AirportActivity'" class="qrcode"
-            src="@/assets/images/checkout-counter/qrcode.png" alt="">
-          <img v-else class="qrcode" src="@/assets/images/checkout-counter/qrcode_christmas.png" alt="">
-        </p>
-        <p class="qrcode-word">长按保存图片，在微信识别</p>
-        <p class="qrcode-word">或微信搜索关注公众号“兜礼”</p>
-        <p class="tip-grey">注：已关注兜礼的用户，请扫描二维码获得礼品</p>
-      </div>
-    </div>
+    <ActivePage v-if="activityName && (isShowPayPage === 2 || isShowPayPage === 3)"></ActivePage>
   </div>
 </template>
 
@@ -97,9 +42,15 @@
     MintUI,
     GlobalProperty,
   } from '@/common/global' // 引用的封装的组件
+  import DahuaPage from '@/components/DahuaPage.vue' // 大华页面
+  import ActivePage from '@/components/ActivePage.vue' // 活动页面
 
   export default {
     name: 'PaymentResult',
+    components: {
+      DahuaPage,
+      ActivePage
+    },
     data() {
       return {
         orderNum: this.$route.params.orderNum,
@@ -111,7 +62,6 @@
         }, // 活动名称对象
         activityName: '', // 活动名称
         payVersion: localStorage.payVersion,
-        isIphoneX: false, // 兼容iphoneX尺寸
         isWeChatH5: false, // 判断是否是微信h5
         browserName: GlobalProperty.browserName, // 浏览器名称
         backLock: false,
@@ -124,8 +74,7 @@
       this.isShowActivityPage();
       // 设置头部标题
       dooolyAPP.initTitle('支付结果', '2', 'golastPage()');
-      // 兼容iphoneX尺寸
-      this.judgeIsIphoneX();
+
     },
     mounted() {
       // 支付完成后点击返回
@@ -201,23 +150,6 @@
         dooolyAPP.goBackPageIndex('2');
       },
       /**
-       *大华点击: 继续逛逛 跳转
-       * 
-       * */
-      handleGoHomePage() {
-        localStorage.removeItem('isWeChatH5');
-        baiduStats("大华活动-支付成功-继续逛逛");
-        dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.m}nav/newHome`);
-      },
-      /**
-       *大华广告页点击跳转
-       * 
-       * */
-      handlerGiftList() {
-        baiduStats("大华活动-支付成功-查看更多礼包");
-        dooolyAPP.redirectActivity(`${GlobalProperty.frontendDomain.activity}giftList`);
-      },
-      /**
        * 查看列表
        * 
        * */
@@ -239,18 +171,7 @@
         localStorage.removeItem('isWeChatH5');
         dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.m}nav/newHome`);
       },
-      /**
-       * 判断若是phonex的尺寸
-       * 
-       * **/
-      judgeIsIphoneX() {
-        function testUA(str) {
-          return navigator.userAgent.indexOf(str) > -1
-        }
-        let isIphoneX = window.devicePixelRatio && window.devicePixelRatio === 3 && window.screen.width === 375 &&
-          testUA('iPhone');
-        this.isIphoneX = isIphoneX;
-      },
+
     },
     destroyed() {
       // 页面销毁，移除监听
@@ -261,7 +182,6 @@
     beforeRouteLeave(to, from, next) {
       if (this.browserName !== "Chrome WebView" && this.browserName !== "WebKit") {
         if (this.browserName == "WeChat" && to.name == "Payment") {
-          debugger
           window.history.go(-2);
         } else {
           window.history.go(-1);
@@ -287,7 +207,7 @@
       margin-bottom: 0.3rem;
       height: 0.24rem;
       line-height: 0.24rem;
-      background: url('../../../assets/images/checkout-counter/pay_succeed.png') no-repeat 1.34rem;
+      background: url('~@/assets/images/checkout-counter/pay_succeed.png') no-repeat 1.34rem;
       background-size: auto 100%;
       color: #333;
       font-size: 0.18rem;
@@ -295,7 +215,7 @@
       text-indent: 0.34rem;
 
       &.error {
-        background-image: url('../../../assets/images/checkout-counter/pay_error.png');
+        background-image: url('~@/assets/images/checkout-counter/pay_error.png');
       }
     }
 
@@ -310,162 +230,5 @@
       }
     }
 
-    .label {
-      margin-top: 0.6rem;
-      padding-bottom: 0.2rem;
-      text-align: center;
-
-      li {
-        display: inline-block;
-        width: 1.2rem;
-        height: 0.36rem;
-        line-height: 0.36rem;
-        font-size: 0.14rem;
-        color: #333;
-        border-radius: 0.05rem;
-        border: 1px solid #ddd;
-
-        &:nth-child(1) {
-          margin-right: 0.2rem;
-        }
-      }
-
-      .error {
-        border-color: #ee3f44;
-        color: #ee3f44;
-      }
-    }
-
-    /* pop */
-    .pop-wrap {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-
-      &.fix-iphonex-bottom {
-        bottom: 34px;
-      }
-
-      .pop-content {
-        padding: 0.3rem 0.34rem 0.14rem;
-        text-align: center;
-        font-size: 0.14rem;
-        color: #333;
-
-        h2 {
-          font-size: 0.14rem;
-        }
-      }
-
-      .title-bold {
-        color: #333;
-        font-weight: bold;
-      }
-
-      .title-bold-red {
-        color: #ee3f44;
-        font-weight: bold;
-      }
-
-      .img-wrap {
-        overflow: hidden;
-
-        img {
-          width: 1.44rem;
-        }
-
-        .qrcode {
-          padding-top: 0.06rem;
-        }
-      }
-
-      .tip-grey {
-        font-size: 0.12rem;
-        padding-top: 0.08rem;
-        color: #999999;
-      }
-    }
-
-    .confirm-order {
-      text-align: center;
-
-      .titele-view {
-        background: #fff;
-      }
-
-      .titele-icon {
-        width: 0.6rem;
-        margin: 0.25rem auto 0.16rem auto;
-      }
-
-      .titele-text {
-        font-size: 0.18rem;
-        color: #333;
-        margin-bottom: 0.12rem;
-      }
-
-      .title-toast {
-        font-size: 0.14rem;
-        color: #999;
-        display: flex;
-        justify-content: center;
-
-        img {
-          width: 0.18rem;
-          height: 0.18rem;
-          margin: 0;
-          margin-right: 0.06rem;
-        }
-      }
-
-      .label {
-        margin-top: 0.17rem;
-      }
-
-      .line {
-        width: 100%;
-        height: 0.1rem;
-        background: #f5f5f5;
-      }
-
-      .order-list {
-        padding: 0.12rem 0;
-        background: #fff;
-
-        .order {
-          display: flex;
-          justify-content: space-between;
-          padding: 0.05rem 0.15rem;
-          font-size: 0.12rem;
-          color: #333;
-
-          div:first-child {
-            color: #999;
-          }
-        }
-      }
-
-      .banner {
-        width: 3.45rem;
-        margin-top: 0.2rem;
-      }
-
-      .toast {
-        font-size: 0.12rem;
-        color: #999;
-        padding: 0 0.15rem;
-        text-align: left;
-        margin-top: 0.18rem;
-
-        b {
-          color: #666;
-        }
-
-        span {
-          color: #ee3f44;
-        }
-      }
-    }
   }
 </style>

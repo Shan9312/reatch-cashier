@@ -130,7 +130,7 @@
           supportHybrid: true, // 是否支持混合支付
           supportWechat: true, // 是否支持微信支付
           supportAlipay: true, // 是否支持支付宝
-          isPayPassword: '1', // 后端返回：'1' :短信验证; '2' :密码支付
+          isPayPassword: '1', // 后端返回：'1' / '0':短信验证; '2' :密码支付
           payId: '', // 后端返回的 预订单ID
           dirIntegralSwitch: false, // 支付方式为 定向积分，发给后端字段
           commonIntegralSwitch: false, // 支付方式为 兜礼积分，发给后端字段
@@ -899,7 +899,6 @@
       },
       // 微信支付跳转接口
       wechatPayOrder(data) {
-        debugger
         const currentBaseUrl = window.location.href.substring(0, window.location.href.indexOf('#') + 1);
         if (this.browserName === 'WeChat') { // 微信支付
           this.wechatBridgePay(data);
@@ -1031,7 +1030,7 @@
       padding: 0.14rem 0.15rem 0.36rem;
       font-size: 0.16rem;
       color: #333;
-      background: #fff url('../../../assets/images/checkout-counter/title_background.png') repeat-x 0 bottom;
+      background: #fff url('~@/assets/images/checkout-counter/title_background.png') repeat-x 0 bottom;
       background-size: auto 0.15rem;
 
       .amount {

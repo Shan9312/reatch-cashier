@@ -3,7 +3,7 @@
     <div class="content">
       <div class="keyboard-title">
         <img src="@/assets/images/checkout-counter/icon_close.png" alt="" @click="handlerClose">
-        {{isPayPassword == '1' ? '请输入短信验证码' : '请输入兜礼支付密码'}}
+        {{isPayPassword != '2' ? '请输入短信验证码' : '请输入兜礼支付密码'}}
       </div>
       <!-- 密码输入框 -->
       <div class="password-list">
@@ -17,7 +17,7 @@
       <!-- 短信提示信息 -->
       <div class="message-title">
         <!-- 定向积分支付 手机验证码 -->
-        <p v-if="isPayPassword === '1'" class="code">
+        <p v-if="isPayPassword != '2'" class="code">
           <span v-if="countdownNum === 0 || countdownNum === 60">
             未收到验证码，请
             <label class="text-color-red" @click="handlerRepeatVerificat">重新获取</label>
@@ -55,6 +55,7 @@
     props: {
       isPayPassword: {
         type: String,
+        required: true,
       }, // 1: 短信 ,2: 密码支付,
       handlerCloseKeyboard: {
         type: Function,
