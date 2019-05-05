@@ -159,7 +159,7 @@
       };
     },
     filters: {
-      fixedNum: function (num) {
+      fixedNum(num) {
         if (!num) return 0;
         return Number(num).toFixed(2);
       },
