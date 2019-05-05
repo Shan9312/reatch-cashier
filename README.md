@@ -28,7 +28,7 @@ Vue-Cli详细内容见
 ## 2.3 环境配置
 见 [reach-cashier/vue.config.js]
 
-# 项目备注说明
+#3.项目备注说明
 
 ## 3.1 项目引入公共文件
 index.html中引用公共文件 如: dooolyAPP,globalProperties 等
@@ -36,10 +36,10 @@ index.html中引用公共文件 如: dooolyAPP,globalProperties 等
 
 ## 3.2 接口API 
 见 [reach-cashier/src/service]
-改项目的后端负责人: 张青
+改项目的后端接口负责人: 张青
 
-## 3.3 项目重构参与人
-前端主要参与人: 秦明, 郝闪闪
+## 3.3 收银台前端重构参与人
+秦明, 郝闪闪
 
 
 
