@@ -29,7 +29,7 @@ Vue-Cli详细内容见
 ## 2.3 环境配置
 见 [reach-cashier/vue.config.js]
 
-#3.项目备注说明
+# 3.项目备注说明
 
 ## 3.1 引入公共资源文件
 index.html中引用公共文件 如: dooolyAPP,globalProperties 等
