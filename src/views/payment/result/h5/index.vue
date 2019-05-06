@@ -22,6 +22,8 @@
         orderNum: this.$route.params.orderNum,
         productType: this.$route.params.productType,
         count: 0,
+        browserName: GlobalProperty.browserName, // 浏览器名称
+
       };
     },
     created() {
@@ -73,10 +75,7 @@
        * 回退的判断
        * */
       handlerGoBack() {
-        const parser = new UAParser();
-        const result = parser.getResult();
-        let browser = result.browser.name;
-        if (browser == "Mobile Safari") {
+        if (this.browserName == "Mobile Safari") {
           // 苹果浏览器少返回一级
           window.history.go(-3);
         } else {
