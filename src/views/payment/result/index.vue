@@ -71,9 +71,12 @@
       this.getPayOrder();
       // 判断活动二维码是否显示
       this.isShowActivityPage();
-      // 设置头部标题
-      dooolyAPP.initTitle('支付结果', '2', 'golastPage()');
 
+
+      window.golastPage = function () {
+        dooolyAPP.goBackPageIndex('2');
+      };
+      dooolyAPP.initTitle('支付结果', '2', 'golastPage()');
     },
     mounted() {
       // 支付完成后点击返回
@@ -140,13 +143,6 @@
         if (this.activityName) {
           baiduStats(this.umengNameObj[this.activityName] + "支付成功");
         }
-      },
-      /**
-       * 点击返回2级
-       * 
-       * */
-      golastPage() {
-        dooolyAPP.goBackPageIndex('2');
       },
       /**
        * 查看列表
