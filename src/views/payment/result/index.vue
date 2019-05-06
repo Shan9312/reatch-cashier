@@ -175,10 +175,10 @@
     },
     beforeRouteLeave(to, from, next) {
       if (this.browserName !== "Chrome WebView" && this.browserName !== "WebKit") {
-        if (this.browserName == "WeChat" && to.name == "Payment") {
-          window.history.go(-2);
-        } else {
+        if (to.name == 'Payment' && !this.backLock) {
+          this.backLock = true;
           window.history.go(-1);
+          return
         }
       }
       next();
