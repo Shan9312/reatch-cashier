@@ -12,7 +12,7 @@
           <span class="mark">￥</span>{{orderInformObj.totalAmount}}
         </div>
         <ul class="label">
-          <li @click="handlerCheckList">{{payVersion? '查看列表' :'查看详情'}}</li>
+          <li @click="handlerCheckList">查看列表</li>
           <li @click="handlerReturnHomePage">返回首页</li>
         </ul>
       </div>
@@ -61,7 +61,6 @@
           'ChristmasActivity': '圣诞平安夜'
         }, // 活动名称对象
         activityName: '', // 活动名称
-        payVersion: localStorage.payVersion,
         isWeChatH5: false, // 判断是否是微信h5
         browserName: GlobalProperty.browserName, // 浏览器名称
         backLock: false,
@@ -155,13 +154,8 @@
        * */
       handlerCheckList() {
         baiduStats("支付成功-查看详情");
-        if (this.payVersion === 'payV2') {
-          dooolyAPP.gotoJumpJq(this.$router,
-            `${GlobalProperty.frontendDomain.m}myOrderList/1/all`);
-        } else {
-          dooolyAPP.gotoJumpJq(this.$router,
-            `${GlobalProperty.frontendDomain.thirdWebSite}myOrderDetail/${this.orderInformObj.orderId}`);
-        }
+        dooolyAPP.gotoJumpJq(this.$router,
+          `${GlobalProperty.frontendDomain.m}myOrderList/1/all`);
       },
       /**
        * 返回首页

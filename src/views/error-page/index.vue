@@ -23,7 +23,7 @@
     methods: {
       // 跳转首页
       goHomePage() {
-        dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.thirdWebSite}`)
+        dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.m}`)
       }
     }
   }

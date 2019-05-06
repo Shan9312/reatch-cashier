@@ -22,7 +22,6 @@
         orderNum: this.$route.params.orderNum,
         productType: this.$route.params.productType,
         count: 0,
-        payVersion: UtilsFunction.getUrlParams("payVersion")
       };
     },
     created() {
@@ -67,7 +66,7 @@
             message: res.msg
           });
           // 跳转 home
-          dooolyAPP.jumpIndexPage(this.$router, "/nav/newHome");
+          dooolyAPP.jumpIndexPage(this.$router, "/v3/home");
         }
       },
       /**

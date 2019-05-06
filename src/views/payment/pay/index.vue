@@ -1,7 +1,7 @@
 <template>
   <div class="pay-warpper">
     <div class="content">
-      需支付：
+      需支付*金额:
       <!-- 日常的商品手续费 -->
       <span v-if="defaultOptions.serviceCharge">
         <span class="amount">
@@ -72,7 +72,7 @@
         <p>确定要离开收银台？</p>
         <div class="input-view">
           <div @click="handlerReturnPrePage" class="leave-input-btn left">确认离开</div>
-          <div @click="continuePay" class="leave-input-btn right">继续支付</div>
+          <div @click="continuePay(false)" class="leave-input-btn right">继续支付</div>
         </div>
       </div>
     </div>
@@ -174,11 +174,58 @@
       // 获取用户 订单信息
       this.getPayContentByUserId();
       console.log('***hss-test***');
+      const _this = this;
+      // 付款成功后返回的值
+      window.payResponseMsg = async function () {
+        const res = await getPayResult(_this.orderNum);
+        if (res.code === 1000 || res.code === 1001) {
+          // 根据支付环境 跳转到不同的页面
+          if (res.data && res.data.redirectUrl) { // 接口有值，直接跳接口的
+            dooolyAPP.gotoJumpJq(_this.$router, res.data.redirectUrl);
+          } else if (_this.handlerThirdJudge()) { // 若有美团接口 之间跳转美团
+            dooolyApp.gotoJumpJq(_this.$router, _this.meituanInfo.return_url)
+          } else if (_this.defaultOptions.productType == 7) { // 活动页面
+            const {
+              code,
+              totalAmount,
+              orderId,
+              orderNum,
+              activityParam
+            } = res.data;
+            dooolyAPP.gotoJumpJq(_this.$router,
+              `${GlobalProperty.frontendDomain.m}activity_cardBuyPayResult/${code}/${totalAmount}/${orderId}/${orderNum}/${activityParam}/${_this.defaultOptions.productType}`
+            )
+          } else { // 支付结果页面 
+            dooolyAPP.gotoJumpVue(_this.$router, `/cardBuyPayResult/${_this.orderNum}`)
+          }
+
+        } else {
+          MintUI.Toast.open({
+            message: res.msg,
+          });
+        }
+      };
+      window.altNoticeAndriod = function () {
+        _this.handlerCloseKeyboard(false);
+        if (browserName == "Chrome WebView" || browserName == "otherAPPAndroid") {
+          RHNativeJS.visablePtrFrame("false");
+          HNativeJS.setTopDialog("true");
+        }
+      };
+      window.altNotice = function () {
+        if (browserName == "WebKit" || browserName == "otherAPPIos") {
+          window.webkit.messageHandlers.hideNavgationBar.postMessage('1');
+        }
+        _this.handlerCloseKeyboard(false);
+      };
+      window.isConfirmShow = function () { // 确认离开弹框
+        _this.continuePay(true);
+        _this.handlerCloseKeyboard(false);
+      };
+      dooolyAPP.initTitle('兜礼收银台', '2', 'isConfirmShow()')
+
     },
-    mounted() {
-      // 监听 且无刷新的 在浏览历史中添加/修改记录
-      this.handlerMonitorState();
-    },
+    mounted() {},
     methods: {
       // 点击返回上一页
       handlerReturnPrePage() {
@@ -877,7 +924,7 @@
           } else if (this.payType === 11) { // 支付宝混合支付
             this.apliyPayOrder(res.data);
           } else {
-            this.payResponseMsg(); // 付款成功后返回的消息 跳转
+            window.payResponseMsg();
           }
         } else if (res.code === 1016 || res.code === 1017) { // 1016:手机验证码失败; 1017:验证码已过期，请重新获取
           this.promptDialog = true;
@@ -895,7 +942,7 @@
 
       // 支付宝支付跳转接口
       apliyPayOrder(data) {
-        dooolyAPP.appPay(data, "payResponseMsg", 'zfb');
+        dooolyAPP.appPay(data, 'payResponseMsg', 'zfb');
       },
       // 微信支付跳转接口
       wechatPayOrder(data) {
@@ -919,7 +966,7 @@
           }
 
         } else {
-          dooolyAPP.appPay(data, "payResponseMsg", 'wx') // doooly app
+          dooolyAPP.appPay(data, 'payResponseMsg', 'wx') // doooly app
         }
 
       },
@@ -939,7 +986,7 @@
             MintUI.Toast.open({
               message: '支付成功',
             });
-            _this.payResponseMsg();
+            window.payResponseMsg();
           } else if (res.err_msg == "get_brand_wcpay_request:cancel") {
             MintUI.Toast.open({
               message: '用户取消支付!',
@@ -948,42 +995,9 @@
             MintUI.Toast.open({
               message: '支付失败!',
             });
-            _this.payResponseMsg();
+            window.payResponseMsg();
           }
         })
-      },
-      /**
-       * 付款成功后返回的值
-       *
-       * */
-      async payResponseMsg() {
-        const res = await getPayResult(this.orderNum);
-        if (res.code === 1000 || res.code === 1001) {
-          // 根据支付环境 跳转到不同的页面
-          if (res.data && res.data.redirectUrl) { // 接口有值，直接跳接口的
-            dooolyAPP.gotoJumpJq(this.$router, res.data.redirectUrl);
-          } else if (this.handlerThirdJudge()) { // 若有美团接口 之间跳转美团
-            dooolyApp.gotoJumpJq(this.$router, this.meituanInfo.return_url)
-          } else if (this.defaultOptions.productType == 7) { // 活动页面
-            const {
-              code,
-              totalAmount,
-              orderId,
-              orderNum,
-              activityParam
-            } = res.data;
-            dooolyAPP.gotoJumpJq(this.$router,
-              `${GlobalProperty.frontendDomain.thirdWebSite}activity_cardBuyPayResult/${code}/${totalAmount}/${orderId}/${orderNum}/${activityParam}/${this.defaultOptions.productType}`
-            )
-          } else { // 支付结果页面 
-            dooolyAPP.gotoJumpVue(this.$router, `/cardBuyPayResult/${this.orderNum}`)
-          }
-
-        } else {
-          MintUI.Toast.open({
-            message: res.msg,
-          });
-        }
       },
       // 判断第三方 美团支付付款情况
       handlerThirdJudge() {
@@ -997,25 +1011,9 @@
         }
       },
       // 微信/支付宝 点击 继续支付
-      continuePay() {
-        this.isShowLeaveBtn = false;
-        history.pushState(null, null, document.URL);
+      continuePay(v) {
+        this.isShowLeaveBtn = v;
       },
-      // 监听：在浏览添 前进/后退 添加修改记录。 无刷新跳转页面
-      handlerMonitorState() {
-        if (this.browserName == 'WeChat' || this.browserName == 'enterpriseWX') {
-          history.pushState(null, null, document.URL);
-          window.addEventListener('popstate', () => {
-            this.isShowLeaveBtn = true;
-          }, false);
-        }
-      },
-    },
-    destroyed() {
-      // 页面销毁，移除监听
-      window.removeEventListener('popstate', function () {
-        this.isShowLeaveBtn = true;
-      }, false);
     },
   }
 </script>

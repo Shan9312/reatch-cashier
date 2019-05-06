@@ -106,7 +106,7 @@
        * 
        * */
       handlerForgetPassword() {
-        dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.thirdWebSite}verification/0/2`);
+        dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.m}verification/0/2`);
       },
       /**
        * 若是积分付款则 60s倒计时

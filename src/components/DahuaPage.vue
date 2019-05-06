@@ -82,7 +82,7 @@
             `${GlobalProperty.frontendDomain.m}myOrderList/1/all`);
         } else {
           dooolyAPP.gotoJumpJq(this.$router,
-            `${GlobalProperty.frontendDomain.thirdWebSite}myOrderDetail/${this.orderInformObj.orderId}`);
+            `${GlobalProperty.frontendDomain.m}myOrderDetail/${this.orderInformObj.orderId}`);
         }
       },
       /**
