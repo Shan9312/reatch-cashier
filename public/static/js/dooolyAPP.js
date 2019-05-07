@@ -192,7 +192,9 @@
       else {
         var r = e.aLiPayUrl,
           a = document.createElement("div");
-        a.innerHTML = r, document.body.appendChild(a), document.forms[0].submit()
+        a.innerHTML = r;
+        document.body.appendChild(a);
+        document.forms[0].submit();
       }
     } catch (e) {
       errorLog(e)

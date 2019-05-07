@@ -146,7 +146,7 @@
         isShowChargePay: false, // 是否显示手续费
         usablePayList: [], // 支付种类的列表; 如 定积分/兜礼/微信/支付宝 等等
         isShowKeyboard: false, // 是否显示 键盘页面
-        redirectUrl: '', // 支付成功页面；从接口取得返回地址，接口有值给后台就传接口的值
+        redirectUrl: `${GlobalProperty.frontendDomain.cashier}cardBuyPayResult/`, // 支付成功页面；从接口取得返回地址，接口有值给后台就传接口的值
         responseRedirectUrl: false, // 判断 unifiedorder接口获取的地址是否有
         tradeType: 'DOOOLY_JS', // 设置交易类型 默认 DOOOLY_JS
         payType: 0, // 设置付款类型
@@ -171,6 +171,7 @@
       },
     },
     created() {
+      console.log(this.redirectUrl);
       // 获取用户 订单信息
       this.getPayContentByUserId();
       console.log('***hss-test***');
@@ -947,9 +948,9 @@
       // 微信支付跳转接口
       wechatPayOrder(data) {
         const currentBaseUrl = window.location.href.substring(0, window.location.href.indexOf('#') + 1);
-        if (this.browserName === 'WeChat') { // 微信支付
+        if (this.browserName === 'WeChat') { // app 支付
           this.wechatBridgePay(data);
-        } else if (this.tradeType == 'DOOOLY_H5') { // 微信公众号
+        } else if (this.tradeType == 'DOOOLY_H5') { // h5支付
           let redirect_url = window.encodeURIComponent(
             `${currentBaseUrl}/cardBuyPayResultH5/${this.orderNum}/${this.defaultOptions.productType}`)
           if (this.responseRedirectUrl) { // 判断 unifiedorder接口获取的地址
