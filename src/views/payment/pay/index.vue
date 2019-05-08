@@ -226,7 +226,9 @@
       dooolyAPP.initTitle('兜礼收银台', '2', 'isConfirmShow()')
 
     },
-    mounted() {},
+    mounted() {
+
+    },
     methods: {
       // 点击返回上一页
       handlerReturnPrePage() {
@@ -508,7 +510,7 @@
             .supportHybrid && this.result.orientIntergralFlag) {
             this.result.dooolyIntergralPayAmount = this.usableOptions.realPayAmount - this.usableOptions
               .orientIntergral - this.usableOptions.orientServiceCharge;
-            this.realServiceCharge = this.usableOptions.orientServiceCharge + this.usableOptions.dooolyServiceCharge;
+            this.realServiceCharge = this.usableOptions.totalServiceCharge;
           } else {
             //如果 兜礼积分不够的情况下
             this.result.dooolyIntergralPayAmount = this.usableOptions.dooolyIntergral;
