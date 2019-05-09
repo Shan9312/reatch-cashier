@@ -71,8 +71,6 @@
       this.getPayOrder();
       // 判断活动二维码是否显示
       this.isShowActivityPage();
-
-
       window.golastPage = function () {
         dooolyAPP.goBackPageIndex('2');
       };

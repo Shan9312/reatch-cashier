@@ -171,13 +171,12 @@
       },
     },
     created() {
-      console.log(this.redirectUrl);
       // 获取用户 订单信息
       this.getPayContentByUserId();
       console.log('***hss-test***');
       const _this = this;
       // 付款成功后返回的值
-      window.payResponseMsg = async function () {
+      window.pay_callBack = async function () {
         const res = await getPayResult(_this.orderNum);
         if (res.code === 1000 || res.code === 1001) {
           // 根据支付环境 跳转到不同的页面
@@ -208,13 +207,13 @@
       };
       window.altNoticeAndriod = function () {
         _this.handlerCloseKeyboard(false);
-        if (browserName == "Chrome WebView" || browserName == "otherAPPAndroid") {
+        if (_this.browserName == "Chrome WebView" || _this.browserName == "otherAPPAndroid") {
           RHNativeJS.visablePtrFrame("false");
           HNativeJS.setTopDialog("true");
         }
       };
       window.altNotice = function () {
-        if (browserName == "WebKit" || browserName == "otherAPPIos") {
+        if (_this.browserName == "WebKit" || _this.browserName == "otherAPPIos") {
           window.webkit.messageHandlers.hideNavgationBar.postMessage('1');
         }
         _this.handlerCloseKeyboard(false);
@@ -927,7 +926,7 @@
           } else if (this.payType === 11) { // 支付宝混合支付
             this.apliyPayOrder(res.data);
           } else {
-            window.payResponseMsg();
+            window.pay_callBack();
           }
         } else if (res.code === 1016 || res.code === 1017) { // 1016:手机验证码失败; 1017:验证码已过期，请重新获取
           this.promptDialog = true;
@@ -945,12 +944,12 @@
 
       // 支付宝支付跳转接口
       apliyPayOrder(data) {
-        dooolyAPP.appPay(data, 'payResponseMsg', 'zfb');
+        dooolyAPP.appPay(data, 'pay_callBack', 'zfb');
       },
       // 微信支付跳转接口
       wechatPayOrder(data) {
         const currentBaseUrl = window.location.href.substring(0, window.location.href.indexOf('#') + 1);
-        if (this.browserName === 'WeChat') { // app 支付
+        if (this.browserName === 'WeChat') { // 微信 支付
           this.wechatBridgePay(data);
         } else if (this.tradeType == 'DOOOLY_H5') { // h5支付
           let redirect_url = window.encodeURIComponent(
@@ -967,9 +966,8 @@
           } else {
             window.location.href = `${data.mwebUrl}&redirect_url=${redirect_url}`;
           }
-
         } else {
-          dooolyAPP.appPay(data, 'payResponseMsg', 'wx') // doooly app
+          dooolyAPP.appPay(data, 'pay_callBack', 'wx') // doooly app
         }
 
       },
@@ -989,7 +987,7 @@
             MintUI.Toast.open({
               message: '支付成功',
             });
-            window.payResponseMsg();
+            window.pay_callBack();
           } else if (res.err_msg == "get_brand_wcpay_request:cancel") {
             MintUI.Toast.open({
               message: '用户取消支付!',
@@ -998,7 +996,7 @@
             MintUI.Toast.open({
               message: '支付失败!',
             });
-            window.payResponseMsg();
+            window.pay_callBack();
           }
         })
       },
