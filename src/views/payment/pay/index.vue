@@ -491,7 +491,7 @@
           if (this.usableOptions.dooolyIntergral >= this.result.dooolyIntergralPayAmount && this.result
             .orientIntergralFlag) {
             //  实际总支付手续费 = 定向手续费+ 兜礼手续费
-            this.realServiceCharge = this.usableOptions.orientServiceCharge + this.usableOptions.dooolyServiceCharge;
+            this.realServiceCharge = this.usableOptions.totalServiceCharge;
           } // 如果当 定向积分没选中 兜里积分足够的情况 
           else if (this.usableOptions.dooolyIntergral >= this.result.dooolyIntergralPayAmount && !this.result
             .orientIntergralFlag) {
