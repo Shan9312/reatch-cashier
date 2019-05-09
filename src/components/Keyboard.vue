@@ -81,7 +81,7 @@
        * 确认订单支付按钮： 把密码/验证值 传给父，在父组件中执行订单支付
        * */
       handlerPayBtn() {
-        if (!this.verificationCodeArr || this.verificationCodeArr.length != 6) return false
+        if (!this.verificationCodeArr || this.verificationCodeArr.length != 6) return;
         this.$emit('handlerPayOrderBtn', this.verificationCodeArr.join(''));
       },
       /**

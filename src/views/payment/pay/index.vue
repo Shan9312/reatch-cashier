@@ -225,14 +225,8 @@
       dooolyAPP.initTitle('兜礼收银台', '2', 'isConfirmShow()')
 
     },
-    mounted() {
-
-    },
+    mounted() {},
     methods: {
-      // 点击返回上一页
-      handlerReturnPrePage() {
-        dooolyAPP.goBackPageIndex('1');
-      },
       /**
        * 根据用户的信息 获取付款页面的内容
        * 并且根据 返回的paymethods 的值 判断付款列表
@@ -258,6 +252,7 @@
             supportAlipay: true,
             dirIntegralSwitch: false,
             commonIntegralSwitch: false,
+            supportPayType: data.supportPayType,
             orientServiceCharge: UtilsFunction.converNumber(data.serviceCharge) ? UtilsFunction.converNumber(data
               .serviceCharge) : UtilsFunction.converNumber(
               data.dirIntegralServiceCharge), // 定向积分足够 服务费
@@ -857,18 +852,22 @@
       tradeTypeByBrowserName() {
         if (this.browserName === 'WeChat') {
           if (localStorage.token == localStorage.wiscoToken) {
-            this.tradeType = 'WISCO_JS'
+            this.tradeType = 'WISCO_JS';
           } else {
-            this.tradeType = 'DOOOLY_JS'
+            this.tradeType = 'DOOOLY_JS';
           }
         } else if (this.browserName == 'WebKit' || this.browserName == 'Chrome WebView') {
           this.tradeType = 'DOOOLY_APP'; // 兜礼 app
         } else if (this.browserName == 'otherAPPAndroid' || this.browserName == 'otherAPPIos') {
           this.tradeType = 'WISCO_APP'; // 其他第三方app
         } else if (this.payType === 1 || this.payType === 2) { // 含微信的支付，不在微信和app中，用微信h5调起微信
-          this.tradeType = 'DOOOLY_H5'
+          this.tradeType = 'DOOOLY_H5';
         } else {
           this.tradeType = 'DOOOLY_JS'; // 默认
+        }
+        if (this.defaultOptions.supportPayType == 0) {
+          this.tradeType = 'doooly_zero';
+          this.payType = 0;
         }
       },
       /**
@@ -886,6 +885,10 @@
           this.defaultOptions.commonIntegralSwitch ? '1' : '0',
           this.defaultOptions.dirIntegralSwitch ? '1' : '0',
         );
+        if (this.defaultOptions.supportPayType == 0 && res.code === 1000) {
+          this.handlerPayOrderBtn();
+          return
+        }
         if (res.code === 1000) {
           if (this.selectedPayList.filter(payItem => payItem.id < 3).length) { // 只要含有积分,就键盘弹出 倒计时计数 
             this.isShowKeyboard = true;
@@ -911,6 +914,8 @@
         if (this.defaultOptions.isPayPassword === '2') { // 密码输入 需要加密
           code = UtilsFunction.encrypt(code);
         }
+        // 若 是0元支付金额 就默认验证码 111111
+        if (this.defaultOptions.supportPayType == 0) code = '11111';
         const res = await integralPay(
           this.orderNum,
           this.userId,
@@ -1014,6 +1019,10 @@
       // 微信/支付宝 点击 继续支付
       continuePay(v) {
         this.isShowLeaveBtn = v;
+      },
+      // 点击返回上一页
+      handlerReturnPrePage() {
+        dooolyAPP.goBackPageIndex('1');
       },
     },
   }
