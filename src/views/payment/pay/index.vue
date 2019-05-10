@@ -31,7 +31,7 @@
                 src="@/assets/images/checkout-counter/icon_why.png" alt="定向积分疑问">
             </span>
             <span class="fr direct-available">可抵扣余额:
-              <label> {{item.payAmount > 0? item.payAmount  : '余额不可用'}}</label>
+              <label> {{item.payAmount > 0? item.payAmount  : '余额不可用' | fixedNum }}</label>
             </span>
           </div>
           <!-- 支付选择状态 组件 -->
@@ -258,7 +258,8 @@
               data.dirIntegralServiceCharge), // 定向积分足够 服务费
             dooolyServiceCharge: UtilsFunction.converNumber(data.serviceCharge) ? UtilsFunction.converNumber(data
               .serviceCharge) : UtilsFunction.converNumber(data.commonIntegralServiceCharge), // 兜里积分足够的 服务费
-            totalServiceCharge: UtilsFunction.converNumber(data.serviceCharge) ? 0 : UtilsFunction.converNumber(data
+            totalServiceCharge: UtilsFunction.converNumber(data.serviceCharge) ? UtilsFunction.converNumber(data
+              .serviceCharge) : UtilsFunction.converNumber(data
               .totalServiceCharge),
           }
           // 特殊情况：判断 不支持混合的公司 测试环境 欧飞 正式环境 是 兜礼
@@ -402,24 +403,15 @@
             totalServiceCharge,
             orientServiceCharge,
             dooolyServiceCharge,
+            serviceCharge,
           } = this.defaultOptions;
-          // 如果两个都小于 总金额
+          const chargeFee = serviceCharge;
+          // 只要 2个积分组合不满足 支付 就都禁止掉
           if ((UtilsFunction.converNumber(orientIntergral, dooolyIntergral) <
               UtilsFunction.converNumber(needPayAmount, totalServiceCharge))) {
             [orientUsable, dooolyUsable] = [false, false];
-          }
-          // 定向不满足 兜礼满足
-          else if (orientIntergral < UtilsFunction.converNumber(needPayAmount, orientServiceCharge) &&
-            dooolyIntergral >= UtilsFunction.converNumber(needPayAmount, dooolyServiceCharge)) {
+          } else {
             [orientUsable, dooolyUsable] = [true, true];
-            // 定向满足 兜礼不满足
-          } else if (orientIntergral >= UtilsFunction.converNumber(needPayAmount, orientServiceCharge) &&
-            dooolyIntergral < UtilsFunction.converNumber(needPayAmount, dooolyServiceCharge)) {
-            [orientUsable, dooolyUsable] = [true, true];
-            // 定向 & 兜礼 都不满足
-          } else if (orientIntergral < UtilsFunction.converNumber(needPayAmount, orientServiceCharge) &&
-            dooolyIntergral < UtilsFunction.converNumber(needPayAmount, dooolyServiceCharge)) {
-            [orientUsable, dooolyUsable] = [false, false];
           }
         }
         // 积分小于0 都禁用
@@ -445,11 +437,6 @@
         if (UtilsFunction.converNumber(this.usableOptions.orientIntergral, this.usableOptions.dooolyIntergral) <
           UtilsFunction.converNumber(this.usableOptions.needPayAmount, this.usableOptions.totalServiceCharge) &&
           !this.usableOptions.supportHybrid) return false;
-        // 兜礼 或者 定向 积分不足够且不支持混合 不计算手续费
-        if ((this.usableOptions.dooolyIntergral < UtilsFunction.converNumber(this.usableOptions.needPayAmount,
-            this.usableOptions.dooolyServiceCharge) && (this.usableOptions.orientIntergral < UtilsFunction
-            .converNumber(this.usableOptions.needPayAmount,
-              this.usableOptions.orientServiceCharge))) && !this.defaultOptions.supportHybrid) return false;
         this.isShowChargePay = true;
         if (this.usableOptions.serviceCharge) {
           this.usableOptions.realPayAmount = this.usableOptions.needPayAmount + this.usableOptions.serviceCharge;
@@ -502,8 +489,7 @@
           } else if (UtilsFunction.converNumber(this.usableOptions.orientIntergral, this.usableOptions
               .dooolyIntergral) >=
             UtilsFunction.converNumber(this.usableOptions.needPayAmount, this.usableOptions.totalServiceCharge) && this
-            .defaultOptions
-            .supportHybrid && this.result.orientIntergralFlag) {
+            .result.orientIntergralFlag) {
             this.result.dooolyIntergralPayAmount = this.usableOptions.realPayAmount - this.usableOptions
               .orientIntergral - this.usableOptions.orientServiceCharge;
             this.realServiceCharge = this.usableOptions.totalServiceCharge;
