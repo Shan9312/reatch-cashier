@@ -31,7 +31,7 @@
                 src="@/assets/images/checkout-counter/icon_why.png" alt="定向积分疑问">
             </span>
             <span class="fr direct-available">可抵扣余额:
-              <label> {{item.payAmount > 0? item.payAmount  : '余额不可用' | fixedNum }}</label>
+              <label> {{item.payAmount ? Number(item.payAmount).toFixed(2) : '余额不可用' }}</label>
             </span>
           </div>
           <!-- 支付选择状态 组件 -->
