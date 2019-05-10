@@ -408,13 +408,15 @@
               UtilsFunction.converNumber(needPayAmount, totalServiceCharge))) {
             [orientUsable, dooolyUsable] = [false, false];
           }
-          // 有一项积分 > 实际金额 而 另一个小于 总金额 的情况
+          // 定向不满足 兜礼满足
           else if (orientIntergral < UtilsFunction.converNumber(needPayAmount, orientServiceCharge) &&
             dooolyIntergral >= UtilsFunction.converNumber(needPayAmount, dooolyServiceCharge)) {
-            [orientUsable, dooolyUsable] = [false, true];
+            [orientUsable, dooolyUsable] = [true, true];
+            // 定向满足 兜礼不满足
           } else if (orientIntergral >= UtilsFunction.converNumber(needPayAmount, orientServiceCharge) &&
             dooolyIntergral < UtilsFunction.converNumber(needPayAmount, dooolyServiceCharge)) {
-            [orientUsable, dooolyUsable] = [true, false];
+            [orientUsable, dooolyUsable] = [true, true];
+            // 定向 & 兜礼 都不满足
           } else if (orientIntergral < UtilsFunction.converNumber(needPayAmount, orientServiceCharge) &&
             dooolyIntergral < UtilsFunction.converNumber(needPayAmount, dooolyServiceCharge)) {
             [orientUsable, dooolyUsable] = [false, false];
