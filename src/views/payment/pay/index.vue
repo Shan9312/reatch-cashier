@@ -119,7 +119,7 @@
     data() {
       return {
         orderNum: this.$route.params.orderNum, // 订单号
-        userId: localStorage.userId || this.$Cookies.get('userId') || UtilsFunction.getUrlParams('userId'), // 用户ID
+        userId: localStorage.userId || this.$Cookies.get('userId'), // 用户ID
         defaultOptions: {
           needPayAmount: 0, // 需支付金额
           realPayAmount: 0, // 实际支付金额 传入值跟需支付金额一样即可
