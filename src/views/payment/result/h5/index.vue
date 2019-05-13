@@ -9,7 +9,8 @@
     getPayResult
   } from "@/service";
   import {
-    MintUI
+    MintUI,
+    GlobalProperty
   } from "@/common/global"; // 引用的封装的组件
   import {
     UtilsFunction
@@ -46,12 +47,6 @@
           if (res.data && res.data.redirectUrl) {
             // 接口有值，直接跳接口的
             dooolyAPP.gotoJumpJq(this.$router, res.data.redirectUrl);
-          } else if (UtilsFunction.getUrlParams("orderSource") === "meituan") {
-            // 判断美团平台
-            dooolyApp.gotoJumpJq(
-              this.$router,
-              UtilsFunction.getUrlParams("return_url")
-            );
           } else {
             // 支付结果页面
             dooolyAPP.gotoJumpVue(
@@ -67,8 +62,7 @@
           MintUI.Toast.open({
             message: res.msg
           });
-          // 跳转 home
-          dooolyAPP.jumpIndexPage(this.$router, "/v3/home");
+          window.location.href = `${GlobalProperty.frontendDomain.m}v3/home`;
         }
       },
       /**

@@ -947,11 +947,7 @@
         } else if (this.tradeType == 'DOOOLY_H5') { // h5支付
           let redirect_url = window.encodeURIComponent(
             `${currentBaseUrl}/cardBuyPayResultH5/${this.orderNum}/${this.defaultOptions.productType}`)
-          if (this.responseRedirectUrl) { // 判断 unifiedorder接口获取的地址
-            redirect_url = window.encodeURIComponent(
-              `${currentBaseUrl}/middle?redirect_url=${window.encodeURIComponent(this.redirectUrl)}`)
-            window.location.href = `${data.mwebUrl}&redirect_url=${redirect_url}`;
-          } else if (this.handlerThirdJudge()) { // 判断 美团h5支付，支付完成跳转页面
+          if (this.handlerThirdJudge()) { // 判断 美团h5支付，支付完成跳转页面
             redirect_url = window.encodeURIComponent(
               `${currentBaseUrl}/middle?redirect_url=${window.encodeURIComponent(this.meituanInfo.return_url)}`
             )
