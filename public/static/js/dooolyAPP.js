@@ -212,7 +212,6 @@
         jumpUrl: o
       };
       if ("WebKit" == this.browserName) {
-        alert(1)
         window.webkit.messageHandlers.gotoNativeJump.postMessage(JSON.stringify(t));
       } else if ("Chrome WebView" == this.browserName) RHNativeJS.gotoNativeJump(JSON.stringify(t));
       else {

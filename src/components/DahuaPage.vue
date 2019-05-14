@@ -69,7 +69,7 @@
       handleGoHomePage() {
         localStorage.removeItem('isWeChatH5');
         baiduStats("大华活动-支付成功-继续逛逛");
-        dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.m}v3/home`);
+        dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.m}nav/newHome`);
       },
       /**
        * 查看列表
