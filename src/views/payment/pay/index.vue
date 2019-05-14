@@ -156,6 +156,8 @@
         promptText: '', // 温馨提示标题
         promptDialog: false, // 温馨提示框
         realServiceCharge: 0, // 实际需要支付的手续费
+        isHandleConfirm: false, // 确定用户再次选支付列表
+        stashArr: [], // 临时存储上一次支付列表
       };
     },
     filters: {
@@ -235,6 +237,7 @@
         const res = await unifiedorder(this.orderNum, this.userId, this.redirectUrl);
         if (res.code === 1000) {
           const data = res.data;
+          this.stashArr = [];
           // 初始化订单信息值
           this.defaultOptions = {
             needPayAmount: UtilsFunction.converNumber(data.totalFree),
@@ -776,6 +779,7 @@
        * */
       handlerCloseKeyboard(v) {
         this.isShowKeyboard = v;
+        this.isHandleConfirm = !v;
         this.$refs.keybordItem.verificationCodeArr = [];
       },
       /**
@@ -798,12 +802,29 @@
         this.payTypeByselectedPayList();
         // 判断交易平台的tradeType:类型
         this.tradeTypeByBrowserName();
-        // 如果含有积分支付，倒计时在 60s 内，重新打开键盘页面，不重复发送 短信
-        if (this.selectedPayList.filter(payItem => payItem.id < 3).length) {
-          if (this.$refs.keybordItem.countdownNum > 0 && this.$refs.keybordItem.countdownNum < 60) {
-            this.isShowKeyboard = true;
-            return
+        // 若用户是短信支付 && 更改支付列表 && 选择列表数量相等 && 列表含有积分支付 就进行短信优化判断
+        if (this.defaultOptions.isPayPassword != 2 && this.isHandleConfirm && this.stashArr.length === this
+          .selectedPayList.length && this.selectedPayList.filter(
+            payItem => payItem.id < 3).length) {
+          let statusType = false;
+          for (let i = 0; i < this.selectedPayList.length; i++) {
+            // 如果列表相等含有积分支付 && 倒计时在 60s 内，重新打开键盘页面，不重复发送 短信
+            if (this.stashArr[i].id === this.selectedPayList[i].id) {
+              statusType = true;
+            } else {
+              statusType = false;
+            };
           }
+          if ((this.$refs.keybordItem.countdownNum > 0 && this.$refs.keybordItem.countdownNum < 60) && statusType) {
+            this.isShowKeyboard = true;
+            return;
+          } else {
+            this.$refs.keybordItem.countdownNum = 60;
+            this.stashArr = JSON.parse(JSON.stringify(this.selectedPayList));
+          }
+        } else {
+          // 第一次点击确认支付时 存储用户支付列表
+          this.stashArr = JSON.parse(JSON.stringify(this.selectedPayList));
         }
         // 确认订单情况
         this.confirmOrder();
@@ -815,13 +836,13 @@
       payTypeByselectedPayList() {
         if (!this.selectedPayList.length) return false;
         let integralList = this.selectedPayList.filter(payItem => payItem.id < 3);
+
         this.selectedPayList.forEach(obj => {
           if (obj.name === 'orientIntergral') { // 定向 积分支付:0
             this.payType = 0;
             this.defaultOptions.dirIntegralSwitch = true;
           } else if (obj.name === 'dooolyIntergral') { // 兜里 积分支付:0
             this.payType = 0;
-            this.defaultOptions.commonIntegralSwitch = true;
           } else if (integralList.length && obj.name === 'wechat') { // 微信积分混合:2
             this.payType = 2;
           } else if (integralList.length && obj.name === 'alipay') { // 支付宝积分混合:11
@@ -832,6 +853,18 @@
             this.payType = 6;
           }
         })
+        const orientIntergralItem = this.selectedPayList.filter(payItem => payItem.name == 'orientIntergral')
+        const dooolyIntergralItem = this.selectedPayList.filter(payItem => payItem.name == 'dooolyIntergral')
+        if (orientIntergralItem.length && orientIntergralItem[0].selected) {
+          this.defaultOptions.dirIntegralSwitch = true;
+        } else {
+          this.defaultOptions.dirIntegralSwitch = false;
+        }
+        if (dooolyIntergralItem.length && dooolyIntergralItem[0].selected) {
+          this.defaultOptions.commonIntegralSwitch = true;
+        } else {
+          this.defaultOptions.commonIntegralSwitch = false;
+        }
       },
       /**
        * 判断当前 支付平台 ；然后根据不同的类型 ： 
@@ -873,6 +906,13 @@
           this.defaultOptions.commonIntegralSwitch ? '1' : '0',
           this.defaultOptions.dirIntegralSwitch ? '1' : '0',
         );
+        // 如果含有积分支付，倒计时在 60s 内，重新打开键盘页面，不重复发送 短信
+        if (this.selectedPayList.filter(payItem => payItem.id < 3).length) {
+          if (this.$refs.keybordItem.countdownNum > 0 && this.$refs.keybordItem.countdownNum < 60) {
+            this.isShowKeyboard = true;
+            return
+          }
+        }
         if (this.defaultOptions.supportPayType == 0 && res.code === 1000) {
           this.handlerPayOrderBtn();
           return
@@ -947,6 +987,7 @@
         } else if (this.tradeType == 'DOOOLY_H5') { // h5支付
           let redirect_url = window.encodeURIComponent(
             `${currentBaseUrl}/cardBuyPayResultH5/${this.orderNum}/${this.defaultOptions.productType}`)
+
           if (this.handlerThirdJudge()) { // 判断 美团h5支付，支付完成跳转页面
             redirect_url = window.encodeURIComponent(
               `${currentBaseUrl}/middle?redirect_url=${window.encodeURIComponent(this.meituanInfo.return_url)}`
