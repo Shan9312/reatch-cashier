@@ -71,10 +71,12 @@
       this.getPayOrder();
       // 判断活动二维码是否显示
       this.isShowActivityPage();
-      window.golastPage = function () {
+      window.isConfirmShow = function () {
+        alert(1)
+        debugger
         dooolyAPP.goBackPageIndex('2');
       };
-      dooolyAPP.initTitle('支付结果', '2', 'golastPage()');
+      dooolyAPP.initTitle('支付结果', '2', 'isConfirmShow()');
     },
     mounted() {
       // 支付完成后点击返回
