@@ -412,6 +412,14 @@
           if ((UtilsFunction.converNumber(orientIntergral, dooolyIntergral) <
               UtilsFunction.converNumber(needPayAmount, totalServiceCharge))) {
             [orientUsable, dooolyUsable] = [false, false];
+          } else if (orientIntergral < UtilsFunction.converNumber(needPayAmount, orientServiceCharge) &&
+            dooolyIntergral >= UtilsFunction.converNumber(needPayAmount, dooolyServiceCharge)) {
+            [orientUsable, dooolyUsable] = [false, true];
+            // 定向满足 兜礼不满足
+          } else if (orientIntergral >= UtilsFunction.converNumber(needPayAmount, orientServiceCharge) &&
+            dooolyIntergral < UtilsFunction.converNumber(needPayAmount, dooolyServiceCharge)) {
+            [orientUsable, dooolyUsable] = [true, false];
+            // 定向 & 兜礼 都不满足
           } else {
             [orientUsable, dooolyUsable] = [true, true];
           }
