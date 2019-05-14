@@ -205,7 +205,6 @@
     window.location.href = this.allConfig.jumpDomain.activity + e
   },
   gotoJumpJq: function (e, o) {
-    alert(ok)
     if ("WeChat" == this.browserName) window.location.href = o;
     else {
       var t = {
