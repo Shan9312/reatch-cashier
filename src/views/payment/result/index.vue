@@ -12,8 +12,8 @@
           <span class="mark">￥</span>{{orderInformObj.totalAmount}}
         </div>
         <ul class="label">
-          <li @click="handlerCheckList">查看列表</li>
-          <li @click="handlerReturnHomePage">返回首页</li>
+          <li @click="handleCheckList">查看列表</li>
+          <li @click="handleReturnHomePage">返回首页</li>
         </ul>
       </div>
       <!-- 支付失败  -->
@@ -25,7 +25,7 @@
           <span class="mark">￥</span>{{orderInformObj.totalAmount}}
         </div>
         <ul class="label">
-          <li class="error" @click="handlerCheckList">重新支付</li>
+          <li class="error" @click="handleCheckList">重新支付</li>
         </ul>
       </div>
     </div>
@@ -91,7 +91,7 @@
           if (this.browserName !== "WeChat" && this.browserName !== "Chrome WebView" && this.browserName !== "WebKit") {
             history.pushState(null, null, document.URL);
             window.addEventListener('popstate', () => {
-              this.handlerReturnHomePage();
+              this.handleReturnHomePage();
             }, false);
           }
         }
@@ -146,7 +146,7 @@
        * 查看列表
        * 
        * */
-      handlerCheckList() {
+      handleCheckList() {
         baiduStats("支付成功-查看详情");
         dooolyAPP.gotoJumpJq(this.$router,
           `${GlobalProperty.frontendDomain.m}myOrderList/1/all`);
@@ -155,7 +155,7 @@
        * 返回首页
        * 
        * */
-      handlerReturnHomePage() {
+      handleReturnHomePage() {
         localStorage.removeItem('isWeChatH5');
         dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.m}v3/home`);
       },
@@ -164,7 +164,7 @@
     destroyed() {
       // 页面销毁，移除监听
       window.removeEventListener('popstate', function () {
-        this.handlerReturnHomePage();
+        this.handleReturnHomePage();
       }, false);
     },
     beforeRouteLeave(to, from, next) {

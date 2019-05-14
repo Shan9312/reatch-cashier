@@ -34,7 +34,7 @@
       /**
        * 付款成功后 调转
        * */
-      async handlerGetPayResult() {
+      async handleGetPayResult() {
         this.count++;
         if (this.count > 5) {
           this.repayment();
@@ -56,7 +56,7 @@
           }
         } else if (res.code === 1002) {
           let timeOut = setTimeout(() => {
-            this.handlerGetPayResult();
+            this.handleGetPayResult();
           }, 500);
         } else {
           MintUI.Toast.open({
@@ -68,7 +68,7 @@
       /**
        * 回退的判断
        * */
-      handlerGoBack() {
+      handleGoBack() {
         if (this.browserName == "Mobile Safari") {
           // 苹果浏览器少返回一级
           window.history.go(-3);
@@ -91,9 +91,9 @@
           .then(action => {
             if (action == "confirm") {
               localStorage.isWeChatH5 = true;
-              this.handlerGetPayResult();
+              this.handleGetPayResult();
             } else {
-              this.handlerGoBack();
+              this.handleGoBack();
             }
           });
       },
@@ -108,7 +108,7 @@
             confirmButtonText: "重新支付"
           })
           .then(action => {
-            this.handlerGoBack();
+            this.handleGoBack();
           });
       }
     },
@@ -119,7 +119,7 @@
         });
       } else {
         next(vm => {
-          vm.handlerGoBack();
+          vm.handleGoBack();
         });
       }
     }

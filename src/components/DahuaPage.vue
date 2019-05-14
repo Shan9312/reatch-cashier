@@ -9,7 +9,7 @@
         </div>
         <ul class="label">
           <li @click="handleGoHomePage">继续逛逛</li>
-          <li @click="handlerCheckList">查看详情</li>
+          <li @click="handleCheckList">查看详情</li>
         </ul>
       </div>
       <div class="line"></div>
@@ -36,7 +36,7 @@
         </div>
       </div>
       <img class="banner" src="@/assets/images/checkout-counter/banner.png" v-show="orderInformObj.hasGift != 1"
-        @click="handlerGiftList">
+        @click="handleGiftList">
       <div class="toast">
         <b>重要提示：</b>您的礼品将在<span>10个工作日发货</span>，您可至大华福利平台—“我的”—“我的订单”查看物流单号<br>
         有任何疑问请咨询客服电话：<span>400-158-2212</span>
@@ -75,7 +75,7 @@
        * 查看列表
        * 
        * */
-      handlerCheckList() {
+      handleCheckList() {
         baiduStats("支付成功-查看详情");
         if (this.payVersion === 'payV2') {
           dooolyAPP.gotoJumpJq(this.$router,
@@ -89,7 +89,7 @@
        *大华广告页点击跳转
        * 
        * */
-      handlerGiftList() {
+      handleGiftList() {
         baiduStats("大华活动-支付成功-查看更多礼包");
         dooolyAPP.redirectActivity('giftList');
       },

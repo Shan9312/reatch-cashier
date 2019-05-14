@@ -1,7 +1,7 @@
 <template>
   <div class="checkout-warrper">
     <!-- 若支付方式使用：则看是否是选择状态  -->
-    <span class="circle" v-if="payItem.usable" :class="{'no-border': payItem.selected}" @click="handlerChoose(payItem)">
+    <span class="circle" v-if="payItem.usable" :class="{'no-border': payItem.selected}" @click="handleChoose(payItem)">
       <img class="picture fr" v-if="payItem.selected" src="@/assets/images/checkout-counter/pay_check.png" alt="定向积分选中">
     </span>
     <!-- 若支付方式不能使用 则是为 禁止状态 -->
@@ -18,7 +18,7 @@
       payItem: {
         type: Object,
       },
-      handlerChoosePay: {
+      handleChoosePay: {
         type: Function,
       },
     },
@@ -28,8 +28,8 @@
     created() {},
     mounted() {},
     methods: {
-      handlerChoose(v) {
-        this.$emit("handlerChoosePay", v);
+      handleChoose(v) {
+        this.$emit("handleChoosePay", v);
       }
     },
     computed: {},
