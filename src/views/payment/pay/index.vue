@@ -27,7 +27,7 @@
         <div class="line" v-if="item.id === 1">
           <div class="center direct">
             <span class="fl direct-left names">{{item.text}}
-              <img class="direct-pic" @click="handlerWhatOrientIntergral"
+              <img class="direct-pic" @click="handleWhatOrientIntergral"
                 src="@/assets/images/checkout-counter/icon_why.png" alt="定向积分疑问">
             </span>
             <span class="fr direct-available">可抵扣余额:
@@ -35,7 +35,7 @@
             </span>
           </div>
           <!-- 支付选择状态 组件 -->
-          <checkout-btn :payItem="item" @handlerChoosePay="handlerChoosePay">
+          <checkout-btn :payItem="item" @handleChoosePay="handleChoosePay">
           </checkout-btn>
         </div>
       </div>
@@ -56,14 +56,14 @@
                 需支付：<label class="point">{{item.payAmount | fixedNum  }}</label></span>
             </div>
             <!-- 支付选择状态 组件 -->
-            <checkout-btn :payItem="item" @handlerChoosePay="handlerChoosePay">
+            <checkout-btn :payItem="item" @handleChoosePay="handleChoosePay">
             </checkout-btn>
           </div>
         </section>
       </div>
     </div>
     <!-- 底部确认支付按钮 -->
-    <div class="footer" @click="handlerConfirmPay">
+    <div class="footer" @click="handleConfirmPay">
       确认支付
     </div>
     <!-- 现金支付的弹  出框 -->
@@ -71,7 +71,7 @@
       <div class="confirm-leave">
         <p>确定要离开收银台？</p>
         <div class="input-view">
-          <div @click="handlerReturnPrePage" class="leave-input-btn left">确认离开</div>
+          <div @click="handleReturnPrePage" class="leave-input-btn left">确认离开</div>
           <div @click="continuePay(false)" class="leave-input-btn right">继续支付</div>
         </div>
       </div>
@@ -86,7 +86,7 @@
     </div>
     <!-- 键盘页面 组件-->
     <Keyboard ref="keybordItem" v-show="isShowKeyboard" :isPayPassword="defaultOptions.isPayPassword"
-      @handlerCloseKeyboard="handlerCloseKeyboard" @handlerPayOrderBtn="handlerPayOrderBtn"
+      @handleCloseKeyboard="handleCloseKeyboard" @handlePayOrderBtn="handlePayOrderBtn"
       @confirmOrder="confirmOrder">
     </Keyboard>
   </div>
@@ -184,7 +184,7 @@
           // 根据支付环境 跳转到不同的页面
           if (res.data && res.data.redirectUrl) { // 接口有值，直接跳接口的
             dooolyAPP.gotoJumpJq(_this.$router, res.data.redirectUrl);
-          } else if (_this.handlerThirdJudge()) { // 若有美团接口 之间跳转美团
+          } else if (_this.handleThirdJudge()) { // 若有美团接口 之间跳转美团
             dooolyApp.gotoJumpJq(_this.$router, _this.meituanInfo.return_url)
           } else if (_this.defaultOptions.productType == 7) { // 活动页面
             const {
@@ -208,7 +208,7 @@
         }
       };
       window.altNoticeAndriod = function () {
-        _this.handlerCloseKeyboard(false);
+        _this.handleCloseKeyboard(false);
         if (_this.browserName == "Chrome WebView" || _this.browserName == "otherAPPAndroid") {
           RHNativeJS.visablePtrFrame("false");
           HNativeJS.setTopDialog("true");
@@ -218,11 +218,11 @@
         if (_this.browserName == "WebKit" || _this.browserName == "otherAPPIos") {
           window.webkit.messageHandlers.hideNavgationBar.postMessage('1');
         }
-        _this.handlerCloseKeyboard(false);
+        _this.handleCloseKeyboard(false);
       };
       window.isConfirmShow = function () { // 确认离开弹框
         _this.continuePay(true);
-        _this.handlerCloseKeyboard(false);
+        _this.handleCloseKeyboard(false);
       };
       dooolyAPP.initTitle('兜礼收银台', '2', 'isConfirmShow()')
 
@@ -574,7 +574,7 @@
        * 点击切换支付方式
        * 
        * */
-      handlerChoosePay(item) {
+      handleChoosePay(item) {
         let orientIntergralItem,
           dooolyIntergralItem,
           wechatItem,
@@ -777,7 +777,7 @@
        * 关闭 键盘页面
        * 
        * */
-      handlerCloseKeyboard(v) {
+      handleCloseKeyboard(v) {
         this.isShowKeyboard = v;
         this.isHandleConfirm = !v;
         this.$refs.keybordItem.verificationCodeArr = [];
@@ -786,7 +786,7 @@
        * 定向积分定义解释
        * 
        * */
-      handlerWhatOrientIntergral() {
+      handleWhatOrientIntergral() {
         MintUI.MessageBox({
           title: '什么是定向积分？',
           message: '定向积分是只能在兜礼固定商品分类、固定商户才能消费的特殊积分，它是企业对员工的另一种特殊关怀。当该商品支持定向积分时，可用余额默认勾选，你可以选择使用或者不使用。当该商品不支持定向积分时，可用余额显示不可用。',
@@ -797,7 +797,7 @@
        * 点击确定付款
        * 
        * */
-      handlerConfirmPay() {
+      handleConfirmPay() {
         // 判断payType类型,选中的支付列表 并做出对应的支付情况
         this.payTypeByselectedPayList();
         // 判断交易平台的tradeType:类型
@@ -914,13 +914,13 @@
           }
         }
         if (this.defaultOptions.supportPayType == 0 && res.code === 1000) {
-          this.handlerPayOrderBtn();
+          this.handlePayOrderBtn();
           return
         }
         if (res.code === 1000) {
           if (this.selectedPayList.filter(payItem => payItem.id < 3).length) { // 只要含有积分,就键盘弹出 倒计时计数 
             this.isShowKeyboard = true;
-            this.$refs.keybordItem.handlerCountdownNum();
+            this.$refs.keybordItem.handleCountdownNum();
           } else if (this.payType === 1) { // 微信接口支付
             this.wechatPayOrder(res.data);
           } else if (this.payType === 6) { // 支付宝接口支付
@@ -938,7 +938,7 @@
        * 1.根据密码/验证码 确认付款。
        * 2.根据后端返回的数据 是支付混合 还是 微信混合 在各自调用 方式
        * */
-      async handlerPayOrderBtn(code) {
+      async handlePayOrderBtn(code) {
         if (this.defaultOptions.isPayPassword === '2') { // 密码输入 需要加密
           code = UtilsFunction.encrypt(code);
         }
@@ -988,7 +988,7 @@
           let redirect_url = window.encodeURIComponent(
             `${currentBaseUrl}/cardBuyPayResultH5/${this.orderNum}/${this.defaultOptions.productType}`)
 
-          if (this.handlerThirdJudge()) { // 判断 美团h5支付，支付完成跳转页面
+          if (this.handleThirdJudge()) { // 判断 美团h5支付，支付完成跳转页面
             redirect_url = window.encodeURIComponent(
               `${currentBaseUrl}/middle?redirect_url=${window.encodeURIComponent(this.meituanInfo.return_url)}`
             )
@@ -1031,7 +1031,7 @@
         })
       },
       // 判断第三方 美团支付付款情况
-      handlerThirdJudge() {
+      handleThirdJudge() {
         if (UtilsFunction.getUrlParams('orderSource') === 'meituan') { // 若是美团支付 需把信息集合
           this.meituanObj = {
             userId: UtilsFunction.getUrlParams('userId'),
@@ -1046,7 +1046,7 @@
         this.isShowLeaveBtn = v;
       },
       // 点击返回上一页
-      handlerReturnPrePage() {
+      handleReturnPrePage() {
         dooolyAPP.goBackPageIndex('1');
       },
     },
