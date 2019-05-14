@@ -1,7 +1,7 @@
 const path = require('path')
 
 module.exports = {
-    publicPath: process.env.PUBLIC_PATH,
+    publicPath: process.env.PUBLIC_PATH || '/',
     chainWebpack: config => {
         // handler less
         const types = ['vue-modules', 'vue', 'normal-modules', 'normal']
