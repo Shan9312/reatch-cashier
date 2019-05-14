@@ -86,8 +86,7 @@
     </div>
     <!-- 键盘页面 组件-->
     <Keyboard ref="keybordItem" v-show="isShowKeyboard" :isPayPassword="defaultOptions.isPayPassword"
-      @handleCloseKeyboard="handleCloseKeyboard" @handlePayOrderBtn="handlePayOrderBtn"
-      @confirmOrder="confirmOrder">
+      @handleCloseKeyboard="handleCloseKeyboard" @handlePayOrderBtn="handlePayOrderBtn" @confirmOrder="confirmOrder">
     </Keyboard>
   </div>
 </template>

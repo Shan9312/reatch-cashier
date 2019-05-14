@@ -211,9 +211,8 @@
         jumpType: "InsideJump",
         jumpUrl: o
       };
-      if ("WebKit" == this.browserName) {
-        window.webkit.messageHandlers.gotoNativeJump.postMessage(JSON.stringify(t));
-      } else if ("Chrome WebView" == this.browserName) RHNativeJS.gotoNativeJump(JSON.stringify(t));
+      if ("WebKit" == this.browserName) window.webkit.messageHandlers.gotoNativeJump.postMessage(JSON.stringify(t));
+      else if ("Chrome WebView" == this.browserName) RHNativeJS.gotoNativeJump(JSON.stringify(t));
       else {
         var r = window.location.href.substring(0, window.location.href.indexOf("#") + 1);
         if (-1 < o.indexOf(r)) {
