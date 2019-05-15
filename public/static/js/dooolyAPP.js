@@ -212,10 +212,8 @@
         jumpUrl: o
       };
       if ("WebKit" == this.browserName) window.webkit.messageHandlers.gotoNativeJump.postMessage(JSON.stringify(t));
-      else if ("Chrome WebView" == this.browserName) {
-        alert('ok');
-        RHNativeJS.gotoNativeJump(JSON.stringify(t));
-      } else {
+      else if ("Chrome WebView" == this.browserName) RHNativeJS.gotoNativeJump(JSON.stringify(t));
+      else {
         var r = window.location.href.substring(0, window.location.href.indexOf("#") + 1);
         if (-1 < o.indexOf(r)) {
           var a = o.substring(o.indexOf("#") + 1);

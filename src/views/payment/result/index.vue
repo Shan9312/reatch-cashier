@@ -157,7 +157,7 @@
        * */
       handleReturnHomePage() {
         localStorage.removeItem('isWeChatH5');
-        dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.m}nav/newHome`);
+        dooolyAPP.jumpIndexPage(this.$router, `${GlobalProperty.frontendDomain.m}nav/newHome`);
       },
 
     },
