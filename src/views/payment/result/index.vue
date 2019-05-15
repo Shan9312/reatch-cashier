@@ -72,8 +72,6 @@
       // 判断活动二维码是否显示
       this.isShowActivityPage();
       window.isConfirmShow = function () {
-        alert(1)
-        debugger
         dooolyAPP.goBackPageIndex('2');
       };
       dooolyAPP.initTitle('支付结果', '2', 'isConfirmShow()');
