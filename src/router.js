@@ -1,5 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import {
+  GlobalFunction
+} from '@/common/global'
 
 
 Vue.use(VueRouter)
@@ -59,6 +62,10 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.title)) {
     document.title = to.meta.title
+  }
+
+  if (!localStorage.token) {
+    GlobalFunction.logout()
   }
   next();
 })
