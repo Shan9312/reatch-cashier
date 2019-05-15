@@ -109,6 +109,7 @@
     GlobalFunction
   } from '@/common/global' // 引用的封装的组件
 
+
   export default {
     name: 'Payment',
     components: {
@@ -118,7 +119,7 @@
     data() {
       return {
         orderNum: this.$route.params.orderNum, // 订单号
-        userId: localStorage.userId || this.$Cookies.get('userId'), // 用户ID
+        userId: localStorage.userId || this.$Cookies.get('userId') || UtilsFunction.getUrlParams('userId'), // 用户ID
         defaultOptions: {
           needPayAmount: 0, // 需支付金额
           realPayAmount: 0, // 实际支付金额 传入值跟需支付金额一样即可
@@ -249,9 +250,9 @@
             productType: data.productType,
             supportOrientIntergral: true,
             supportHybrid: true,
-            supportDooolyIntergral: true,
-            supportWechat: true,
-            supportAlipay: true,
+            supportDooolyIntergral: false,
+            supportWechat: false,
+            supportAlipay: false,
             dirIntegralSwitch: false,
             commonIntegralSwitch: false,
             supportPayType: data.supportPayType,
@@ -274,10 +275,6 @@
             this.responseRedirectUrl = true;
           }
           this.supportPayType(data.payMethod);
-          // 初始化 支付方式列表
-          this.initUseAblePayList();
-          // 初始化 用户默认支付方式
-          this.initDefaultPayType();
         } else {
           MintUI.Toast.open({
             message: res.msg
@@ -289,16 +286,19 @@
        * 
        * */
       supportPayType(payMethod) {
-        const arr = payMethod.split(",");
+        let arr = [];
+        arr = payMethod.split(",");
         arr.forEach(item => {
-          if (item === 0 || item === 2 || item === 11) { // 兜礼列表
+          if (item == 0 || item == 2 || item == 11) { // 兜礼列表
             this.defaultOptions.supportDooolyIntergral = true;
-          } else if (item === 1 || item === 2) { // 微信列表
+          } else if (item == 1 || item == 2) { // 微信列表
             this.defaultOptions.supportWechat = true;
-          } else if (item === 6 || item === 11) { // 支付宝列表
+          } else if (item == 6 || item == 11) { // 支付宝列表
             this.defaultOptions.supportAlipay = true;
           }
         });
+        // 初始化 支付方式列表
+        this.initUseAblePayList();
       },
       /**
        * 初始化可使用的 支付方式列表；
@@ -353,6 +353,9 @@
             id: 4,
           })
         }
+
+        // 初始化 用户默认支付方式
+        this.initDefaultPayType();
       },
       /**
        * 初始化 推荐 用户默认使用的支付方式

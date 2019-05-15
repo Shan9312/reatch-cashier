@@ -48,10 +48,10 @@ const GlobalFunction = {
       storage.removeItem('token')
       if (token == wiscoToken) {
         storage.removeItem('wiscoToken')
-        location.href.replace(`${GlobalProperty.frontendDomain.m}/companyLogin/wugang`)
+        location.href.replace(`${GlobalProperty.frontendDomain.m}companyLogin/wugang`)
       } else {
         storage.removeItem('dooolyToken')
-        location.href.replace(GlobalProperty.frontendDomain.m)
+        location.replace(GlobalProperty.frontendDomain.m)
       }
     }
     location.replace(GlobalProperty.frontendDomain.m)
