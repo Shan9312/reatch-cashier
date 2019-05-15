@@ -1,7 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import Cookies from 'js-cookie'
 import {
-  GlobalFunction
+  GlobalFunction,
+  GlobalProperty
 } from '@/common/global'
 
 
@@ -63,9 +65,8 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.title)) {
     document.title = to.meta.title
   }
-
-  if (!localStorage.token) {
-    GlobalFunction.logout()
+  if (!GlobalProperty.localStorage.getItem('token')) {
+    GlobalFunction.logout();
   }
   next();
 })

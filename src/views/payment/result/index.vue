@@ -77,25 +77,31 @@
       dooolyAPP.initTitle('支付结果', '2', 'isConfirmShow()');
     },
     mounted() {
-      // 支付完成后点击返回
-      this.watchHistoryStatus();
-    },
-    methods: {
       /**
        * 支付宝h5、微信h5支付完成后点击返回，去首页
        * 
        * */
-      watchHistoryStatus() {
-        if (localStorage.isWeChatH5) this.isWeChatH5 = true;
-        if (/method=alipay/.test(window.location.href) || this.isWeChatH5) {
-          if (this.browserName !== "WeChat" && this.browserName !== "Chrome WebView" && this.browserName !== "WebKit") {
-            history.pushState(null, null, document.URL);
-            window.addEventListener('popstate', () => {
-              this.handleReturnHomePage();
-            }, false);
+      if (localStorage.isWeChatH5) this.isWeChatH5 = true;
+      if (/method=alipay/.test(window.location.href) || this.isWeChatH5) {
+        if (this.browserName !== "WeChat" && this.browserName !== "Chrome WebView" && this.browserName !== "WebKit") {
+          history.pushState(null, null, document.URL);
+          window.addEventListener('popstate', () => {
+            this.handleReturnHomePage();
+          }, false);
+        }
+      }
+      let _this = this;
+      window.onpopstate = function () {
+        if (/method=alipay/.test(window.location.href) || _this.isWeChatH5) {
+          if (this.browserName !== "WeChat" && this.browserName !== "Chrome WebView" && this.browserName !==
+            "WebKit") {
+            window.addEventListener('popstate', _this.handleReturnHomePage, false);
+            _this.handleReturnHomePage();
           }
         }
-      },
+      }
+    },
+    methods: {
       /**
        * 获取订单金额 信息
        * 

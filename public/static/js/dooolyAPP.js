@@ -44,7 +44,7 @@
   },
   jumpIndexPage: function (e, o) {
     try {
-      "WebKit" == this.browserName ? window.webkit.messageHandlers.jumpTabarItemIndex.postMessage("0") : "Chrome WebView" == this.browserName ? RHNativeJS.jumpIndexPage() : e.push("/nav/newHome")
+      "WebKit" == this.browserName ? window.webkit.messageHandlers.jumpTabarItemIndex.postMessage("0") : "Chrome WebView" == this.browserName ? RHNativeJS.jumpIndexPage() : window.location.replace(url);
     } catch (e) {
       dooolyAPP.errorLog(e)
     }
