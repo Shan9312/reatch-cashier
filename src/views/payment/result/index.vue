@@ -6,7 +6,7 @@
       <!-- 支付成功 -->
       <div v-else-if="isShowPayPage === 2">
         <div class="title">
-          <span>支付成功</span>
+          <span>支付成功{{browserName}}</span>
         </div>
         <div class="price">
           <span class="mark">￥</span>{{orderInformObj.totalAmount}}
@@ -163,7 +163,6 @@
        * 
        * */
       handleReturnHomePage() {
-        alert(this.browserName);
         localStorage.removeItem('isWeChatH5');
         dooolyAPP.jumpIndexPage(this.$router, `${GlobalProperty.frontendDomain.m}v3/home`);
       },
