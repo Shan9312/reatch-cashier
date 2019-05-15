@@ -6,7 +6,7 @@
       <!-- 支付成功 -->
       <div v-else-if="isShowPayPage === 2">
         <div class="title">
-          <span>支付成功{{browserName}}</span>
+          <span>支付成功</span>
         </div>
         <div class="price">
           <span class="mark">￥</span>{{orderInformObj.totalAmount}}
@@ -175,12 +175,15 @@
       }, false);
     },
     beforeRouteLeave(to, from, next) {
+      alert('ok')
       if (this.browserName != "Chrome WebView" && this.browserName != "WebKit") {
         if (to.name == 'Payment' && !this.backLock) {
           this.backLock = true;
           window.history.go(-1);
           return
         }
+      } else if (this.browserName == 'otherAPP') {
+        window.history.go(-2);
       }
       next();
     }
