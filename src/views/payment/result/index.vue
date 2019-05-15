@@ -163,6 +163,7 @@
        * 
        * */
       handleReturnHomePage() {
+        alert(this.browserName);
         localStorage.removeItem('isWeChatH5');
         dooolyAPP.jumpIndexPage(this.$router, `${GlobalProperty.frontendDomain.m}v3/home`);
       },
@@ -175,7 +176,6 @@
       }, false);
     },
     beforeRouteLeave(to, from, next) {
-      alert(this.browserName);
       if (this.browserName != "Chrome WebView" && this.browserName != "WebKit") {
         if (to.name == 'Payment' && !this.backLock) {
           this.backLock = true;
