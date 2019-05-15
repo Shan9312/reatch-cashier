@@ -71,6 +71,7 @@
       this.getPayOrder();
       // 判断活动二维码是否显示
       this.isShowActivityPage();
+      // 
       window.isConfirmShow = function () {
         dooolyAPP.goBackPageIndex('2');
       };
@@ -174,7 +175,8 @@
       }, false);
     },
     beforeRouteLeave(to, from, next) {
-      if (this.browserName !== "Chrome WebView" && this.browserName !== "WebKit") {
+      alert(this.browserName);
+      if (this.browserName != "Chrome WebView" && this.browserName != "WebKit") {
         if (to.name == 'Payment' && !this.backLock) {
           this.backLock = true;
           window.history.go(-1);

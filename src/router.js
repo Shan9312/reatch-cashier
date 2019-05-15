@@ -65,7 +65,7 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.title)) {
     document.title = to.meta.title
   }
-  if (!GlobalProperty.localStorage.getItem('token')) {
+  if (!GlobalProperty.localStorage.getItem('token') && !Cookies.get('userId')) {
     GlobalFunction.logout();
   }
   next();
