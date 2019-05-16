@@ -9,7 +9,7 @@
           <span>支付成功</span>
         </div>
         <div class="price">
-          <span class="mark">￥</span>{{orderInformObj.totalAmount}}
+          <span class="mark">￥</span>{{orderInformObj.totalAmount ? orderInformObj.totalAmount : 0}}
         </div>
         <ul class="label">
           <li @click="handleCheckList">查看列表</li>
@@ -87,16 +87,6 @@
           window.addEventListener('popstate', _this.handleReturnHomePage, false);
         }
       }
-      // window.onpopstate = function () {
-      //   // 若是 h5 || otherApp 现金支付
-      //   if (/method=alipay/.test(window.location.href) || _this.isWeChatH5) {
-      //     if (this.browserName !== "WeChat" && this.browserName !== "Chrome WebView" && this.browserName !==
-      //       "WebKit") {
-      //       window.addEventListener('popstate', _this.handleReturnHomePage, false);
-      //       _this.handleReturnHomePage();
-      //     }
-      //   }
-      // }
 
       // 若是第三方app 嵌套我们h5页面 积分支付时 点击回退 2个
       if (!(/method=alipay/.test(window.location.href)) && this.browserName == 'otherAPP') {
@@ -116,6 +106,18 @@
       async getPayOrder() {
         const res = await getPayResult(this.orderNum);
         if (res.code === 1000 || res.code === 1001) { // 表示成功code
+          // res.data = {
+          //   hasGift: 0,
+          //   orderResp: {
+          //     consigneeAddr: "江苏省泰州市兴化市www",
+          //     consigneeMobile: "18252639098",
+          //     consigneeName: "奚坚",
+          //     orderDate: "2019-05-16 16:48:51",
+          //     orderId: 199352260,
+          //     orderNumber: "N1557996530645557023",
+          //   },
+          //   orderType: '1',
+          // };
           this.orderInformObj = JSON.parse(JSON.stringify(res.data));
           // 判断isShowPayPage  显示哪个页面
           this.isShowPayResultPage(res.code, this.orderInformObj);
@@ -135,11 +137,11 @@
           this.isShowPayPage = 2;
         }
         // 支付失败
-        else if (code === 1001) {
+        if (code === 1001) {
           this.isShowPayPage = 3;
         }
         // 大华女神节
-        else if (obj.orderResp && obj.orderResp.orderId && obj.orderType === '1') {
+        if (obj.orderResp && obj.orderResp.orderId && obj.orderType === '1') {
           this.isShowPayPage = 1;
         }
       },
@@ -152,7 +154,7 @@
         // 已存的活动对象 找到订单号对应的 活动名称
         this.activityName = JSON.parse(localStorageStr)[this.orderNum];
         if (this.activityName) {
-          baiduStats(this.umengNameObj[this.activityName] + "支付成功");
+          baiduStats(this.umengNameObj[this.activityName] + "支付成功", this.$route);
         }
       },
       /**
@@ -160,7 +162,7 @@
        * 
        * */
       handleCheckList() {
-        baiduStats("支付成功-查看详情");
+        baiduStats("支付成功-查看详情", this.$route);
         dooolyAPP.gotoJumpJq(this.$router,
           `${GlobalProperty.frontendDomain.m}myOrderList/1/all`);
       },

@@ -16,7 +16,7 @@
       <div class="order-list">
         <div class="order">
           <div>订单编号</div>
-          <div>{{ orderInformObj && orderInformObj.orderNum}}</div>
+          <div>{{ orderInformObj && orderInformObj.orderResp.orderNumber}}</div>
         </div>
         <div class="order">
           <div>兑换时间</div>
@@ -68,29 +68,24 @@
        * */
       handleGoHomePage() {
         localStorage.removeItem('isWeChatH5');
-        baiduStats("大华活动-支付成功-继续逛逛");
-        dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.m}nav/newHome`);
+        baiduStats("大华活动-支付成功-继续逛逛", this.$route);
+        dooolyAPP.gotoJumpJq(this.$router, `${GlobalProperty.frontendDomain.m}v3/home`);
       },
       /**
        * 查看列表
        * 
        * */
       handleCheckList() {
-        baiduStats("支付成功-查看详情");
-        if (this.payVersion === 'payV2') {
-          dooolyAPP.gotoJumpJq(this.$router,
-            `${GlobalProperty.frontendDomain.m}myOrderList/1/all`);
-        } else {
-          dooolyAPP.gotoJumpJq(this.$router,
-            `${GlobalProperty.frontendDomain.m}myOrderDetail/${this.orderInformObj.orderId}`);
-        }
+        baiduStats("支付成功-查看详情", this.$route);
+        dooolyAPP.gotoJumpJq(this.$router,
+          `${GlobalProperty.frontendDomain.m}myOrderList/1/all`);
       },
       /**
        *大华广告页点击跳转
        * 
        * */
       handleGiftList() {
-        baiduStats("大华活动-支付成功-查看更多礼包");
+        baiduStats("大华活动-支付成功-查看更多礼包", this.$route);
         dooolyAPP.redirectActivity('giftList');
       },
     },
