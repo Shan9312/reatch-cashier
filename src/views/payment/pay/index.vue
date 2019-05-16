@@ -299,6 +299,8 @@
         });
         // 初始化 支付方式列表
         this.initUseAblePayList();
+        // 初始化 用户默认支付方式
+        this.initDefaultPayType();
       },
       /**
        * 初始化可使用的 支付方式列表；
@@ -354,8 +356,6 @@
           })
         }
 
-        // 初始化 用户默认支付方式
-        this.initDefaultPayType();
       },
       /**
        * 初始化 推荐 用户默认使用的支付方式
