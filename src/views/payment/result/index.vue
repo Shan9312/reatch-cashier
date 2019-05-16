@@ -91,8 +91,10 @@
           }, false);
         }
       }
+
       let _this = this;
       window.onpopstate = function () {
+        // 若是 h5 || otherApp 现金支付
         if (/method=alipay/.test(window.location.href) || _this.isWeChatH5) {
           if (this.browserName !== "WeChat" && this.browserName !== "Chrome WebView" && this.browserName !==
             "WebKit") {
@@ -100,7 +102,14 @@
             _this.handleReturnHomePage();
           }
         }
+        // 若 是第三方otherApp && 是积分支付 就历史返回2级
+        if (!(/method=alipay/.test(window.location.href)) && this.browserName == 'otherAPP') {
+          alert('大华');
+          window.history.go(-2);
+        }
       }
+
+
     },
     methods: {
       /**
@@ -175,15 +184,12 @@
       }, false);
     },
     beforeRouteLeave(to, from, next) {
-      alert('ok')
       if (this.browserName != "Chrome WebView" && this.browserName != "WebKit") {
         if (to.name == 'Payment' && !this.backLock) {
           this.backLock = true;
           window.history.go(-1);
           return
         }
-      } else if (this.browserName == 'otherAPP') {
-        window.history.go(-2);
       }
       next();
     }
