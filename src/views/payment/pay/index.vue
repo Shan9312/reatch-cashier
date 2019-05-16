@@ -1,7 +1,7 @@
 <template>
   <div class="pay-warpper">
     <div class="content">
-      需支付*金额:
+      需支付:
       <!-- 日常的商品手续费 -->
       <span v-if="defaultOptions.serviceCharge">
         <span class="amount">
