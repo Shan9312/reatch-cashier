@@ -91,6 +91,14 @@
           }, false);
         }
       }
+      if (!(/method=alipay/.test(window.location.href)) && this.browserName == 'otherAPP') {
+        alert('ok');
+        history.pushState(null, null, document.URL);
+        window.addEventListener('popstate', () => {
+          window.history.go(-2);
+        }, false);
+      }
+
 
       let _this = this;
       window.onpopstate = function () {
