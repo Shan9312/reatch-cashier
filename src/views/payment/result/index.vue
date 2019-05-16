@@ -107,7 +107,6 @@
     methods: {
       // 大华回退时 监听实际
       goBackDahua() {
-        alert('ok');
         window.history.go(-2);
       },
       /**
