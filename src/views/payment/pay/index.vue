@@ -953,7 +953,8 @@
           code = UtilsFunction.encrypt(code);
         }
         // 若 是0元支付金额 就默认验证码 111111
-        if (this.defaultOptions.supportPayType == 0) code = '11111';
+        this.defaultOptions.supportPayType == 0 ? code = '11111' : code = code;
+
         const res = await integralPay(
           this.orderNum,
           this.userId,

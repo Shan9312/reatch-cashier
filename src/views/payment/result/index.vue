@@ -106,18 +106,6 @@
       async getPayOrder() {
         const res = await getPayResult(this.orderNum);
         if (res.code === 1000 || res.code === 1001) { // 表示成功code
-          // res.data = {
-          //   hasGift: 0,
-          //   orderResp: {
-          //     consigneeAddr: "江苏省泰州市兴化市www",
-          //     consigneeMobile: "18252639098",
-          //     consigneeName: "奚坚",
-          //     orderDate: "2019-05-16 16:48:51",
-          //     orderId: 199352260,
-          //     orderNumber: "N1557996530645557023",
-          //   },
-          //   orderType: '1',
-          // };
           this.orderInformObj = JSON.parse(JSON.stringify(res.data));
           // 判断isShowPayPage  显示哪个页面
           this.isShowPayResultPage(res.code, this.orderInformObj);
