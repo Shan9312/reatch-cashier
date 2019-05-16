@@ -35,7 +35,7 @@
           <div>{{orderInformObj.orderResp && orderInformObj.orderResp.consigneeAddr}}</div>
         </div>
       </div>
-      <img class="banner" src="@/assets/images/checkout-counter/banner.png" v-show="orderInformObj.hasGift != 1"
+      <img class="banner" src="@/assets/images/checkout-counter/banner.png" v-show="orderInformObj.hasGift == 1"
         @click="handleGiftList">
       <div class="toast">
         <b>重要提示：</b>您的礼品将在<span>10个工作日发货</span>，您可至大华福利平台—“我的”—“我的订单”查看物流单号<br>
