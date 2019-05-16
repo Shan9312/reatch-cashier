@@ -78,48 +78,38 @@
       dooolyAPP.initTitle('支付结果', '2', 'isConfirmShow()');
     },
     mounted() {
-      /**
-       * 支付宝h5、微信h5支付完成后点击返回，去首页
-       * 
-       * */
+      let _this = this;
+      // 支付宝h5、微信h5支付完成后点击返回，去首页
       if (localStorage.isWeChatH5) this.isWeChatH5 = true;
       if (/method=alipay/.test(window.location.href) || this.isWeChatH5) {
         if (this.browserName !== "WeChat" && this.browserName !== "Chrome WebView" && this.browserName !== "WebKit") {
           history.pushState(null, null, document.URL);
-          window.addEventListener('popstate', () => {
-            this.handleReturnHomePage();
-          }, false);
+          window.addEventListener('popstate', _this.handleReturnHomePage, false);
         }
       }
+      // window.onpopstate = function () {
+      //   // 若是 h5 || otherApp 现金支付
+      //   if (/method=alipay/.test(window.location.href) || _this.isWeChatH5) {
+      //     if (this.browserName !== "WeChat" && this.browserName !== "Chrome WebView" && this.browserName !==
+      //       "WebKit") {
+      //       window.addEventListener('popstate', _this.handleReturnHomePage, false);
+      //       _this.handleReturnHomePage();
+      //     }
+      //   }
+      // }
+
+      // 若是第三方app 嵌套我们h5页面 积分支付时 点击回退 2个
       if (!(/method=alipay/.test(window.location.href)) && this.browserName == 'otherAPP') {
-        alert('ok');
         history.pushState(null, null, document.URL);
-        window.addEventListener('popstate', () => {
-          window.history.go(-2);
-        }, false);
+        window.addEventListener('popstate', _this.goBackDahua, false)
       }
-
-
-      let _this = this;
-      window.onpopstate = function () {
-        // 若是 h5 || otherApp 现金支付
-        if (/method=alipay/.test(window.location.href) || _this.isWeChatH5) {
-          if (this.browserName !== "WeChat" && this.browserName !== "Chrome WebView" && this.browserName !==
-            "WebKit") {
-            window.addEventListener('popstate', _this.handleReturnHomePage, false);
-            _this.handleReturnHomePage();
-          }
-        }
-        // 若 是第三方otherApp && 是积分支付 就历史返回2级
-        if (!(/method=alipay/.test(window.location.href)) && this.browserName == 'otherAPP') {
-          alert('大华');
-          window.history.go(-2);
-        }
-      }
-
-
     },
     methods: {
+      // 大华回退时 监听实际
+      goBackDahua() {
+        alert('ok');
+        window.history.go(-2);
+      },
       /**
        * 获取订单金额 信息
        * 
