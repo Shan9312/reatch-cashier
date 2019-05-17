@@ -415,10 +415,6 @@
           if ((UtilsFunction.converNumber(orientIntergral, dooolyIntergral) <
               UtilsFunction.converNumber(needPayAmount, totalServiceCharge))) {
             [orientUsable, dooolyUsable] = [false, false];
-          } else if (orientIntergral < UtilsFunction.converNumber(needPayAmount, orientServiceCharge) &&
-            dooolyIntergral >= UtilsFunction.converNumber(needPayAmount, dooolyServiceCharge)) {
-            [orientUsable, dooolyUsable] = [false, true];
-            // 定向满足 兜礼不满足
           } else if (orientIntergral >= UtilsFunction.converNumber(needPayAmount, orientServiceCharge) &&
             dooolyIntergral < UtilsFunction.converNumber(needPayAmount, dooolyServiceCharge)) {
             [orientUsable, dooolyUsable] = [true, false];
@@ -457,9 +453,8 @@
       },
       // 定向积分： 支付方式
       orientIntergralPayType() {
-        let orientIntergralArr = this.usablePayList.filter(item => item.name === 'orientIntergral');
         // 定向积分大于0，默认一定会选中定向积分
-        if (this.usableOptions.orientIntergral > 0 && orientIntergralArr[0].usable) {
+        if (this.usableOptions.orientIntergral > 0) {
           this.result.orientIntergralFlag = true // 选中定向积分
           // 如果定向积分足够支付 则默认只选择定向积分 
           if (this.usableOptions.orientIntergral >= UtilsFunction.converNumber(this.usableOptions.realPayAmount, this
@@ -481,10 +476,8 @@
       },
       // 兜礼积分： 支付方式
       initDooolyIntergral() {
-        let dooolyIntergralArr = this.usablePayList.filter(item => item.name === 'dooolyIntergral');
         // 判断是否支持兜礼积分支付并且余额大于0 如果大于0则一定会默认选中兜礼积分
-        if (this.usableOptions.supportDooolyIntergral && this.usableOptions.dooolyIntergral && dooolyIntergralArr[0]
-          .usable) {
+        if (this.usableOptions.supportDooolyIntergral && this.usableOptions.dooolyIntergral) {
           this.result.dooolyIntergralFlag = true
           // 兜礼实际支付 
           this.result.dooolyIntergralPayAmount = this.usableOptions.needPayAmount + this.usableOptions
@@ -494,6 +487,8 @@
             .orientIntergralFlag) {
             //  实际总支付手续费 = 定向手续费+ 兜礼手续费
             this.realServiceCharge = this.usableOptions.totalServiceCharge;
+            this.result.dooolyIntergralPayAmount = this.usableOptions.realPayAmount - this.result
+              .orientIntergralPayAmount;
           } // 如果当 定向积分没选中 兜里积分足够的情况 
           else if (this.usableOptions.dooolyIntergral >= this.result.dooolyIntergralPayAmount && !this.result
             .orientIntergralFlag) {
