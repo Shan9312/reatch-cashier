@@ -39,6 +39,9 @@
 
 <style lang="less" scoped>
   .checkout-warrper {
+    width: 0.3rem;
+    height: 0.33rem;
+    text-align: center;
 
     .picture {
       width: 0.23rem;
@@ -51,6 +54,7 @@
       height: 0.23rem;
       border-radius: 50%;
       border: 1px solid #ddd;
+      margin-top: 0.05rem;
 
       &.no-border {
         border-color: transparent;
