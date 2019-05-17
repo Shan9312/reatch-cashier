@@ -168,6 +168,7 @@
       // 页面销毁，移除监听
       window.removeEventListener('popstate', function () {
         this.handleReturnHomePage();
+        this.goBackDahua();
       }, false);
     },
     beforeRouteLeave(to, from, next) {
