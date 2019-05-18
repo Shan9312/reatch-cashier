@@ -180,6 +180,7 @@
       // 付款成功后返回的值
       window.pay_callBack = async function () {
         const res = await getPayResult(_this.orderNum);
+        alert('pay_callBack');
         if (res.code === 1000 || res.code === 1001) {
           // 根据支付环境 跳转到不同的页面
           if (res.data && res.data.redirectUrl) { // 接口有值，直接跳接口的
@@ -958,14 +959,16 @@
           this.defaultOptions.supportOrientIntergral ? '1' : '0',
         );
         this.$refs.keybordItem.verificationCodeArr = [];
+        if (this.defaultOptions.supportPayType == 0 && res.code === 1000) {
+          dooolyAPP.gotoJumpVue(this.$router, `/cardBuyPayResult/${this.orderNum}`);
+          return
+        }
         if (res.code === 1000) {
           this.isShowKeyboard = false;
           if (this.payType === 2) { // 微信混合支付
             this.wechatPayOrder(res.data);
           } else if (this.payType === 11) { // 支付宝混合支付
             this.apliyPayOrder(res.data);
-          } else {
-            window.pay_callBack();
           }
         } else if (res.code === 1016 || res.code === 1017) { // 1016:手机验证码失败; 1017:验证码已过期，请重新获取
           this.promptDialog = true;
@@ -983,6 +986,7 @@
 
       // 支付宝支付跳转接口
       apliyPayOrder(data) {
+        alert('支付宝')
         dooolyAPP.appPay(data, 'pay_callBack', 'zfb');
       },
       // 微信支付跳转接口
