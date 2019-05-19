@@ -188,11 +188,9 @@
       if ("wx" == t) "WebKit" == this.browserName || "otherAPPIos" == this.browserName ? (e.func = o, window.webkit.messageHandlers.wechatPay.postMessage(JSON.stringify(e))) : "Chrome WebView" != this.browserName && "otherAPPAndroid" != this.browserName || RHNativeJS.wechatPay(JSON.stringify(e), o);
       else if ("zfb" == t)
         if ("WebKit" == this.browserName) {
-          alert('IOS');
           e.func = o, window.webkit.messageHandlers.aliPayment.postMessage(JSON.stringify(e));
         }
       else if ("Chrome WebView" == this.browserName) {
-        alert('andron');
         RHNativeJS.aliPay(e.aLiPayUrl, o);
       } else {
         var r = e.aLiPayUrl,

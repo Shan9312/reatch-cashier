@@ -175,12 +175,10 @@
     created() {
       // 获取用户 订单信息
       this.getPayContentByUserId();
-      console.log('***hss-test***');
       const _this = this;
       // 付款成功后返回的值
       window.pay_callBack = async function () {
         const res = await getPayResult(_this.orderNum);
-        alert('pay_callBack');
         if (res.code === 1000 || res.code === 1001) {
           // 根据支付环境 跳转到不同的页面
           if (res.data && res.data.redirectUrl) { // 接口有值，直接跳接口的
@@ -986,7 +984,6 @@
 
       // 支付宝支付跳转接口
       apliyPayOrder(data) {
-        alert('支付宝')
         dooolyAPP.appPay(data, 'pay_callBack', 'zfb');
       },
       // 微信支付跳转接口
