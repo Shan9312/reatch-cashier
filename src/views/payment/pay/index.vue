@@ -14,7 +14,7 @@
       <!-- 特殊企业/商品的 手续费3% -->
       <span v-else>
         <span class="amount">
-          {{ (defaultOptions.needPayAmount + realServiceCharge)| fixedNum }}
+          {{ isNaN(Number(defaultOptions.needPayAmount + realServiceCharge))? '' : Number(defaultOptions.needPayAmount + realServiceCharge).toFixed(2)}}
         </span>
         <span class="charge-text" v-show="realServiceCharge>0">
           （含手续费：<span class="charge">{{realServiceCharge | fixedNum }}</span>）
@@ -121,7 +121,6 @@
         orderNum: this.$route.params.orderNum, // 订单号
         userId: localStorage.userId || this.$Cookies.get('userId') || UtilsFunction.getUrlParams('userId'), // 用户ID
         defaultOptions: {
-          needPayAmount: 0, // 需支付金额
           realPayAmount: 0, // 实际支付金额 传入值跟需支付金额一样即可
           serviceCharge: 0, // 手续费
           orientIntergral: 0, // 定向积分
