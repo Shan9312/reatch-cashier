@@ -967,6 +967,8 @@
             this.wechatPayOrder(res.data);
           } else if (this.payType === 11) { // 支付宝混合支付
             this.apliyPayOrder(res.data);
+          } else {
+            window.pay_callBack();
           }
         } else if (res.code === 1016 || res.code === 1017) { // 1016:手机验证码失败; 1017:验证码已过期，请重新获取
           this.promptDialog = true;

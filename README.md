@@ -6,7 +6,7 @@
 主要功能: 用户支付商品金额,对不同的支付方式进行组合 并对选择支付列表支付相应的金额值, 以及支付之后的页面展示;
 
 ## 1.2 业务功能简介图
-见 [reach-cashier/public/static/img/refactor_documents.png]
+![功能思维导图](reach-cashier/public/static/img/refactor_documents.png)
 
 ## 1.3 项目GitLab地址
 见 [http://code.doooly.cn:9090/reach-frontend/reach-cashier.git]
