@@ -28,7 +28,71 @@ const errorLog = (timestamp, clientChannel, sign, logStr, terminaModel, userId, 
         }
     })
 }
-
+/**
+ * 获取订单信息
+ * @param {*} orderNum: 订单号 
+ * @param {*} userId: 用户id 
+ * @param {*} redirectUrl: 重定向地址
+ * */
+const unifiedorder = (orderNum, userId, redirectUrl) => {
+    return Ajax.post(`${GlobalProperty.apiDomain.doooly}jersey/doooly/payment/unifiedorder/V2`, {
+        orderNum,
+        userId,
+        redirectUrl
+    })
+}
+/**
+ * 根据支付列表，点击确认按钮
+ * @param {*} orderNum: 订单号
+ * @param {*} userId: 用户ID
+ * @param {*} redirectUrl: 重定向地址
+ * @param {*} payId: 预付款ID
+ * @param {*} tradeType: 交易平台类型
+ * @param {*} commonIntegralSwitch: 兜礼积分开关状态 
+ * @param {*} dirIntegralSwitch: 定向积分开关状态
+ * */
+const getPayForm = (orderNum, userId, redirectUrl, payId, tradeType, payType, commonIntegralSwitch, dirIntegralSwitch) => {
+    return Ajax.post(`${GlobalProperty.apiDomain.doooly}jersey/doooly/payment/getPayForm/V2`, {
+        orderNum,
+        userId,
+        redirectUrl,
+        payId,
+        tradeType,
+        payType,
+        commonIntegralSwitch,
+        dirIntegralSwitch
+    })
+}
+/**
+ * 根据验证码/密码 确认支付
+ * @param {*} orderNum: 订单号
+ * @param {*} userId: 用户ID
+ * @param {*} payId: 预订单ID
+ * @param {*} payPassword: 验证码/密码
+ * @param {*} dirIntegralSwitch: 定向积分选中状态
+ * */
+const integralPay = (orderNum, userId, payId, payPassword, dirIntegralSwitch) => {
+    return Ajax.post(`${GlobalProperty.apiDomain.doooly}jersey/doooly/payment/integralPay/V2`, {
+        orderNum,
+        userId,
+        payId,
+        payPassword,
+        dirIntegralSwitch
+    })
+}
+/**
+ * 获取订单支付情况
+ * @param {*} orderNum: 订单号
+ * */
+const getPayResult = (orderNum) => {
+    return Ajax.post(`${GlobalProperty.apiDomain.doooly}jersey/doooly/payment/getPayResult/V2`, {
+        orderNum
+    })
+}
 export {
-    errorLog
+    errorLog,
+    unifiedorder,
+    getPayForm,
+    integralPay,
+    getPayResult,
 }

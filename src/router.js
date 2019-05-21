@@ -1,5 +1,11 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import Cookies from 'js-cookie'
+import {
+  GlobalFunction,
+  GlobalProperty
+} from '@/common/global'
+
 
 Vue.use(VueRouter)
 
@@ -49,7 +55,7 @@ const router = new VueRouter({
     {
       path: '*',
       redirect: {
-        name: 'ErrorPage'
+        path: '/error'
       }
     }
   ]
@@ -59,7 +65,10 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.title)) {
     document.title = to.meta.title
   }
-  next()
+  if (!GlobalProperty.localStorage.getItem('token') && !Cookies.get('userId')) {
+    GlobalFunction.logout();
+  }
+  next();
 })
 
 export default router

@@ -1,0 +1,215 @@
+/* 共用的class样式 */
+.fl {
+  float: left;
+}
+
+.fr {
+  float: right;
+}
+
+.tc {
+  text-align: center;
+}
+
+.tr {
+  text-align: right;
+}
+
+/*mint-ui修改*/
+.mint-toast-text {
+  font-size: 0.14rem !important;
+}
+
+.mint-indicator-wrapper {
+  padding: 0.2rem 0.35rem !important;
+  border-radius: 4px !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  font-size: 0 !important;
+  z-index: 99999;
+}
+
+.mint-indicator-text {
+  color: rgb(204, 204, 204) !important;
+  font-size: 0.16rem !important;
+}
+
+.mint-indicator-mask {
+  z-index: 99999;
+}
+
+.mint-msgbox {
+  border-radius: 0.1rem !important;
+  width: 2.7rem !important;
+}
+
+.mint-msgbox-content {
+  padding: 0 0.1rem !important;
+  min-height: auto !important;
+  border: 0 !important;
+}
+
+.mint-msgbox-confirm {
+  color: #ee3f44 !important;
+  font-size: 0.18rem;
+}
+
+.mint-msgbox-cancel {
+  font-size: 0.18rem !important;
+}
+
+.mint-msgbox-title {
+  height: 0.4rem !important;
+  line-height: 0.4rem !important;
+  text-align: center !important;
+  font-size: 0.18rem !important;
+  color: #333 !important;
+  font-weight: bold !important;
+}
+
+.mint-msgbox-message {
+  line-height: normal !important;
+  font-size: 0.14rem !important;
+}
+
+.mint-msgbox-btns {
+  height: 0.5rem !important;
+  line-height: 0.5rem !important;
+  border-top: 1px solid #ddd !important;
+  font-size: 0.16rem !important;
+  margin-top: 0.15rem !important;
+}
+
+.mint-msgbox-header {
+  padding: 0.15rem 0 0 !important;
+}
+
+.mint-switch-input:checked+.mint-switch-core {
+  border-color: #4CD964 !important;
+  background-color: #4CD964 !important;
+}
+
+/*loging.gif样式*/
+.loading_gif {
+  display: inline-block;
+  font-size: 0;
+  width: 0.45rem;
+  height: 0.12rem;
+  position: relative;
+}
+
+.loading_gif:before {
+  content: '';
+  width: 0.12rem;
+  height: 0.12rem;
+  background: #ee3f44;
+  position: absolute;
+  border-radius: 50%;
+  left: 0;
+  top: 0;
+  animation: left 0.7s linear 0s infinite alternate;
+}
+
+.loading_gif:after {
+  content: '';
+  width: 0.12rem;
+  height: 0.12rem;
+  background: yellow;
+  position: absolute;
+  border-radius: 50%;
+  left: 0.33rem;
+  top: 0;
+  animation: right 0.7s linear 0s infinite alternate;
+}
+
+@keyframes left {
+  0% {
+    left: 0;
+  }
+
+  100% {
+    left: 0.33rem
+  }
+}
+
+@keyframes right {
+  0% {
+    left: 0.33rem;
+  }
+
+  100% {
+    left: 0
+  }
+}
+
+@keyframes right {
+  0% {
+    left: 0.33rem;
+  }
+
+  100% {
+    left: 0
+  }
+}
+
+/*mint-ui修改*/
+
+.mint-spinner-snake {
+  height: 0.16rem !important;
+  width: 0.16rem !important;
+}
+
+.mint-indicator-text {
+  color: rgb(204, 204, 204) !important;
+  font-size: 0.14rem !important;
+}
+
+.mint-indicator-mask {
+  z-index: 99999;
+}
+
+.mint-msgbox {
+  border-radius: 0.05rem !important;
+  width: 2.7rem !important;
+}
+
+.mint-msgbox-content {
+  padding: 0 0.1rem !important;
+  min-height: auto !important;
+  border: 0 !important;
+}
+
+.mint-msgbox-confirm {
+  color: #ee3f44 !important;
+  font-size: 0.18rem;
+}
+
+.mint-msgbox-header {
+  padding: 0.15rem 0 0 !important;
+}
+
+.mint-switch-input:checked+.mint-switch-core {
+  border-color: #4CD964 !important;
+  background-color: #4CD964 !important;
+}
+
+/* 支付页面的 按钮样式 */
+.label {
+  margin-top: 0.6rem;
+  padding-bottom: 0.2rem;
+  text-align: center;
+
+  li {
+    display: inline-block;
+    width: 1.2rem;
+    height: 0.36rem;
+    line-height: 0.36rem;
+    font-size: 0.14rem;
+    color: #333;
+    border-radius: 0.05rem;
+    border: 1px solid #ddd;
+
+    &:nth-child(1) {
+      margin-right: 0.2rem;
+    }
+  }
+}
