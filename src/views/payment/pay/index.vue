@@ -176,11 +176,9 @@ export default {
     }
   },
   created() {
-    alert("收银台");
-
     // 获取用户 订单信息
     this.getPayContentByUserId();
-    console.log("ok");
+    console.log("hss-test");
     const _this = this;
     // 付款成功后返回的值
     window.pay_callBack = async function() {
@@ -259,7 +257,6 @@ export default {
         this.redirectUrl
       );
       if (res.code === 1000) {
-        console.log(res);
         const data = res.data;
         this.stashArr = [];
         // 初始化订单信息值
