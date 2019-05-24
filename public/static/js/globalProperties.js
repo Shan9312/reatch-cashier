@@ -1,5 +1,5 @@
 "use strict";
-String.prototype.startWith = function (t) {
+String.prototype.starstWith = function (t) {
   return new RegExp("^" + t).test(this)
 };
 var globalProperties = {
