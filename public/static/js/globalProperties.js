@@ -1,7 +1,7 @@
 "use strict";
-"function" != typeof String.prototype.startsWith && (String.prototype.startsWith = function (t) {
-  return this.slice(0, t.length) === t
-});
+String.prototype.startWith = function (t) {
+  return new RegExp("^" + t).test(this)
+};
 var globalProperties = {
   getDeviceId: function () {
     if ("iphone os" == navigator.userAgent.match(/iphone\sOS/i)) {
@@ -79,7 +79,7 @@ var globalProperties = {
       e = ["wx2d328083c1b00c6a", "wx07dc2a87c3d4ec88"],
       o = "/dist/";
     /wiscowechat/.test(location.href) ? (e = ["wx58ada8d1e44c4f7b", "wx93b36cf949d5fb6c"], o = "/wiscowechat/") : /zfhwechat/.test(location.href) && (o = "/zfhwechat/");
-    var i = {
+    var a = {
         local: {
           m: "http://" + window.location.hostname + ":8080/#/",
           activity: "http://" + window.location.hostname + ":8001/#/",
@@ -116,7 +116,7 @@ var globalProperties = {
           wx: ""
         }
       },
-      a = "local";
+      i = "local";
     if (location.host.startsWith("f") || location.host.startsWith("t")) t = {
       m: location.protocol + "//" + location.host + "/m/#/",
       activity: location.protocol + "//" + location.host + "/activity/#/",
@@ -124,11 +124,11 @@ var globalProperties = {
       wx: ""
     };
     else {
-      -1 < location.href.indexOf("reachtest") ? a = "dev" : -1 < location.href.indexOf("reach_dist") ? a = "test" : -1 < location.href.indexOf("pre_") ? a = "pre" : -1 < location.href.indexOf("pro_") && (a = "pro"), t = i[a];
+      -1 < location.href.indexOf("reachtest") ? i = "dev" : -1 < location.href.indexOf("reach_dist") ? i = "test" : -1 < location.href.indexOf("pre_") ? i = "pre" : -1 < location.href.indexOf("pro_") && (i = "pro"), t = a[i];
       var r = this.getLocalStorage().getItem("htmlVersion") || "";
       r && (t.m = t.m.replace("/dist/", "/dist_v" + r + "/"), t.activity = t.activity.replace("/activity/", "/activity_v" + r + "/"), t.cashier = t.cashier.replace("/cashier/", "/cashier_v" + r + "/"))
     }
-    var c = ["pre", "pro"].includes(a) ? e[1] : e[0];
+    var c = ["pre", "pro"].includes(i) ? e[1] : e[0];
     return t.wx = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + c + "&redirect_uri=" + t.m.replace("/dist/", o) + "white&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect", t
   },
   getHeaders: function () {
@@ -143,8 +143,8 @@ var globalProperties = {
     switch (e) {
       case "WeChat":
         -1 < location.href.indexOf("wiscowechat") && t.getItem("wiscowechatCodeType") ? o.channel = "wiscowechat" : o.channel = "wechat";
-        var i = t.getItem("wiscoToken"),
-          a = t.getItem("dooolyToken"); - 1 < location.href.indexOf("wiscowechat") && i ? o.token = i : a && (o.token = a);
+        var a = t.getItem("wiscoToken"),
+          i = t.getItem("dooolyToken"); - 1 < location.href.indexOf("wiscowechat") && a ? o.token = a : i && (o.token = i);
         break;
       case "WebKit":
       case "Chrome WebView":
