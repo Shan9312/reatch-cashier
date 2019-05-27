@@ -79,44 +79,49 @@ var globalProperties = {
       e = ["wx2d328083c1b00c6a", "wx07dc2a87c3d4ec88"],
       o = "/dist/";
     /wiscowechat/.test(location.href) ? (e = ["wx58ada8d1e44c4f7b", "wx93b36cf949d5fb6c"], o = "/wiscowechat/") : /zfhwechat/.test(location.href) && (o = "/zfhwechat/");
-    var a = {
+    var i = {
         local: {
           m: "http://" + window.location.hostname + ":8080/#/",
           activity: "http://" + window.location.hostname + ":8001/#/",
           cashier: "http://" + window.location.hostname + ":8002/#/",
           thirdWebSite: "http://" + window.location.hostname + ":8080/#/",
-          wx: ""
+          wx: "",
+          ICBCCashier: "https://admin.doooly.com/Doooly/jersey/icbc/icbcOrderPay"
         },
         dev: {
           m: "https://admin.doooly.com/reachtest/dist/#/",
           activity: "https://admin.doooly.com/reachtest/activity/#/",
           cashier: "https://admin.doooly.com/reachtest/cashier/#/",
           thirdWebSite: "https://admin.doooly.com/reachtest/thirdParty/#/",
-          wx: ""
+          wx: "",
+          ICBCCashier: "https://admin.doooly.com/Doooly/jersey/icbc/icbcOrderPay"
         },
         test: {
           m: "https://admin.doooly.com/reach_dist/dist/#/",
           activity: "https://admin.doooly.com/reach_dist/activity/#/",
           cashier: "https://admin.doooly.com/reach_dist/cashier/#/",
           thirdWebSite: "https://admin.doooly.com/reach_dist/thirdParty/#/",
-          wx: ""
+          wx: "",
+          ICBCCashier: "https://admin.doooly.com/Doooly/jersey/icbc/icbcOrderPay"
         },
         pre: {
           m: "https://reach-life.com/pre_dist/dist/#/",
           activity: "https://reach-life.com/pre_activity/activity/#/",
           cashier: "https://reach-life.com/pre_cashier/cashier/#/",
           thirdWebSite: "https://reach-life.com/pre_dist/thirdParty/#/",
-          wx: ""
+          wx: "",
+          ICBCCashier: "https://admin.doooly.com/Doooly/jersey/icbc/icbcOrderPay"
         },
         pro: {
           m: "https://reach-life.com/pro_dist/dist/#/",
           activity: "https://reach-life.com/pro_activity/activity/#/",
           cashier: "https://reach-life.com/pro_cashier/cashier/#/",
           thirdWebSite: "https://reach-life.com/pro_dist/thirdParty/#/",
-          wx: ""
+          wx: "",
+          ICBCCashier: "https://admin.doooly.com/Doooly/jersey/icbc/icbcOrderPay"
         }
       },
-      i = "local";
+      a = "local";
     if (0 == location.host.indexOf("f") || 0 == location.host.indexOf("t")) t = {
       m: location.protocol + "//" + location.host + "/m/#/",
       activity: location.protocol + "//" + location.host + "/activity/#/",
@@ -124,11 +129,11 @@ var globalProperties = {
       wx: ""
     };
     else {
-      t = a[i = this.getCurrentEnv()];
+      t = i[a = this.getCurrentEnv()];
       var r = this.getLocalStorage().getItem("htmlVersion") || "";
       r && (t.m = t.m.replace("/dist/", "/dist_v" + r + "/"), t.activity = t.activity.replace("/activity/", "/activity_v" + r + "/"), t.cashier = t.cashier.replace("/cashier/", "/cashier_v" + r + "/"))
     }
-    var c = -1 < ["pre", "pro"].indexOf(i) ? e[1] : e[0];
+    var c = -1 < ["pre", "pro"].indexOf(a) ? e[1] : e[0];
     return t.wx = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + c + "&redirect_uri=" + t.m.replace("/dist/", o) + "white&response_type=code&scope=snsapi_base&state=STATE#wechat_redirect", t
   },
   getHeaders: function () {
@@ -143,8 +148,8 @@ var globalProperties = {
     switch (e) {
       case "WeChat":
         -1 < location.href.indexOf("wiscowechat") && t.getItem("wiscowechatCodeType") ? o.channel = "wiscowechat" : o.channel = "wechat";
-        var a = t.getItem("wiscoToken"),
-          i = t.getItem("dooolyToken"); - 1 < location.href.indexOf("wiscowechat") && a ? o.token = a : i && (o.token = i);
+        var i = t.getItem("wiscoToken"),
+          a = t.getItem("dooolyToken"); - 1 < location.href.indexOf("wiscowechat") && i ? o.token = i : a && (o.token = a);
         break;
       case "WebKit":
       case "Chrome WebView":
