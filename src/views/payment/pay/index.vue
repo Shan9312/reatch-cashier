@@ -1,5 +1,4 @@
 <template>
-<<<<<<< HEAD
   <div>
     <div class="pay-warpper" v-if="usablePayList.length">
       <div class="content">
@@ -40,72 +39,6 @@
               <span class="fr direct-available">
                 可抵扣余额:
                 <label>{{item.payAmount ? Number(item.payAmount).toFixed(2) : '余额不可用' }}</label>
-=======
-  <div class="pay-warpper" v-if="usablePayList.length">
-    <div class="content">
-      需支付:
-      <!-- 日常的商品手续费 -->
-      <span v-if="defaultOptions.serviceCharge">
-        <span
-          class="amount"
-        >{{isShowChargePay?(defaultOptions.needPayAmount + defaultOptions.serviceCharge): defaultOptions.needPayAmount | fixedNum }}</span>
-        <label class="charge-text" v-show="isShowChargePay && defaultOptions.serviceCharge>0">
-          （含手续费：
-          <span class="charge">{{defaultOptions.serviceCharge | fixedNum }}</span>）
-        </label>
-      </span>
-      <!-- 特殊企业/商品的 手续费3% -->
-      <span v-else>
-        <span class="amount">{{ (defaultOptions.needPayAmount + realServiceCharge) | fixedNum }}</span>
-        <span class="charge-text" v-show="realServiceCharge>0">
-          （含手续费：
-          <span class="charge">{{realServiceCharge | fixedNum }}</span>）
-        </span>
-      </span>
-    </div>
-    <div>
-      <!-- 定向积分 -->
-      <div class="pay-type" v-for="item in usablePayList" :key="item.id">
-        <div class="line" v-if="item.id === 1">
-          <div class="center direct">
-            <span class="fl direct-left names">
-              {{item.text}}
-              <img
-                class="direct-pic"
-                @click="handleWhatOrientIntergral"
-                src="@/assets/images/checkout-counter/icon_why.png"
-                alt="定向积分疑问"
-              >
-            </span>
-            <span class="fr direct-available">
-              可抵扣余额:
-              <label>{{item.payAmount ? Number(item.payAmount).toFixed(2) : '余额不可用' }}</label>
-            </span>
-          </div>
-          <!-- 支付选择状态 组件 -->
-          <checkout-btn :payItem="item" @handleChoosePay="handleChoosePay"></checkout-btn>
-        </div>
-      </div>
-      <!-- 兜礼付款方式提醒 -->
-      <div class="pay-title">
-        兜礼方式
-        <span>（使用该支付商户将不向个人开具发票）</span>
-      </div>
-      <!--/兜礼/微信/支付宝-->
-      <div class="pay-type">
-        <section v-for="item in usablePayList" :key="item.id">
-          <div class="line" v-if="item.id !== 1">
-            <img class="picture fl" :src="item.imgSrc">
-            <div class="center">
-              <span class="type-text fl names">{{item.text}}</span>
-              <span class="fr available" v-if="item.id === 2">
-                可用余额：
-                <label class="point">{{item.payAmount? item.payAmount :0 | fixedNum }}</label>
-              </span>
-              <span class="fr available" v-if="item.selected  && item.id >2  ">
-                需支付：
-                <label class="point">{{item.payAmount | fixedNum }}</label>
->>>>>>> release
               </span>
             </div>
             <!-- 支付选择状态 组件 -->
@@ -139,7 +72,6 @@
           </section>
         </div>
       </div>
-<<<<<<< HEAD
       <!-- 底部确认支付按钮 -->
       <div class="footer" @click="handleConfirmPay">确认支付</div>
       <!-- 现金支付的弹  出框 -->
@@ -150,18 +82,6 @@
             <div @click="handleReturnPrePage" class="leave-input-btn left">确认离开</div>
             <div @click="continuePay(false)" class="leave-input-btn right">继续支付</div>
           </div>
-=======
-    </div>
-    <!-- 底部确认支付按钮 -->
-    <div class="footer" @click="handleConfirmPay">确认支付</div>
-    <!-- 现金支付的弹  出框 -->
-    <div class="leave-box" v-show="isShowLeaveBtn" @touchmove.prevent>
-      <div class="confirm-leave">
-        <p>确定要离开收银台？</p>
-        <div class="input-view">
-          <div @click="handleReturnPrePage" class="leave-input-btn left">确认离开</div>
-          <div @click="continuePay(false)" class="leave-input-btn right">继续支付</div>
->>>>>>> release
         </div>
       </div>
       <!-- 短信/密码验证 错误的弹出框 -->
@@ -192,18 +112,6 @@
         <br>请选择其他商品。谢谢
       </p>
     </div>
-<<<<<<< HEAD
-=======
-    <!-- 键盘页面 组件-->
-    <Keyboard
-      ref="keybordItem"
-      v-show="isShowKeyboard"
-      :isPayPassword="defaultOptions.isPayPassword"
-      @handleCloseKeyboard="handleCloseKeyboard"
-      @handlePayOrderBtn="handlePayOrderBtn"
-      @confirmOrder="confirmOrder"
-    ></Keyboard>
->>>>>>> release
   </div>
 </template>
 
@@ -233,11 +141,7 @@ export default {
         serviceCharge: 0, // 手续费
         orientIntergral: 0, // 定向积分
         dooolyIntergral: 0, // 兜礼积分
-<<<<<<< HEAD
         supportDooolyIntergral: false, // 是否支持兜礼积分
-=======
-        supportDooolyIntergral: true, // 是否支持兜礼积分
->>>>>>> release
         supportHybrid: true, // 是否支持混合支付
         supportWechat: true, // 是否支持微信支付
         supportAlipay: true, // 是否支持支付宝
@@ -268,12 +172,8 @@ export default {
       promptDialog: false, // 温馨提示框
       realServiceCharge: 0, // 实际需要支付的手续费
       isHandleConfirm: false, // 确定用户再次选支付列表
-<<<<<<< HEAD
       stashArr: [], // 临时存储上一次支付列表
       isShowMsg: false // 若商品无是否方式提醒
-=======
-      stashArr: [] // 临时存储上一次支付列表
->>>>>>> release
     };
   },
   filters: {
@@ -291,10 +191,6 @@ export default {
   created() {
     // 获取用户 订单信息
     this.getPayContentByUserId();
-<<<<<<< HEAD
-=======
-    console.log("hss-test");
->>>>>>> release
     const _this = this;
     // 付款成功后返回的值
     window.pay_callBack = async function() {
@@ -385,11 +281,7 @@ export default {
           payId: data.payId,
           isPayPassword: data.isPayPassword,
           productType: data.productType,
-<<<<<<< HEAD
           supportOrientIntergral: false,
-=======
-          supportOrientIntergral: true,
->>>>>>> release
           supportHybrid: true,
           supportDooolyIntergral: false,
           supportWechat: false,
@@ -431,11 +323,7 @@ export default {
       let arr = [];
       arr = payMethod.split(",");
       arr.forEach(item => {
-<<<<<<< HEAD
         if (item == "0" || item == 2 || item == 11) {
-=======
-        if (item == 0 || item == 2 || item == 11) {
->>>>>>> release
           // 兜礼列表
           this.defaultOptions.supportDooolyIntergral = true;
         } else if (item == 1 || item == 2) {
@@ -444,7 +332,6 @@ export default {
         } else if (item == 6 || item == 11) {
           // 支付宝列表
           this.defaultOptions.supportAlipay = true;
-<<<<<<< HEAD
         } else if (item == 3) {
           this.defaultOptions.supportOrientIntergral = true;
         }
@@ -465,10 +352,6 @@ export default {
         this.defaultOptions.supportHybrid = false;
       }
 
-=======
-        }
-      });
->>>>>>> release
       // 初始化 支付方式列表
       this.initUseAblePayList();
       // 初始化 用户默认支付方式
@@ -481,7 +364,6 @@ export default {
     initUseAblePayList() {
       this.usablePayList = [];
       // 定向积分：不管任何情况都会显示，通过积分是否大于0来判断是否可用
-<<<<<<< HEAD
       if (this.defaultOptions.supportOrientIntergral) {
         this.usablePayList.push({
           text: "定向积分",
@@ -514,37 +396,6 @@ export default {
           usable: true,
           payAmount: 0,
           selected: false,
-=======
-      this.usablePayList.push({
-        text: "定向积分",
-        name: "orientIntergral",
-        usable: this.defaultOptions.orientIntergral > 0,
-        payAmount: this.defaultOptions.orientIntergral,
-        selected: false,
-        imgSrc: "",
-        id: 1
-      });
-      // 兜礼积分：后台可配置是否显示，通过积分是否大于0来判断是否可用
-      if (this.defaultOptions.supportDooolyIntergral) {
-        this.usablePayList.push({
-          text: "兜礼积分",
-          name: "dooolyIntergral",
-          usable: this.defaultOptions.dooolyIntergral > 0,
-          payAmount: this.defaultOptions.dooolyIntergral,
-          selected: false,
-          imgSrc: require("@/assets/images/checkout-counter/icon_doooly.png"),
-          id: 2
-        });
-      }
-      // 微信支付：后台可配置是否显示
-      if (this.defaultOptions.supportWechat) {
-        this.usablePayList.push({
-          text: "微信支付",
-          name: "wechat",
-          usable: true,
-          payAmount: 0,
-          selected: false,
->>>>>>> release
           imgSrc: require("@/assets/images/checkout-counter/icon_wechat.png"),
           id: 3
         });
@@ -562,10 +413,7 @@ export default {
           id: 4
         });
       }
-<<<<<<< HEAD
       if (!this.usablePayList.length) this.isShowMsg = true;
-=======
->>>>>>> release
     },
     /**
      * 初始化 推荐 用户默认使用的支付方式
@@ -626,10 +474,6 @@ export default {
           dooolyServiceCharge,
           serviceCharge
         } = this.defaultOptions;
-<<<<<<< HEAD
-=======
-        const chargeFee = serviceCharge;
->>>>>>> release
         // 只要 2个积分组合不满足 支付 就都禁止掉
         if (
           UtilsFunction.converNumber(orientIntergral, dooolyIntergral) <
@@ -698,14 +542,10 @@ export default {
     // 定向积分： 支付方式
     orientIntergralPayType() {
       // 定向积分大于0，默认一定会选中定向积分
-<<<<<<< HEAD
       if (
         this.usableOptions.orientIntergral &&
         this.defaultOptions.supportOrientIntergral
       ) {
-=======
-      if (this.usableOptions.orientIntergral > 0) {
->>>>>>> release
         this.result.orientIntergralFlag = true; // 选中定向积分
         // 如果定向积分足够支付 则默认只选择定向积分
         if (
@@ -1429,7 +1269,6 @@ export default {
           }
         }
       );
-<<<<<<< HEAD
     },
     // 判断第三方 美团支付付款情况
     handleThirdJudge() {
@@ -1443,21 +1282,6 @@ export default {
         return true;
       }
     },
-=======
-    },
-    // 判断第三方 美团支付付款情况
-    handleThirdJudge() {
-      if (UtilsFunction.getUrlParams("orderSource") === "meituan") {
-        // 若是美团支付 需把信息集合
-        this.meituanObj = {
-          userId: UtilsFunction.getUrlParams("userId"),
-          orderSource: UtilsFunction.getUrlParams("orderSource"),
-          return_url: UtilsFunction.getUrlParams("return_url")
-        };
-        return true;
-      }
-    },
->>>>>>> release
     // 微信/支付宝 点击 继续支付
     continuePay(v) {
       this.isShowLeaveBtn = v;
@@ -1598,7 +1422,6 @@ export default {
     height: 100%;
     background: rgba(51, 51, 51, 0.8);
     z-index: 9999;
-<<<<<<< HEAD
 
     .confirm-leave {
       position: absolute;
@@ -1616,25 +1439,6 @@ export default {
         color: #333;
       }
 
-=======
-
-    .confirm-leave {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 2.7rem;
-      height: 1.6rem;
-      background: #fff;
-      transform: translate(-50%, -50%);
-      border-radius: 0.1rem;
-
-      p {
-        font-size: 0.18rem;
-        padding: 0.4rem 0.1rem 0;
-        color: #333;
-      }
-
->>>>>>> release
       .input-view {
         display: flex;
         position: absolute;
@@ -1710,7 +1514,6 @@ export default {
     }
   }
 }
-<<<<<<< HEAD
 .msg-box {
   position: fixed;
   left: 0;
@@ -1734,6 +1537,4 @@ export default {
     // overflow: hidden;
   }
 }
-=======
->>>>>>> release
 </style>
