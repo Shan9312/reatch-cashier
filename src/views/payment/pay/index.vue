@@ -189,6 +189,14 @@ export default {
     }
   },
   created() {
+    let userAgent = window.navigator.userAgent;
+    let isICBC = /ICBC/.test(userAgent);
+    if (isICBC) {
+      window.location.replace(
+        `${GlobalProperty.frontendDomain.ICBCCashier}?orderNum=${this.orderNum}`
+      );
+      return;
+    }
     // 获取用户 订单信息
     this.getPayContentByUserId();
     const _this = this;
@@ -281,7 +289,7 @@ export default {
           payId: data.payId,
           isPayPassword: data.isPayPassword,
           productType: data.productType,
-          supportOrientIntergral: false,
+          supportOrientIntergral: true,
           supportHybrid: true,
           supportDooolyIntergral: false,
           supportWechat: false,
