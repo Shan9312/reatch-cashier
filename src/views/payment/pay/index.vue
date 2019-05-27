@@ -143,8 +143,8 @@ export default {
         dooolyIntergral: 0, // 兜礼积分
         supportDooolyIntergral: false, // 是否支持兜礼积分
         supportHybrid: true, // 是否支持混合支付
-        supportWechat: true, // 是否支持微信支付
-        supportAlipay: true, // 是否支持支付宝
+        supportWechat: false, // 是否支持微信支付
+        supportAlipay: false, // 是否支持支付宝
         isPayPassword: "1", // 后端返回：'1' / '0':短信验证; '2' :密码支付
         payId: "", // 后端返回的 预订单ID
         dirIntegralSwitch: false, // 支付方式为 定向积分，发给后端字段
@@ -289,7 +289,7 @@ export default {
           payId: data.payId,
           isPayPassword: data.isPayPassword,
           productType: data.productType,
-          supportOrientIntergral: true,
+          supportOrientIntergral: false,
           supportHybrid: true,
           supportDooolyIntergral: false,
           supportWechat: false,
