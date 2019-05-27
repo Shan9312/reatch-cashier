@@ -14,6 +14,12 @@ module.exports = {
                 args[0].commonResourcePath = process.env.COMMON_RESOURCE_PATH // set common resource path
                 return args
             })
+        config.module
+            .rule('iview')
+            .test(/iview.src.*?js$/)
+            .use('babel')
+            .loader('babel-loader')
+            .end()
 
     },
     devServer: {
