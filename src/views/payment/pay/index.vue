@@ -1,105 +1,117 @@
 <template>
-  <div class="pay-warpper" v-if="usablePayList.length">
-    <div class="content">
-      需支付:
-      <!-- 日常的商品手续费 -->
-      <span v-if="defaultOptions.serviceCharge">
-        <span
-          class="amount"
-        >{{isShowChargePay?(defaultOptions.needPayAmount + defaultOptions.serviceCharge): defaultOptions.needPayAmount | fixedNum }}</span>
-        <label class="charge-text" v-show="isShowChargePay && defaultOptions.serviceCharge>0">
-          （含手续费：
-          <span class="charge">{{defaultOptions.serviceCharge | fixedNum }}</span>）
-        </label>
-      </span>
-      <!-- 特殊企业/商品的 手续费3% -->
-      <span v-else>
-        <span class="amount">{{ (defaultOptions.needPayAmount + realServiceCharge) | fixedNum }}</span>
-        <span class="charge-text" v-show="realServiceCharge>0">
-          （含手续费：
-          <span class="charge">{{realServiceCharge | fixedNum }}</span>）
+  <div>
+    <div class="pay-warpper" v-if="usablePayList.length">
+      <div class="content">
+        需支付:
+        <!-- 日常的商品手续费 -->
+        <span v-if="defaultOptions.serviceCharge">
+          <span
+            class="amount"
+          >{{isShowChargePay?(defaultOptions.needPayAmount + defaultOptions.serviceCharge): defaultOptions.needPayAmount | fixedNum }}</span>
+          <label class="charge-text" v-show="isShowChargePay && defaultOptions.serviceCharge>0">
+            （含手续费：
+            <span class="charge">{{defaultOptions.serviceCharge | fixedNum }}</span>）
+          </label>
         </span>
-      </span>
-    </div>
-    <div>
-      <!-- 定向积分 -->
-      <div class="pay-type" v-for="item in usablePayList" :key="item.id">
-        <div class="line" v-if="item.id === 1">
-          <div class="center direct">
-            <span class="fl direct-left names">
-              {{item.text}}
-              <img
-                class="direct-pic"
-                @click="handleWhatOrientIntergral"
-                src="@/assets/images/checkout-counter/icon_why.png"
-                alt="定向积分疑问"
-              >
-            </span>
-            <span class="fr direct-available">
-              可抵扣余额:
-              <label>{{item.payAmount ? Number(item.payAmount).toFixed(2) : '余额不可用' }}</label>
-            </span>
-          </div>
-          <!-- 支付选择状态 组件 -->
-          <checkout-btn :payItem="item" @handleChoosePay="handleChoosePay"></checkout-btn>
-        </div>
+        <!-- 特殊企业/商品的 手续费3% -->
+        <span v-else>
+          <span class="amount">{{ (defaultOptions.needPayAmount + realServiceCharge) | fixedNum }}</span>
+          <span class="charge-text" v-show="realServiceCharge>0">
+            （含手续费：
+            <span class="charge">{{realServiceCharge | fixedNum }}</span>）
+          </span>
+        </span>
       </div>
-      <!-- 兜礼付款方式提醒 -->
-      <div class="pay-title">
-        兜礼方式
-        <span>（使用该支付商户将不向个人开具发票）</span>
-      </div>
-      <!--/兜礼/微信/支付宝-->
-      <div class="pay-type">
-        <section v-for="item in usablePayList" :key="item.id">
-          <div class="line" v-if="item.id !== 1">
-            <img class="picture fl" :src="item.imgSrc">
-            <div class="center">
-              <span class="type-text fl names">{{item.text}}</span>
-              <span class="fr available" v-if="item.id === 2">
-                可用余额：
-                <label class="point">{{item.payAmount? item.payAmount :0 | fixedNum }}</label>
+      <div>
+        <!-- 定向积分 -->
+        <div class="pay-type" v-for="item in usablePayList" :key="item.id">
+          <div class="line" v-if="item.id === 1">
+            <div class="center direct">
+              <span class="fl direct-left names">
+                {{item.text}}
+                <img
+                  class="direct-pic"
+                  @click="handleWhatOrientIntergral"
+                  src="@/assets/images/checkout-counter/icon_why.png"
+                  alt="定向积分疑问"
+                >
               </span>
-              <span class="fr available" v-if="item.selected  && item.id >2  ">
-                需支付：
-                <label class="point">{{item.payAmount | fixedNum }}</label>
+              <span class="fr direct-available">
+                可抵扣余额:
+                <label>{{item.payAmount ? Number(item.payAmount).toFixed(2) : '余额不可用' }}</label>
               </span>
             </div>
             <!-- 支付选择状态 组件 -->
             <checkout-btn :payItem="item" @handleChoosePay="handleChoosePay"></checkout-btn>
           </div>
-        </section>
-      </div>
-    </div>
-    <!-- 底部确认支付按钮 -->
-    <div class="footer" @click="handleConfirmPay">确认支付</div>
-    <!-- 现金支付的弹  出框 -->
-    <div class="leave-box" v-show="isShowLeaveBtn" @touchmove.prevent>
-      <div class="confirm-leave">
-        <p>确定要离开收银台？</p>
-        <div class="input-view">
-          <div @click="handleReturnPrePage" class="leave-input-btn left">确认离开</div>
-          <div @click="continuePay(false)" class="leave-input-btn right">继续支付</div>
+        </div>
+        <!-- 兜礼付款方式提醒 -->
+        <div class="pay-title">
+          兜礼方式
+          <span>（使用该支付商户将不向个人开具发票）</span>
+        </div>
+        <!--/兜礼/微信/支付宝-->
+        <div class="pay-type">
+          <section v-for="item in usablePayList" :key="item.id">
+            <div class="line" v-if="item.id !== 1">
+              <img class="picture fl" :src="item.imgSrc">
+              <div class="center">
+                <span class="type-text fl names">{{item.text}}</span>
+                <span class="fr available" v-if="item.id === 2">
+                  可用余额：
+                  <label class="point">{{item.payAmount? item.payAmount :0 | fixedNum }}</label>
+                </span>
+                <span class="fr available" v-if="item.selected  && item.id >2  ">
+                  需支付：
+                  <label class="point">{{item.payAmount | fixedNum }}</label>
+                </span>
+              </div>
+              <!-- 支付选择状态 组件 -->
+              <checkout-btn :payItem="item" @handleChoosePay="handleChoosePay"></checkout-btn>
+            </div>
+          </section>
         </div>
       </div>
-    </div>
-    <!-- 短信/密码验证 错误的弹出框 -->
-    <div v-if="promptDialog" class="toast-bg" @touchmove.prevent>
-      <div class="toast">
-        <p>温馨提示</p>
-        <div class="text">{{promptText}}</div>
-        <div class="input" @click="promptDialog = false">确定</div>
+      <!-- 底部确认支付按钮 -->
+      <div class="footer" @click="handleConfirmPay">确认支付</div>
+      <!-- 现金支付的弹  出框 -->
+      <div class="leave-box" v-show="isShowLeaveBtn" @touchmove.prevent>
+        <div class="confirm-leave">
+          <p>确定要离开收银台？</p>
+          <div class="input-view">
+            <div @click="handleReturnPrePage" class="leave-input-btn left">确认离开</div>
+            <div @click="continuePay(false)" class="leave-input-btn right">继续支付</div>
+          </div>
+        </div>
       </div>
+      <!-- 短信/密码验证 错误的弹出框 -->
+      <div v-if="promptDialog" class="toast-bg" @touchmove.prevent>
+        <div class="toast">
+          <p>温馨提示</p>
+          <div class="text">{{promptText}}</div>
+          <div class="input" @click="promptDialog = false">确定</div>
+        </div>
+      </div>
+      <!-- 键盘页面 组件-->
+      <Keyboard
+        ref="keybordItem"
+        v-show="isShowKeyboard"
+        :isPayPassword="defaultOptions.isPayPassword"
+        @handleCloseKeyboard="handleCloseKeyboard"
+        @handlePayOrderBtn="handlePayOrderBtn"
+        @confirmOrder="confirmOrder"
+      ></Keyboard>
     </div>
-    <!-- 键盘页面 组件-->
-    <Keyboard
-      ref="keybordItem"
-      v-show="isShowKeyboard"
-      :isPayPassword="defaultOptions.isPayPassword"
-      @handleCloseKeyboard="handleCloseKeyboard"
-      @handlePayOrderBtn="handlePayOrderBtn"
-      @confirmOrder="confirmOrder"
-    ></Keyboard>
+    <!-- 如果只有一种支付宝选择 && 且在微信中支付-->
+    <div
+      v-if="(usablePayList.length == 1 && usablePayList[0].id == '4' && browserName == 'WeChat') || isShowMsg "
+      class="msg-box"
+    >
+      <p>
+        抱歉! 该商品暂无支付方式,
+        <br>请选择其他商品。谢谢
+      </p>
+    </div>
   </div>
 </template>
 
@@ -160,7 +172,8 @@ export default {
       promptDialog: false, // 温馨提示框
       realServiceCharge: 0, // 实际需要支付的手续费
       isHandleConfirm: false, // 确定用户再次选支付列表
-      stashArr: [] // 临时存储上一次支付列表
+      stashArr: [], // 临时存储上一次支付列表
+      isShowMsg: false // 若商品无是否方式提醒
     };
   },
   filters: {
@@ -331,6 +344,14 @@ export default {
         this.defaultOptions.dooolyIntergral = 0;
         this.defaultOptions.dooolyServiceCharge = 0;
       }
+      // 不支持现金支付 则禁止混合支付的功能
+      if (
+        !this.defaultOptions.supportWechat &&
+        !this.defaultOptions.supportAlipay
+      ) {
+        this.defaultOptions.supportHybrid = false;
+      }
+
       // 初始化 支付方式列表
       this.initUseAblePayList();
       // 初始化 用户默认支付方式
@@ -392,6 +413,7 @@ export default {
           id: 4
         });
       }
+      if (!this.usablePayList.length) this.isShowMsg = true;
     },
     /**
      * 初始化 推荐 用户默认使用的支付方式
@@ -1490,6 +1512,29 @@ export default {
         color: #ee3f44;
       }
     }
+  }
+}
+.msg-box {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.5;
+  background: #000;
+  z-index: 1999;
+  p {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    padding: 0.1rem 0.05rem;
+    text-align: center;
+    transform: translate3d(-50%, -50%, 0);
+    background-color: #fff;
+    border-radius: 0.05rem !important;
+    width: 2.7rem !important;
+    font-size: 0.15rem;
+    // overflow: hidden;
   }
 }
 </style>
