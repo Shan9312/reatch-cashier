@@ -71,7 +71,6 @@ export default {
     this.isShowActivityPage();
     //
     window.isConfirmShow = function() {
-      alert(1);
       dooolyAPP.goBackPageIndex("2");
     };
     dooolyAPP.initTitle("支付结果", "2", "isConfirmShow()");

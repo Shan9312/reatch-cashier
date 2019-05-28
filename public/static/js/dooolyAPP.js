@@ -109,7 +109,6 @@
     }
   },
   goBackPageIndex: function (e) {
-    alert(this.browserName);
     try {
       "WebKit" == this.browserName ? window.webkit.messageHandlers.goBackPageIndex.postMessage(e) : "Chrome WebView" == this.browserName ? RHNativeJS.backWebPage(e) : window.history.go(-e)
     } catch (e) {
