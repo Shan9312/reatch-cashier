@@ -32,7 +32,7 @@
       </div>
     </div>
     <!-- 活动类型-->
-    <ActivePage v-if="activityName && (isShowPayPage === 2 || isShowPayPage === 3)"></ActivePage>
+    <ActivePage v-if="umengNameObj[activityName] && (isShowPayPage === 2 || isShowPayPage === 3)"></ActivePage>
   </div>
 </template>
 
@@ -151,7 +151,8 @@ export default {
       this.activityName = JSON.parse(localStorageStr)[this.orderNum];
       if (this.activityName) {
         baiduStats(
-          this.umengNameObj[this.activityName] + "支付成功",
+          (this.umengNameObj[this.activityName] || this.activityName) +
+            "支付成功",
           this.$route
         );
       }

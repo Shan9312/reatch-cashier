@@ -383,7 +383,6 @@ export default {
           id: 1
         });
       }
-
       // 兜礼积分：后台可配置是否显示，通过积分是否大于0来判断是否可用
       if (this.defaultOptions.supportDooolyIntergral) {
         this.usablePayList.push({
