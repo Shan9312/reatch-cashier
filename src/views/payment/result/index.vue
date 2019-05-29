@@ -69,7 +69,7 @@ export default {
     this.getPayOrder();
     // 判断活动二维码是否显示
     this.isShowActivityPage();
-    //
+    // 安卓，ios支付后 历史返回调用方法，返回2级页面
     window.isConfirmShow = function() {
       dooolyAPP.goBackPageIndex("2");
     };
