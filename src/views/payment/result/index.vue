@@ -86,7 +86,7 @@ export default {
         this.browserName !== "Chrome WebView" &&
         this.browserName !== "WebKit"
       ) {
-        history.replaceState(null, null, document.URL);
+        // history.pushState(null, null, document.URL);
         window.addEventListener("popstate", _this.handleReturnHomePage, false);
       }
     }
