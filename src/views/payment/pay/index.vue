@@ -102,16 +102,6 @@
         @confirmOrder="confirmOrder"
       ></Keyboard>
     </div>
-    <!-- 如果只有一种支付宝选择 && 且在微信中支付-->
-    <div
-      v-if="(usablePayList.length == 1 && usablePayList[0].id == '4' && browserName == 'WeChat') || isShowMsg "
-      class="msg-box"
-    >
-      <p>
-        抱歉! 该商品暂无支付方式,
-        <br>请选择其他商品。谢谢
-      </p>
-    </div>
   </div>
 </template>
 
