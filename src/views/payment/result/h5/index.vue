@@ -33,14 +33,21 @@ export default {
         Mint.Indicator.close();
         return;
       }
-      alert(1);
       const res = await getPayResult(this.orderNum);
       if (res.code === 1000 || res.code === 1001) {
         // 根据支付环境 跳转到不同的页面
         if (res.data && res.data.redirectUrl) {
-          alert(2);
           // 接口有值，直接跳接口的
-          dooolyAPP.gotoJumpJq(this.$router, res.data.redirectUrl);
+          if (/cardBuyPayResult/.test(res.data.redirectUrl)) {
+            // 区分是微信h5支付完成,跳转支付完成页要用
+            localStorage.isWeChatH5 = true;
+            dooolyAPP.gotoJumpVue(
+              this.$router,
+              `/cardBuyPayResult/${this.orderNum}`
+            );
+          } else {
+            dooolyAPP.gotoJumpJq(this.$router, res.data.redirectUrl);
+          }
         } else {
           // 支付结果页面
           dooolyAPP.gotoJumpVue(
