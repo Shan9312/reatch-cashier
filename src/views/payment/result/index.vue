@@ -85,13 +85,12 @@ export default {
         this.browserName !== "Chrome WebView" &&
         this.browserName !== "WebKit"
       ) {
-        alert(1);
         history.pushState(null, null, document.URL);
         window.addEventListener("popstate", _this.handleReturnHomePage, false);
       }
     }
 
-    // 若是第三方app 嵌套我们h5页面 积分支付时 点击回退 2个
+    // 若是第三方app 嵌套我们h5页面 积分支付时 点击回退2级页面
     if (
       !/method=alipay/.test(window.location.href) &&
       this.browserName == "otherAPP" &&
@@ -191,7 +190,6 @@ export default {
     );
   },
   beforeRouteLeave(to, from, next) {
-    alert(2);
     if (this.browserName != "Chrome WebView" && this.browserName != "WebKit") {
       if (to.name == "Payment" && !this.backLock) {
         this.backLock = true;
