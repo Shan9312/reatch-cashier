@@ -106,21 +106,14 @@ export default {
   },
   beforeRouteEnter(to, from, next) {
     // 若是第三方app 嵌套我们h5页面 积分支付时 点击回退 2个
-    if (
-      !/method=alipay/.test(window.location.href) &&
-      this.browserName == "otherAPP"
-    ) {
-      vm.handleGoBack();
+    if (!from.name) {
+      next(vm => {
+        vm.paymentRemind();
+      });
     } else {
-      if (!from.name) {
-        next(vm => {
-          vm.paymentRemind();
-        });
-      } else {
-        next(vm => {
-          vm.handleGoBack();
-        });
-      }
+      next(vm => {
+        vm.handleGoBack();
+      });
     }
   }
 };
