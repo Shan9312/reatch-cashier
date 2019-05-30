@@ -184,7 +184,6 @@ export default {
     window.removeEventListener(
       "popstate",
       function() {
-        this.handleReturnHomePage();
         this.goBackDahua();
       },
       false

@@ -43,7 +43,6 @@
     }
   },
   jumpIndexPage: function (e) {
-    alert(e);
     try {
       "WebKit" == this.browserName ? window.webkit.messageHandlers.jumpTabarItemIndex.postMessage("0") : "Chrome WebView" == this.browserName ? RHNativeJS.jumpIndexPage() : window.location.replace(e);
     } catch (e) {
