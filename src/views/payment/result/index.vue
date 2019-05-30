@@ -86,7 +86,9 @@ export default {
         this.browserName !== "Chrome WebView" &&
         this.browserName !== "WebKit"
       ) {
-        // history.pushState(null, null, document.URL);
+        setTimeout(function() {
+          history.pushState(null, null, document.URL);
+        }, 0);
         window.addEventListener("popstate", _this.handleReturnHomePage, false);
       }
     }
