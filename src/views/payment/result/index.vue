@@ -76,6 +76,7 @@ export default {
     dooolyAPP.initTitle("支付结果", "2", "isConfirmShow()");
   },
   mounted() {
+    console.log(`${GlobalProperty.frontendDomain.m}v3/home`);
     let _this = this;
     // 支付宝h5、微信h5支付完成后点击返回，去首页
     if (localStorage.isWeChatH5) this.isWeChatH5 = true;
@@ -85,7 +86,6 @@ export default {
         this.browserName !== "Chrome WebView" &&
         this.browserName !== "WebKit"
       ) {
-        alert("test");
         history.replaceState(null, null, document.URL);
         window.addEventListener("popstate", _this.handleReturnHomePage, false);
       }
@@ -176,7 +176,6 @@ export default {
      * */
     handleReturnHomePage() {
       localStorage.removeItem("isWeChatH5");
-      alert("返回首页");
       dooolyAPP.jumpIndexPage(`${GlobalProperty.frontendDomain.m}v3/home`);
     }
   },
@@ -195,7 +194,6 @@ export default {
     if (this.browserName != "Chrome WebView" && this.browserName != "WebKit") {
       if (to.name == "Payment" && !this.backLock) {
         this.backLock = true;
-        alert("2");
         window.history.go(-1);
         return;
       }
