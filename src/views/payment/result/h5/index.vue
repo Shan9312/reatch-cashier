@@ -106,6 +106,7 @@ export default {
   },
   beforeRouteEnter(to, from, next) {
     // 若是第三方app 嵌套我们h5页面 积分支付时 点击回退 2个
+    alert(from.name);
     if (!from.name) {
       next(vm => {
         vm.paymentRemind();
