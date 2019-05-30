@@ -76,7 +76,6 @@ export default {
     dooolyAPP.initTitle("支付结果", "2", "isConfirmShow()");
   },
   mounted() {
-    console.log(`${GlobalProperty.frontendDomain.m}v3/home`);
     let _this = this;
     // 支付宝h5、微信h5支付完成后点击返回，去首页
     if (localStorage.isWeChatH5) this.isWeChatH5 = true;
