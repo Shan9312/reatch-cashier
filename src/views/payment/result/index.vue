@@ -176,6 +176,7 @@ export default {
      * */
     handleReturnHomePage() {
       localStorage.removeItem("isWeChatH5");
+      alert("返回首页");
       dooolyAPP.jumpIndexPage(`${GlobalProperty.frontendDomain.m}v3/home`);
     }
   },
@@ -194,6 +195,7 @@ export default {
     if (this.browserName != "Chrome WebView" && this.browserName != "WebKit") {
       if (to.name == "Payment" && !this.backLock) {
         this.backLock = true;
+        alert("2");
         window.history.go(-1);
         return;
       }
