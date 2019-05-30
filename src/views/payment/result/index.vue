@@ -175,8 +175,7 @@ export default {
      * */
     handleReturnHomePage() {
       localStorage.removeItem("isWeChatH5");
-      window.location.href = `${GlobalProperty.frontendDomain.m}v3/home`;
-      // dooolyAPP.jumpIndexPage(`${GlobalProperty.frontendDomain.m}v3/home`);
+      dooolyAPP.jumpIndexPage(`${GlobalProperty.frontendDomain.m}v3/home`);
     }
   },
   destroyed() {
