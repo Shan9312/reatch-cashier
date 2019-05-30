@@ -85,8 +85,9 @@ export default {
         this.browserName !== "Chrome WebView" &&
         this.browserName !== "WebKit"
       ) {
-        history.pushState(null, null, document.URL);
-        window.addEventListener("popstate", _this.handleReturnHomePage, false);
+        this.goBackDahua();
+        // history.pushState(null, null, document.URL);
+        // window.addEventListener("popstate", _this.handleReturnHomePage, false);
       }
     }
 
