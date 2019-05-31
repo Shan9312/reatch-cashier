@@ -176,6 +176,7 @@ export default {
      *
      * */
     handleReturnHomePage() {
+      baiduStats("支付成功-返回首页", this.$route);
       localStorage.removeItem("isWeChatH5");
       dooolyAPP.jumpIndexPage(`${GlobalProperty.frontendDomain.m}v3/home`);
     }

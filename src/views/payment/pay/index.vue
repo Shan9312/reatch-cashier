@@ -1010,6 +1010,7 @@ export default {
       }
       // 确认订单情况
       this.confirmOrder();
+      baiduStats("兜礼收银台-确认支付", this.$route);
     },
     /**
      * 判断 payType 类型 发送给后端 ，及 支付方式
