@@ -73,7 +73,7 @@
         </div>
       </div>
       <!-- 底部确认支付按钮 -->
-      <div class="footer" @click="handleConfirmPay">确认支付</div>
+      <div class="footer" @click="handleConfirmPay" data-baidu-stats="兜礼收银台-确认支付">确认支付</div>
       <!-- 现金支付的弹  出框 -->
       <div class="leave-box" v-show="isShowLeaveBtn" @touchmove.prevent>
         <div class="confirm-leave">
@@ -1010,7 +1010,6 @@ export default {
       }
       // 确认订单情况
       this.confirmOrder();
-      baiduStats("兜礼收银台-确认支付", this.$route);
     },
     /**
      * 判断 payType 类型 发送给后端 ，及 支付方式
@@ -1107,7 +1106,10 @@ export default {
         this.defaultOptions.dirIntegralSwitch ? "1" : "0"
       );
       // 如果含有积分支付，倒计时在 60s 内，重新打开键盘页面，不重复发送 短信
-      if (this.selectedPayList.filter(payItem => payItem.id < 3).length) {
+      if (
+        this.selectedPayList.filter(payItem => payItem.id < 3).length &&
+        res.code == 1000
+      ) {
         if (
           this.$refs.keybordItem.countdownNum > 0 &&
           this.$refs.keybordItem.countdownNum < 60
@@ -1115,6 +1117,10 @@ export default {
           this.isShowKeyboard = true;
           return;
         }
+      } else {
+        MintUI.Toast.open({
+          message: res.msg
+        });
       }
       if (this.defaultOptions.supportPayType == 0 && res.code === 1000) {
         this.handlePayOrderBtn();

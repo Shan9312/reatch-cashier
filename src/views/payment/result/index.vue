@@ -14,7 +14,7 @@
         </div>
         <ul class="label">
           <li @click="handleCheckList" :class="{labelChild: !isShowHomeBtn}">查看列表</li>
-          <li @click="handleReturnHomePage" v-if="isShowHomeBtn">返回首页</li>
+          <li @click="handleReturnHomePage" v-if="isShowHomeBtn" data-baidu-stats="支付成功-返回首页">返回首页</li>
         </ul>
       </div>
       <!-- 支付失败  -->
@@ -27,7 +27,7 @@
           {{orderInformObj.totalAmount}}
         </div>
         <ul class="label">
-          <li class="error" @click="handleCheckList">重新支付</li>
+          <li class="error" @click="handleCheckList" data-baidu-stats="支付成功-查看详情">重新支付</li>
         </ul>
       </div>
     </div>
@@ -165,7 +165,6 @@ export default {
      *
      * */
     handleCheckList() {
-      baiduStats("支付成功-查看详情", this.$route);
       dooolyAPP.gotoJumpJq(
         this.$router,
         `${GlobalProperty.frontendDomain.m}myOrderList/1/all`
@@ -176,7 +175,6 @@ export default {
      *
      * */
     handleReturnHomePage() {
-      baiduStats("支付成功-返回首页", this.$route);
       localStorage.removeItem("isWeChatH5");
       dooolyAPP.jumpIndexPage(`${GlobalProperty.frontendDomain.m}v3/home`);
     }
