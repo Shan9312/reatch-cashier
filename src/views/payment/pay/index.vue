@@ -56,13 +56,19 @@
             <div class="line" v-if="item.id !== 1">
               <img class="picture fl" :src="item.imgSrc">
               <div class="center">
-                <span class="type-text fl names">{{item.text}}</span>
-                <p v-if="item.name === 'unionPay'" class="union-class fl">建设银行首次支付满30减29</p>
+                <div class="fl">
+                  <span class="type-text names">{{item.text}}</span>
+                  <p v-if="item.name === 'unionPay'" class="union-text">建设银行首次支付满30减29</p>
+                </div>
                 <span class="fr available" v-if="item.id === 2">
                   可用余额：
                   <label class="point">{{item.payAmount? item.payAmount :0 | fixedNum }}</label>
                 </span>
-                <span class="fr available" v-if="item.selected  && item.id >2  ">
+                <span
+                  class="fr available"
+                  v-if="item.selected  && item.id >2"
+                  :class="{'union-right': item.name === 'unionPay'}"
+                >
                   需支付：
                   <label class="point">{{item.payAmount | fixedNum }}</label>
                 </span>
@@ -1174,23 +1180,6 @@ export default {
         this.defaultOptions.commonIntegralSwitch ? "1" : "0",
         this.defaultOptions.dirIntegralSwitch ? "1" : "0"
       );
-      // 如果含有积分支付，倒计时在 60s 内，重新打开键盘页面，不重复发送 短信
-      if (
-        this.selectedPayList.filter(payItem => payItem.id < 3).length &&
-        res.code == 1000
-      ) {
-        if (
-          this.$refs.keybordItem.countdownNum > 0 &&
-          this.$refs.keybordItem.countdownNum < 60
-        ) {
-          this.isShowKeyboard = true;
-          return;
-        }
-      } else {
-        MintUI.Toast.open({
-          message: res.msg
-        });
-      }
       if (this.defaultOptions.supportPayType == 0 && res.code === 1000) {
         this.handlePayOrderBtn();
         return;
@@ -1316,7 +1305,12 @@ export default {
 
     // 云闪付支付跳转接口
     applePayOrder(data) {
-      alert("云闪付");
+      let form = data.unionPayUrl;
+      let div = document.createElement("div");
+      div.innerHTML = form;
+      document.body.appendChild(div);
+      console.log(div);
+      // document.all.pay_form.submit();
     },
 
     // 若是 微信环境 则微信接口跳转支付接口
@@ -1426,6 +1420,16 @@ export default {
       width: 0.23rem;
       height: 0.23rem;
     }
+    .union-text {
+      color: #ee3f44;
+      font-size: 0.12rem;
+    }
+    .union-right {
+      position: absolute;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+    }
 
     .line {
       height: 0.5rem;
@@ -1436,7 +1440,7 @@ export default {
 
       .center {
         width: 78%;
-
+        position: relative;
         &.direct {
           width: 91%;
           font-size: 0.14rem;
