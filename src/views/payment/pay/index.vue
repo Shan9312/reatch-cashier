@@ -1105,23 +1105,6 @@ export default {
         this.defaultOptions.commonIntegralSwitch ? "1" : "0",
         this.defaultOptions.dirIntegralSwitch ? "1" : "0"
       );
-      // 如果含有积分支付，倒计时在 60s 内，重新打开键盘页面，不重复发送 短信
-      if (
-        this.selectedPayList.filter(payItem => payItem.id < 3).length &&
-        res.code == 1000
-      ) {
-        if (
-          this.$refs.keybordItem.countdownNum > 0 &&
-          this.$refs.keybordItem.countdownNum < 60
-        ) {
-          this.isShowKeyboard = true;
-          return;
-        }
-      } else {
-        MintUI.Toast.open({
-          message: res.msg
-        });
-      }
       if (this.defaultOptions.supportPayType == 0 && res.code === 1000) {
         this.handlePayOrderBtn();
         return;
