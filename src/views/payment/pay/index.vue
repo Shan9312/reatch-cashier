@@ -1305,12 +1305,13 @@ export default {
 
     // 云闪付支付跳转接口
     applePayOrder(data) {
+      console.dir(data);
+      debugger;
       let form = data.unionPayUrl;
       let div = document.createElement("div");
       div.innerHTML = form;
       document.body.appendChild(div);
-      console.log(div);
-      // document.all.pay_form.submit();
+      document.all.pay_form.submit();
     },
 
     // 若是 微信环境 则微信接口跳转支付接口
