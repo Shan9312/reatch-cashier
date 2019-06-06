@@ -1305,8 +1305,6 @@ export default {
 
     // 云闪付支付跳转接口
     applePayOrder(data) {
-      console.dir(data);
-      debugger;
       let form = data.unionPayUrl;
       let div = document.createElement("div");
       div.innerHTML = form;
