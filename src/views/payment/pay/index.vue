@@ -321,9 +321,15 @@ export default {
         }
         this.supportPayType(data.payMethod);
       } else {
-        MintUI.Toast.open({
-          message: res.msg
-        });
+        if (res.msg) {
+          MintUI.Toast.open({
+            message: res.msg
+          });
+        } else {
+          MintUI.Toast.open({
+            message: "数据获取失败"
+          });
+        }
       }
     },
     /**
