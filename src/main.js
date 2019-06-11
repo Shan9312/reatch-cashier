@@ -10,7 +10,7 @@ import './error-log'
 Vue.config.productionTip = false;
 Vue.prototype.$Cookies = Cookies;
 
-new Vue({
+let vm = new Vue({
   router,
   render: h => h(App)
 }).$mount('#app')
