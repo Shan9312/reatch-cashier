@@ -195,6 +195,7 @@ export default {
       );
       return;
     }
+
     // 获取用户 订单信息
     this.getPayContentByUserId();
     const _this = this;
@@ -262,8 +263,18 @@ export default {
     };
     dooolyAPP.initTitle("兜礼收银台", "2", "isConfirmShow()");
   },
-  mounted() {},
+  mounted() {
+    // 银联支付
+    this.handleUnionPayResult();
+  },
   methods: {
+    // 若银联支付之后返回到收银台，则调用getpayResult的接口
+    handleUnionPayResult() {
+      let urlUnionPay = window.location.href;
+      if (/payType/.test(urlUnionPay)) {
+        window.pay_callBack();
+      }
+    },
     /**
      * 根据用户的信息 获取付款页面的内容
      * 并且根据 返回的paymethods 的值 判断付款列表
