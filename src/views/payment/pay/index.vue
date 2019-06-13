@@ -278,7 +278,7 @@ export default {
       window.addEventListener(
         "popstate",
         function() {
-          dooolyAPP.jumpIndexPage(`${GlobalProperty.frontendDomain.m}v3/home`);
+          window.history.go(-7);
         },
         false
       );
