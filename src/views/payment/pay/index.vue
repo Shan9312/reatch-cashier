@@ -266,12 +266,28 @@ export default {
   mounted() {
     // 银联支付
     this.handleUnionPayResult();
+    // 若是银联支付，回到收银台时，点击回退直接返回首页
+    if (
+      /payType/.test(window.location.href) &&
+      this.browserName !== "Chrome WebView" &&
+      this.browserName !== "WebKit"
+    ) {
+      setTimeout(function() {
+        history.pushState(null, null, document.URL);
+      }, 0);
+      window.addEventListener(
+        "popstate",
+        function() {
+          dooolyAPP.jumpIndexPage(`${GlobalProperty.frontendDomain.m}v3/home`);
+        },
+        false
+      );
+    }
   },
   methods: {
     // 若银联支付之后返回到收银台，则调用getpayResult的接口
     handleUnionPayResult() {
-      let urlUnionPay = window.location.href;
-      if (/payType/.test(urlUnionPay)) {
+      if (/payType/.test(window.location.href)) {
         window.pay_callBack();
       }
     },
