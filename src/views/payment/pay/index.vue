@@ -58,7 +58,7 @@
               <div class="center">
                 <div class="fl">
                   <span class="type-text names">{{item.text}}</span>
-                  <p v-if="item.name === 'unionPay'" class="union-text">建设银行首次支付满30减29</p>
+                  <p v-if="item.name === 'unionPay'" class="union-text">建行信用卡首次支付满30减29</p>
                 </div>
                 <span class="fr available" v-if="item.id === 2">
                   可用余额：
