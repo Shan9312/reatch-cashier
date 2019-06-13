@@ -276,9 +276,6 @@ export default {
       );
       if (res.code === 1000) {
         const data = res.data;
-        //TODO:
-        data.payMethod = "0,1,3,6,13";
-
         this.stashArr = [];
         // 初始化订单信息值
         this.defaultOptions = {
