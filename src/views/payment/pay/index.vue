@@ -56,12 +56,19 @@
             <div class="line" v-if="item.id !== 1">
               <img class="picture fl" :src="item.imgSrc">
               <div class="center">
-                <span class="type-text fl names">{{item.text}}</span>
+                <div class="fl">
+                  <span class="type-text names">{{item.text}}</span>
+                  <p v-if="item.name === 'unionPay'" class="union-text">建行信用卡首次支付满30减29</p>
+                </div>
                 <span class="fr available" v-if="item.id === 2">
                   可用余额：
                   <label class="point">{{item.payAmount? item.payAmount :0 | fixedNum }}</label>
                 </span>
-                <span class="fr available" v-if="item.selected  && item.id >2  ">
+                <span
+                  class="fr available"
+                  v-if="item.selected  && item.id >2"
+                  :class="{'union-right': item.name === 'unionPay'}"
+                >
                   需支付：
                   <label class="point">{{item.payAmount | fixedNum }}</label>
                 </span>
@@ -135,6 +142,7 @@ export default {
         supportHybrid: true, // 是否支持混合支付
         supportWechat: false, // 是否支持微信支付
         supportAlipay: false, // 是否支持支付宝
+        supportUnionpay: false, // 是否支付云闪付
         isPayPassword: "1", // 后端返回：'1' / '0':短信验证; '2' :密码支付
         payId: "", // 后端返回的 预订单ID
         dirIntegralSwitch: false, // 支付方式为 定向积分，发给后端字段
@@ -187,6 +195,7 @@ export default {
       );
       return;
     }
+
     // 获取用户 订单信息
     this.getPayContentByUserId();
     const _this = this;
@@ -254,8 +263,34 @@ export default {
     };
     dooolyAPP.initTitle("兜礼收银台", "2", "isConfirmShow()");
   },
-  mounted() {},
+  mounted() {
+    // 银联支付
+    this.handleUnionPayResult();
+    // 若是银联支付，回到收银台时，点击回退直接返回首页
+    if (
+      /payType/.test(window.location.href) &&
+      this.browserName !== "Chrome WebView" &&
+      this.browserName !== "WebKit"
+    ) {
+      setTimeout(function() {
+        history.pushState(null, null, document.URL);
+      }, 0);
+      window.addEventListener(
+        "popstate",
+        function() {
+          window.history.go(-7);
+        },
+        false
+      );
+    }
+  },
   methods: {
+    // 若银联支付之后返回到收银台，则调用getpayResult的接口
+    handleUnionPayResult() {
+      if (/payType/.test(window.location.href)) {
+        window.pay_callBack();
+      }
+    },
     /**
      * 根据用户的信息 获取付款页面的内容
      * 并且根据 返回的paymethods 的值 判断付款列表
@@ -284,6 +319,7 @@ export default {
           supportDooolyIntergral: false,
           supportWechat: false,
           supportAlipay: false,
+          supportUnionpay: false,
           dirIntegralSwitch: false,
           commonIntegralSwitch: false,
           supportPayType: data.supportPayType,
@@ -297,6 +333,7 @@ export default {
             ? UtilsFunction.converNumber(data.serviceCharge)
             : UtilsFunction.converNumber(data.totalServiceCharge)
         };
+
         // 特殊情况：判断 不支持混合的公司 测试环境 欧飞 正式环境 是 兜礼
         if (data.company === "兜礼" || data.company === "欧·飞") {
           this.defaultOptions.supportHybrid = false;
@@ -308,9 +345,15 @@ export default {
         }
         this.supportPayType(data.payMethod);
       } else {
-        MintUI.Toast.open({
-          message: res.msg
-        });
+        if (res.msg) {
+          MintUI.Toast.open({
+            message: res.msg
+          });
+        } else {
+          MintUI.Toast.open({
+            message: "数据获取失败"
+          });
+        }
       }
     },
     /**
@@ -332,6 +375,8 @@ export default {
           this.defaultOptions.supportAlipay = true;
         } else if (item == 3) {
           this.defaultOptions.supportOrientIntergral = true;
+        } else if (item == 13) {
+          this.defaultOptions.supportUnionpay = true;
         }
       });
       if (!this.defaultOptions.supportOrientIntergral) {
@@ -342,10 +387,12 @@ export default {
         this.defaultOptions.dooolyIntergral = 0;
         this.defaultOptions.dooolyServiceCharge = 0;
       }
-      // 不支持现金支付 则禁止混合支付的功能
+      // 若不支持现金支付 则禁止混合支付的功能
+      // 暂时默认只要有 云闪付 就不支持混合
       if (
-        !this.defaultOptions.supportWechat &&
-        !this.defaultOptions.supportAlipay
+        (!this.defaultOptions.supportWechat &&
+          !this.defaultOptions.supportAlipay) ||
+        this.defaultOptions.supportUnionpay
       ) {
         this.defaultOptions.supportHybrid = false;
       }
@@ -410,6 +457,20 @@ export default {
           id: 4
         });
       }
+      // 云闪付：后台可配置是否显示
+      //  默认 微信环境支持云闪付
+      if (this.defaultOptions.supportUnionpay) {
+        this.usablePayList.push({
+          text: "银联在线",
+          name: "unionPay",
+          usable: true,
+          payAmount: 0,
+          selected: false,
+          imgSrc: require("@/assets/images/checkout-counter/icon_unionpay.png"),
+          id: 5
+        });
+      }
+
       if (!this.usablePayList.length) this.isShowMsg = true;
     },
     /**
@@ -693,6 +754,34 @@ export default {
           }
         });
       } else {
+        this.initUnionPay();
+      }
+    },
+    // 云闪付： 支付方式
+    initUnionPay() {
+      // 判断是否支持支付宝支付
+      if (this.usableOptions.supportUnionpay) {
+        let applePayAmount = 0;
+        if (this.defaultOptions.serviceCharge) {
+          this.realServiceCharge = 0;
+        }
+        if (this.usableOptions.supportHybrid) {
+          applePayAmount =
+            this.usableOptions.realPayAmount +
+            this.realServiceCharge -
+            this.result.orientIntergralPayAmount -
+            this.result.dooolyIntergralPayAmount;
+        } else {
+          applePayAmount = this.usableOptions.realPayAmount;
+        }
+        // 选中支付宝支付及修改需支付金额
+        this.usablePayList.map(payType => {
+          if (payType.name == "unionPay") {
+            payType.selected = true;
+            payType.payAmount = applePayAmount;
+          }
+        });
+      } else {
         throw Error("error");
       }
     },
@@ -706,7 +795,8 @@ export default {
         wechatItem,
         alipayItem,
         orientIntergralPayAmount,
-        dooolyIntergralPayAmount;
+        dooolyIntergralPayAmount,
+        applePayItem;
       let {
         orientIntergral,
         dooolyIntergral,
@@ -739,7 +829,7 @@ export default {
       ) {
         return false;
       }
-      let cashTypeArr = ["wechat", "alipay"]; //现金支付类型
+      let cashTypeArr = ["wechat", "alipay", "unionPay"]; //现金支付类型
       // 不可取消微信支付及支付宝支付
       if (item.selected && cashTypeArr.includes(item.name)) return false;
       // 定向积分+兜礼积分点击 取消时
@@ -762,13 +852,17 @@ export default {
             // 不支持混合支付，并且单项积分不够支付时 不允许取消其中一项
             return false;
           } else {
-            // 开启微信支付 支付宝支付
-            alipayItem = this.selectedPayList.filter(
-              payItem => payItem.name == "alipay"
-            );
-            // 开启微信支付及支付宝支付
+            let cashArr = [];
+            this.selectedPayList.map(child => {
+              if (child.id >= 3) cashArr.push(child.id);
+            });
+
+            // 开启微信支付 或者 支付宝支付 或者 云闪付
             this.usablePayList.map(payItem => {
-              if (cashTypeArr.includes(payItem.name) && !alipayItem.length) {
+              if (
+                cashTypeArr.includes(payItem.name) &&
+                cashArr.includes(payItem.id)
+              ) {
                 payItem.selected = true;
               }
             });
@@ -889,6 +983,7 @@ export default {
           }
         }
       }
+
       item.selected = !item.selected;
       // copy返回的数值
       let optionsClone = JSON.parse(JSON.stringify(this.defaultOptions));
@@ -904,6 +999,9 @@ export default {
       );
       alipayItem = this.selectedPayList.filter(
         payItem => payItem.name == "alipay"
+      );
+      applePayItem = this.selectedPayList.filter(
+        payItem => payItem.name == "unionPay"
       );
 
       // 初始化 付款方式
@@ -941,6 +1039,10 @@ export default {
       }
       if (!alipayItem.length) {
         optionsClone.supportAlipay = false;
+      }
+      // 云闪付
+      if (!applePayItem.length) {
+        optionsClone.supportUnionpay = false;
       }
       // 初始化 支付列表
       this.initUseAblePayList();
@@ -1039,6 +1141,9 @@ export default {
         } else if (!integralList.length && obj.name === "alipay") {
           // 支付宝支付:6
           this.payType = 6;
+        } else if (!integralList.length && obj.name === "unionPay") {
+          // 云闪付
+          this.payType = 13;
         }
       });
       const orientIntergralItem = this.selectedPayList.filter(
@@ -1120,6 +1225,9 @@ export default {
         } else if (this.payType === 6) {
           // 支付宝接口支付
           this.apliyPayOrder(res.data);
+        } else if (this.payType === 13) {
+          // 云闪付支付
+          this.applePayOrder(res.data);
         }
       } else {
         // 订单 无效 则返回数据 做弹窗 提示 信息
@@ -1224,6 +1332,16 @@ export default {
         dooolyAPP.appPay(data, "pay_callBack", "wx"); // doooly app
       }
     },
+
+    // 云闪付支付跳转接口
+    applePayOrder(data) {
+      let form = data.unionPayUrl;
+      let div = document.createElement("div");
+      div.innerHTML = form;
+      document.body.appendChild(div);
+      document.all.pay_form.submit();
+    },
+
     // 若是 微信环境 则微信接口跳转支付接口
     wechatBridgePay(data) {
       const _this = this;
@@ -1269,10 +1387,12 @@ export default {
         return true;
       }
     },
+
     // 微信/支付宝 点击 继续支付
     continuePay(v) {
       this.isShowLeaveBtn = v;
     },
+
     // 点击返回上一页
     handleReturnPrePage() {
       dooolyAPP.goBackPageIndex("1");
@@ -1329,6 +1449,16 @@ export default {
       width: 0.23rem;
       height: 0.23rem;
     }
+    .union-text {
+      color: #ee3f44;
+      font-size: 0.12rem;
+    }
+    .union-right {
+      position: absolute;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+    }
 
     .line {
       height: 0.5rem;
@@ -1339,7 +1469,7 @@ export default {
 
       .center {
         width: 78%;
-
+        position: relative;
         &.direct {
           width: 91%;
           font-size: 0.14rem;
