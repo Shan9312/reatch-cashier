@@ -268,7 +268,7 @@ export default {
     this.handleUnionPayResult();
     // 若是银联支付，回到收银台时，点击回退直接返回首页
     if (
-      /payType/.test(window.location.href) &&
+      /payType=cloudUnionPay/.test(window.location.href) &&
       this.browserName !== "Chrome WebView" &&
       this.browserName !== "WebKit"
     ) {
@@ -278,7 +278,7 @@ export default {
       window.addEventListener(
         "popstate",
         function() {
-          window.history.go(-7);
+          window.history.go(-2);
         },
         false
       );
