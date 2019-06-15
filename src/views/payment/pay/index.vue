@@ -58,7 +58,7 @@
               <div class="center">
                 <div class="fl">
                   <span class="type-text names">{{item.text}}</span>
-                  <p v-if="item.name === 'unionPay'" class="union-text">建行信用卡首次支付满30减29</p>
+                  <!-- <p v-if="item.name === 'unionPay'" class="union-text">建行信用卡首次支付满30减29</p> -->
                 </div>
                 <span class="fr available" v-if="item.id === 2">
                   可用余额：
@@ -375,7 +375,7 @@ export default {
           this.defaultOptions.supportAlipay = true;
         } else if (item == 3) {
           this.defaultOptions.supportOrientIntergral = true;
-        } else if (item == 13) {
+        } else if (item == 14) {
           this.defaultOptions.supportUnionpay = true;
         }
       });
@@ -461,12 +461,12 @@ export default {
       //  默认 微信环境支持云闪付
       if (this.defaultOptions.supportUnionpay) {
         this.usablePayList.push({
-          text: "银联在线",
+          text: "银联云闪付",
           name: "unionPay",
           usable: true,
           payAmount: 0,
           selected: false,
-          imgSrc: require("@/assets/images/checkout-counter/icon_unionpay.png"),
+          imgSrc: require("@/assets/images/checkout-counter/icon_flash_pay.png"),
           id: 5
         });
       }
@@ -1143,7 +1143,7 @@ export default {
           this.payType = 6;
         } else if (!integralList.length && obj.name === "unionPay") {
           // 云闪付
-          this.payType = 13;
+          this.payType = 14;
         }
       });
       const orientIntergralItem = this.selectedPayList.filter(
@@ -1225,7 +1225,7 @@ export default {
         } else if (this.payType === 6) {
           // 支付宝接口支付
           this.apliyPayOrder(res.data);
-        } else if (this.payType === 13) {
+        } else if (this.payType === 14) {
           // 云闪付支付
           this.applePayOrder(res.data);
         }
