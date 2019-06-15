@@ -171,7 +171,8 @@ export default {
       realServiceCharge: 0, // 实际需要支付的手续费
       isHandleConfirm: false, // 确定用户再次选支付列表
       stashArr: [], // 临时存储上一次支付列表
-      isShowMsg: false // 若商品无是否方式提醒
+      isShowMsg: false, // 若商品无是否方式提醒
+      isFlashPay: true // 银联支付成功
     };
   },
   filters: {
@@ -199,12 +200,18 @@ export default {
     // 获取用户 订单信息
     this.getPayContentByUserId();
     const _this = this;
+    // 若银联支付失败，则收银台返回2级页面
+    window.addEventListener("popstate", _this.handleFlashPay, false);
     // 付款成功后返回的值
     window.pay_callBack = async function() {
       const res = await getPayResult(_this.orderNum);
       if (res.code === 1000 || res.code === 1001) {
         // 根据支付环境 跳转到不同的页面
-        if (res.data && res.data.redirectUrl) {
+        if (
+          res.data &&
+          res.data.redirectUrl &&
+          !/payType=cloudUnionPay/.test(window.location.href)
+        ) {
           // 接口有值，直接跳接口的
           dooolyAPP.gotoJumpJq(_this.$router, res.data.redirectUrl);
         } else if (_this.handleThirdJudge()) {
@@ -227,6 +234,12 @@ export default {
               _this.defaultOptions.productType
             }`
           );
+        } else if (/payType=cloudUnionPay/.test(window.location.href)) {
+          // 若是云闪付支付成功 则跳转到 支付结果页，带云闪付的标时
+          dooolyAPP.gotoJumpVue(
+            _this.$router,
+            `/cardBuyPayResult/${_this.orderNum}?payType=cloudUnionPay`
+          );
         } else {
           // 支付结果页面
           dooolyAPP.gotoJumpVue(
@@ -235,6 +248,7 @@ export default {
           );
         }
       } else {
+        this.isFlashPay = false;
         MintUI.Toast.open({
           message: res.msg
         });
@@ -266,28 +280,21 @@ export default {
   mounted() {
     // 银联支付
     this.handleUnionPayResult();
-    // 若是银联支付，回到收银台时，点击回退直接返回首页
-    if (
-      /payType=cloudUnionPay/.test(window.location.href) &&
-      this.browserName !== "Chrome WebView" &&
-      this.browserName !== "WebKit"
-    ) {
-      setTimeout(function() {
-        history.pushState(null, null, document.URL);
-      }, 0);
-      window.addEventListener(
-        "popstate",
-        function() {
-          window.history.go(-2);
-        },
-        false
-      );
-    }
   },
   methods: {
+    // 若云闪付支付失败，回退时到下单页
+    handleFlashPay() {
+      if (
+        /payType=cloudUnionPay/.test(window.location.href) &&
+        this.browserName !== "Chrome WebView" &&
+        this.browserName !== "WebKit"
+      ) {
+        !this.isFlashPay && window.history.go(-2);
+      }
+    },
     // 若银联支付之后返回到收银台，则调用getpayResult的接口
     handleUnionPayResult() {
-      if (/payType/.test(window.location.href)) {
+      if (/payType=cloudUnionPay/.test(window.location.href)) {
         window.pay_callBack();
       }
     },
@@ -1397,6 +1404,10 @@ export default {
     handleReturnPrePage() {
       dooolyAPP.goBackPageIndex("1");
     }
+  },
+  destroyed() {
+    const _this = this;
+    window.removeEventListener("popstate", _this.handleFlashPay, false);
   }
 };
 </script>
