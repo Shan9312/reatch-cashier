@@ -33,7 +33,7 @@ const router = new VueRouter({
       name: 'Payment',
       component: () => import( /* webpackChunkName: "main" */ '@/views/payment/pay'),
       meta: {
-        title: '收银台'
+        title: '订单支付'
       }
     },
     {

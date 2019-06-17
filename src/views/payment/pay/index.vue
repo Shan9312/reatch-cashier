@@ -48,7 +48,7 @@
         <!-- 兜礼付款方式提醒 -->
         <div class="pay-title">
           兜礼方式
-          <span>（使用该支付商户将不向个人开具发票）</span>
+          <span>（使用该支付，商户将不向个人开具发票）</span>
         </div>
         <!--/兜礼/微信/支付宝-->
         <div class="pay-type">
@@ -84,9 +84,9 @@
       <!-- 现金支付的弹  出框 -->
       <div class="leave-box" v-show="isShowLeaveBtn" @touchmove.prevent>
         <div class="confirm-leave">
-          <p>确定要离开收银台？</p>
+          <p>支付尚未完成，确认要离开？</p>
           <div class="input-view">
-            <div @click="handleReturnPrePage" class="leave-input-btn left">确认离开</div>
+            <div @click="handleReturnPrePage" class="leave-input-btn left">离开</div>
             <div @click="continuePay(false)" class="leave-input-btn right">继续支付</div>
           </div>
         </div>
@@ -275,7 +275,7 @@ export default {
       _this.continuePay(true);
       _this.handleCloseKeyboard(false);
     };
-    dooolyAPP.initTitle("兜礼收银台", "2", "isConfirmShow()");
+    dooolyAPP.initTitle("订单支付", "2", "isConfirmShow()");
   },
   mounted() {
     // 银联支付
