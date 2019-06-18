@@ -54,21 +54,20 @@
         <div class="pay-type">
           <section v-for="item in usablePayList" :key="item.id">
             <div class="line" v-if="item.id !== 1">
-              <img class="picture fl" :src="item.imgSrc">
-              <div class="center">
+              <img
+                class="picture fl"
+                :src="item.imgSrc"
+                :class="{'union-right': item.name === 'unionPay'}"
+              >
+              <div class="center" :class="{'union-text': item.name === 'unionPay'}">
                 <div class="fl">
                   <span class="type-text names">{{item.text}}</span>
-                  <!-- <p v-if="item.name === 'unionPay'" class="union-text">建行信用卡首次支付满30减29</p> -->
                 </div>
                 <span class="fr available" v-if="item.id === 2">
                   可用余额：
                   <label class="point">{{item.payAmount? item.payAmount :0 | fixedNum }}</label>
                 </span>
-                <span
-                  class="fr available"
-                  v-if="item.selected  && item.id >2"
-                  :class="{'union-right': item.name === 'unionPay'}"
-                >
+                <span class="fr available" v-if="item.selected  && item.id >2">
                   需支付：
                   <label class="point">{{item.payAmount | fixedNum }}</label>
                 </span>
@@ -468,12 +467,12 @@ export default {
       //  默认 微信环境支持云闪付
       if (this.defaultOptions.supportUnionpay) {
         this.usablePayList.push({
-          text: "银联云闪付",
+          text: "",
           name: "unionPay",
           usable: true,
           payAmount: 0,
           selected: false,
-          imgSrc: require("@/assets/images/checkout-counter/icon_flash_pay.png"),
+          imgSrc: require("@/assets/images/checkout-counter/icon_cloud_unionPay.png"),
           id: 5
         });
       }
@@ -1413,6 +1412,9 @@ export default {
 </script>
 <style lang="less" scoped>
 .pay-warpper {
+  .union-text {
+    width: 58% !important;
+  }
   img {
     width: 100%;
     height: 100%;
@@ -1465,10 +1467,7 @@ export default {
       font-size: 0.12rem;
     }
     .union-right {
-      position: absolute;
-      top: 50%;
-      right: 0;
-      transform: translateY(-50%);
+      width: auto;
     }
 
     .line {
