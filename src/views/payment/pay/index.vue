@@ -1341,6 +1341,7 @@ export default {
 
     // 云闪付支付跳转接口
     unionPay(data) {
+      data.unionPayUrl = data.unionPayUrl.replace('\"\g','"');
       dooolyAPP.appPay(data, "pay_callBack", "union");
     },
 
