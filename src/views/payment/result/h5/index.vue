@@ -20,7 +20,7 @@ export default {
     };
   },
   created() {
-    dooolyAPP.initTitle("兜礼收银台");
+    dooolyAPP.initTitle("订单支付");
   },
   methods: {
     /**

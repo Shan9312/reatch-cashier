@@ -1,5 +1,5 @@
 # 1.项目名称
-兜里收银台 : reach-cashier
+兜礼收银台 : reach-cashier
 
 ## 1.1 项目描述
 改项目是基于 doooly-web-cashier V3.0.0版本上重构
