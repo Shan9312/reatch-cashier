@@ -210,13 +210,20 @@ export default {
       const res = await getPayResult(_this.orderNum);
       if (res.code === 1000 || res.code === 1001) {
         // 根据支付环境 跳转到不同的页面
-        if (
-          res.data &&
-          res.data.redirectUrl &&
-          !/payType=cloudUnionPay/.test(window.location.href)
-        ) {
-          // 接口有值，直接跳接口的
-          dooolyAPP.gotoJumpJq(_this.$router, res.data.redirectUrl);
+        if (res.data && res.data.redirectUrl) {
+          // 若是云闪付&& 后端返回的地址是我们的页面， 则跳转到 支付结果页，带云闪付的标时
+          if (
+            /cardBuyPayResult/.test(res.data.redirectUrl) &&
+            /payType=cloudUnionPay/.test(window.location.href)
+          ) {
+            dooolyAPP.gotoJumpJq(
+              _this.$router,
+              `${res.data.redirectUrl}?payType=cloudUnionPay`
+            );
+          } else {
+            // 接口有值，直接跳接口的
+            dooolyAPP.gotoJumpJq(_this.$router, res.data.redirectUrl);
+          }
         } else if (_this.handleThirdJudge()) {
           // 若有美团接口 之间跳转美团
           dooolyApp.gotoJumpJq(_this.$router, _this.meituanInfo.return_url);
@@ -237,8 +244,12 @@ export default {
               _this.defaultOptions.productType
             }`
           );
-        } else if (/payType=cloudUnionPay/.test(window.location.href)) {
-          // 若是云闪付支付成功 则跳转到 支付结果页，带云闪付的标时
+        } else if (
+          /payType=cloudUnionPay/.test(window.location.href) &&
+          !res.data &&
+          !res.data.redirectUrl
+        ) {
+          // 若是云闪付支付成功 && 后端无返回的地址 则跳转到 支付结果页，带云闪付的标时
           dooolyAPP.gotoJumpVue(
             _this.$router,
             `/cardBuyPayResult/${_this.orderNum}?payType=cloudUnionPay`
@@ -297,7 +308,11 @@ export default {
     },
     // 若银联支付之后返回到收银台，则调用getpayResult的接口
     handleUnionPayResult() {
-      if (/payType=cloudUnionPay/.test(window.location.href)) {
+      if (
+        /payType=cloudUnionPay/.test(window.location.href) &&
+        this.browserName !== "Chrome WebView" &&
+        this.browserName !== "WebKit"
+      ) {
         window.pay_callBack();
       }
     },
