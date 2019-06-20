@@ -15,8 +15,12 @@
         </span>
         <!-- 特殊企业/商品的 手续费3% -->
         <span v-else>
-          <span class="amount">{{ (defaultOptions.needPayAmount + realServiceCharge) | fixedNum }}</span>
-          <span class="charge-text" v-show="realServiceCharge>0">
+          <span class="amount" v-if="!isShowChargePay">{{ defaultOptions.needPayAmount | fixedNum }}</span>
+          <span
+            class="amount"
+            v-else
+          >{{ (defaultOptions.needPayAmount + realServiceCharge) | fixedNum }}</span>
+          <span class="charge-text" v-show="realServiceCharge>0 && isShowChargePay ">
             （含手续费：
             <span class="charge">{{realServiceCharge | fixedNum }}</span>）
           </span>
