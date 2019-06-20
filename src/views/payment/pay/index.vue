@@ -863,12 +863,11 @@ export default {
             return false;
           } else {
             let cashArr = [];
-            this.selectedPayList.map(child => {
+            this.usablePayList.map(child => {
               if (child.id >= 3) cashArr.push(child.id);
             });
-
             // 开启微信支付 或者 支付宝支付 或者 云闪付
-            this.usablePayList.map(payItem => {
+            this.selectedPayList.map(payItem => {
               if (
                 cashTypeArr.includes(payItem.name) &&
                 cashArr.includes(payItem.id)
