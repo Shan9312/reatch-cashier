@@ -1233,7 +1233,7 @@ export default {
           this.apliyPayOrder(res.data);
         } else if (this.payType === 14) {
           // 云闪付支付
-          this.unionPay(res.data);
+          this.unionPayOrder(res.data);
         }
       } else {
         // 订单 无效 则返回数据 做弹窗 提示 信息
@@ -1340,8 +1340,7 @@ export default {
     },
 
     // 云闪付支付跳转接口
-    unionPay(data) {
-      data.unionPayUrl = data.unionPayUrl.replace('\"\g','"');
+    unionPayOrder(data) {
       dooolyAPP.appPay(data, "pay_callBack", "union");
     },
 
