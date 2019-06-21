@@ -878,19 +878,30 @@ export default {
             return false;
           } else {
             let cashArr = [];
-            this.selectedPayList.map(child => {
+            this.usablePayList.map(child => {
               if (child.id >= 3) cashArr.push(child.id);
             });
-
             // 开启微信支付 或者 支付宝支付 或者 云闪付
-            this.usablePayList.map(payItem => {
-              if (
-                cashTypeArr.includes(payItem.name) &&
-                cashArr.includes(payItem.id)
-              ) {
-                payItem.selected = true;
+            // 如果选中的列表中包括现金支付，则让现金支付选中。否则 默认让现金的第一个选中;
+            if (cashArr.length) {
+              let isChooseCash = false;
+              this.selectedPayList.map(payItem => {
+                if (
+                  cashTypeArr.includes(payItem.name) &&
+                  cashArr.includes(payItem.id)
+                ) {
+                  payItem.selected = true;
+                  isChooseCash = true;
+                }
+              });
+              if (!isChooseCash) {
+                this.usablePayList.map(child => {
+                  if (child.id == cashArr[0]) child.selected = true;
+                });
               }
-            });
+            } else {
+              return false;
+            }
           }
         }
       }
