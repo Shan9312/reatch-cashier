@@ -1248,7 +1248,7 @@ export default {
           this.apliyPayOrder(res.data);
         } else if (this.payType === 14) {
           // 云闪付支付
-          this.applePayOrder(res.data);
+          this.unionPayOrder(res.data);
         }
       } else {
         // 订单 无效 则返回数据 做弹窗 提示 信息
@@ -1355,12 +1355,8 @@ export default {
     },
 
     // 云闪付支付跳转接口
-    applePayOrder(data) {
-      let form = data.unionPayUrl;
-      let div = document.createElement("div");
-      div.innerHTML = form;
-      document.body.appendChild(div);
-      document.all.pay_form.submit();
+    unionPayOrder(data) {
+      dooolyAPP.appPay(data, "pay_callBack", "union");
     },
 
     // 若是 微信环境 则微信接口跳转支付接口
