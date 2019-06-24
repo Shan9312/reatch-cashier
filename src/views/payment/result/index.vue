@@ -191,19 +191,10 @@ export default {
   },
   beforeRouteLeave(to, from, next) {
     if (this.browserName != "Chrome WebView" && this.browserName != "WebKit") {
-      if (
-        to.name == "Payment" &&
-        !this.backLock &&
-        !/payType=cloudUnionPay/.test(window.location.href)
-      ) {
+      if (to.name == "Payment" && !this.backLock) {
         this.backLock = true;
         window.history.go(-1);
         return;
-      } else if (
-        to.name == "Payment" &&
-        /payType=cloudUnionPay/.test(window.location.href)
-      ) {
-        window.history.go(-6);
       }
     }
     next();
