@@ -109,7 +109,7 @@ export default {
       this.browserName !== "WebKit"
     ) {
       history.pushState(null, null, document.URL);
-      window.addEventListener("popstate", _goBackUnionPay, false);
+      window.addEventListener("popstate", _this.goBackUnionPay, false);
     }
   },
   methods: {
