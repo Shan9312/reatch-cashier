@@ -400,9 +400,9 @@ export default {
       // 若不支持现金支付 则禁止混合支付的功能
       // 暂时默认只要有 云闪付 就不支持混合
       if (
-        (!this.defaultOptions.supportWechat &&
-          !this.defaultOptions.supportAlipay) ||
-        this.defaultOptions.supportUnionpay
+        !this.defaultOptions.supportWechat &&
+        !this.defaultOptions.supportAlipay &&
+        !this.defaultOptions.supportUnionpay
       ) {
         this.defaultOptions.supportHybrid = false;
       }
@@ -1169,6 +1169,9 @@ export default {
         } else if (!integralList.length && obj.name === "unionPay") {
           // 云闪付
           this.payType = 14;
+        } else if (integralList.length && obj.name === "unionPay") {
+          // 云闪付混合支付
+          this.payType = 17;
         }
       });
       const orientIntergralItem = this.selectedPayList.filter(
@@ -1307,6 +1310,9 @@ export default {
         } else if (this.payType === 11) {
           // 支付宝混合支付
           this.apliyPayOrder(res.data);
+        } else if (this.payType === 17) {
+          // 云闪付混合支付
+          this.applePayOrder(res.data);
         } else {
           window.pay_callBack();
         }
