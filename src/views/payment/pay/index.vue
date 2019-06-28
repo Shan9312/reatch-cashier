@@ -1228,7 +1228,7 @@ export default {
       // 若改商品 无支付列表，确认支付时禁止付款
       if (!this.selectedPayList.length) {
         MintUI.Toast.open({
-          message: "该用户余额不足"
+          message: "余额不足"
         });
         this.payType = null;
         return false;
