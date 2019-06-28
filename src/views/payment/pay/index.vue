@@ -1145,7 +1145,7 @@ export default {
       this.selectedPayList.forEach(obj => {
         if (obj.name === "orientIntergral") {
           // 定向 积分支付:0
-          this.payType = 3;
+          this.payType = 0;
           this.defaultOptions.dirIntegralSwitch = true;
         } else if (obj.name === "dooolyIntergral") {
           // 兜里 积分支付:0
@@ -1221,6 +1221,14 @@ export default {
      *  确认订单OK后：1.判断选中的支付类型 做对于的 付款跳转
      * */
     async confirmOrder() {
+      // 若改商品 无支付列表，确认支付时禁止付款
+      if (!this.selectedPayList.length) {
+        MintUI.Toast.open({
+          message: "当前商户无可用支付方式"
+        });
+        this.payType = null;
+        return false;
+      }
       const res = await getPayForm(
         this.orderNum,
         this.userId,
