@@ -1141,14 +1141,18 @@ export default {
     payTypeByselectedPayList() {
       if (!this.selectedPayList.length) return false;
       let integralList = this.selectedPayList.filter(payItem => payItem.id < 3);
+      let cashList = this.selectedPayList.filter(payItem => payItem.id >= 3);
 
       this.selectedPayList.forEach(obj => {
         if (obj.name === "orientIntergral") {
           // 定向 积分支付:0
-          this.payType = 0;
+          this.payType = 3;
           this.defaultOptions.dirIntegralSwitch = true;
         } else if (obj.name === "dooolyIntergral") {
           // 兜里 积分支付:0
+          this.payType = 0;
+        } else if (integralList.length == 2 && !cashList.length) {
+          // 只选则 兜里和定向时
           this.payType = 0;
         } else if (integralList.length && obj.name === "wechat") {
           // 微信积分混合:2
