@@ -1145,7 +1145,7 @@ export default {
       this.selectedPayList.forEach(obj => {
         if (obj.name === "orientIntergral") {
           // 定向 积分支付:0
-          this.payType = 0;
+          this.payType = 3;
           this.defaultOptions.dirIntegralSwitch = true;
         } else if (obj.name === "dooolyIntergral") {
           // 兜里 积分支付:0
