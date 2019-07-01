@@ -1342,6 +1342,9 @@ export default {
         } else if (this.payType === 17) {
           // 云闪付混合支付
           this.applePayOrder(res.data);
+        } else if (this.payType === 16) {
+          // 龙支付混合
+          this.continuePayOrder(res.data);
         } else {
           window.pay_callBack();
         }
