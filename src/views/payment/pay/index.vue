@@ -297,6 +297,7 @@ export default {
           supportWechat: false,
           supportAlipay: false,
           supportUnionpay: false,
+          supportConstrucPay: true,
           dirIntegralSwitch: false,
           commonIntegralSwitch: false,
           supportPayType: data.supportPayType,
@@ -365,11 +366,11 @@ export default {
         this.defaultOptions.dooolyServiceCharge = 0;
       }
       // 若不支持现金支付 则禁止混合支付的功能
-      // 暂时默认只要有 云闪付 就不支持混合
       if (
         !this.defaultOptions.supportWechat &&
         !this.defaultOptions.supportAlipay &&
-        !this.defaultOptions.supportUnionpay
+        !this.defaultOptions.supportUnionpay &&
+        !this.defaultOptions.supportConstrucPay
       ) {
         this.defaultOptions.supportHybrid = false;
       }
@@ -380,12 +381,12 @@ export default {
       this.initDefaultPayType();
     },
     /**
-     * 初始化可使用的 支付方式列表；
+     * 初始化可使用的 支付方式列表；后台可配置是否显示
      *
      * */
     initUseAblePayList() {
       this.usablePayList = [];
-      // 定向积分：不管任何情况都会显示，通过积分是否大于0来判断是否可用
+      // 定向积分：
       if (this.defaultOptions.supportOrientIntergral) {
         this.usablePayList.push({
           text: "定向积分",
@@ -397,7 +398,7 @@ export default {
           id: 1
         });
       }
-      // 兜礼积分：后台可配置是否显示，通过积分是否大于0来判断是否可用
+      // 兜礼积分：
       if (this.defaultOptions.supportDooolyIntergral) {
         this.usablePayList.push({
           text: "兜礼积分",
@@ -435,7 +436,6 @@ export default {
         });
       }
       // 云闪付：后台可配置是否显示
-      //  默认 微信环境支持云闪付
       if (this.defaultOptions.supportUnionpay) {
         this.usablePayList.push({
           text: "",
@@ -445,6 +445,18 @@ export default {
           selected: false,
           imgSrc: require("@/assets/images/checkout-counter/icon_cloud_unionPay.png"),
           id: 5
+        });
+      }
+      // 建行龙支付：
+      if (this.defaultOptions.supportConstrucPay) {
+        this.usablePayList.push({
+          text: "建行龙支付",
+          name: "construcPay",
+          usable: true,
+          payAmount: 0,
+          selected: false,
+          imgSrc: require("@/assets/images/checkout-counter/icon_construcPay.jpeg"),
+          id: 6
         });
       }
 
@@ -759,9 +771,38 @@ export default {
           }
         });
       } else {
+        this.initConstrucPay();
+      }
+    },
+    // 龙支付： 支付方式
+    initConstrucPay() {
+      // 判断是否支持支付宝支付
+      if (this.usableOptions.supportConstrucPay) {
+        let construcPayAmount = 0;
+        if (this.defaultOptions.serviceCharge) {
+          this.realServiceCharge = 0;
+        }
+        if (this.usableOptions.supportHybrid) {
+          construcPayAmount =
+            this.usableOptions.realPayAmount +
+            this.realServiceCharge -
+            this.result.orientIntergralPayAmount -
+            this.result.dooolyIntergralPayAmount;
+        } else {
+          construcPayAmount = this.usableOptions.realPayAmount;
+        }
+        // 选中支付宝支付及修改需支付金额
+        this.usablePayList.map(payType => {
+          if (payType.name == "construcPay") {
+            payType.selected = true;
+            payType.payAmount = construcPayAmount;
+          }
+        });
+      } else {
         throw Error("error");
       }
     },
+
     /**
      * 点击切换支付方式
      *
@@ -773,7 +814,8 @@ export default {
         alipayItem,
         orientIntergralPayAmount,
         dooolyIntergralPayAmount,
-        applePayItem;
+        applePayItem,
+        construcPayItem;
       let {
         orientIntergral,
         dooolyIntergral,
@@ -806,7 +848,7 @@ export default {
       ) {
         return false;
       }
-      let cashTypeArr = ["wechat", "alipay", "unionPay"]; //现金支付类型
+      let cashTypeArr = ["wechat", "alipay", "unionPay", "construcPay"]; //现金支付类型
       // 不可取消微信支付及支付宝支付
       if (item.selected && cashTypeArr.includes(item.name)) return false;
       // 定向积分+兜礼积分点击 取消时
@@ -991,6 +1033,9 @@ export default {
       applePayItem = this.selectedPayList.filter(
         payItem => payItem.name == "unionPay"
       );
+      construcPayItem = this.selectedPayList.filter(
+        payItem => payItem.name == "construcPay"
+      );
 
       // 初始化 付款方式
       if (!wechatItem.length) {
@@ -1031,6 +1076,10 @@ export default {
       // 云闪付
       if (!applePayItem.length) {
         optionsClone.supportUnionpay = false;
+      }
+      // 建行龙支付
+      if (!construcPayItem.length) {
+        optionsClone.supportConstrucPay = false;
       }
       // 初始化 支付列表
       this.initUseAblePayList();
