@@ -354,7 +354,11 @@ export default {
         } else if (item == 3) {
           this.defaultOptions.supportOrientIntergral = true;
         } else if (item == 14) {
+          // 云闪付
           this.defaultOptions.supportUnionpay = true;
+        } else if (item == 15) {
+          // 建行龙支付
+          this.defaultOptions.supportConstrucPay = true;
         }
       });
       if (!this.defaultOptions.supportOrientIntergral) {
@@ -1188,6 +1192,12 @@ export default {
         } else if (integralList.length && obj.name === "unionPay") {
           // 云闪付混合支付
           this.payType = 17;
+        } else if (!integralList.length && obj.name === "construcPay") {
+          // 建行龙支付
+          this.payType = 15;
+        } else if (integralList.length && obj.name === "construcPay") {
+          // 建行龙混合支付
+          this.payType = 16;
         }
       });
       const orientIntergralItem = this.selectedPayList.filter(
@@ -1280,6 +1290,9 @@ export default {
         } else if (this.payType === 14) {
           // 云闪付支付
           this.applePayOrder(res.data);
+        } else if (this.payType === 15) {
+          // 建行龙支付
+          this.continuePayOrder(res.data);
         }
       } else {
         // 订单 无效 则返回数据 做弹窗 提示 信息
@@ -1390,6 +1403,15 @@ export default {
 
     // 云闪付支付跳转接口
     applePayOrder(data) {
+      let form = data.unionPayUrl;
+      let div = document.createElement("div");
+      div.innerHTML = form;
+      document.body.appendChild(div);
+      document.all.pay_form.submit();
+    },
+
+    // 建行龙支付跳转接口
+    continuePayOrder(data) {
       let form = data.unionPayUrl;
       let div = document.createElement("div");
       div.innerHTML = form;
