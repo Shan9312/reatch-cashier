@@ -619,12 +619,12 @@ export default {
         if (
           this.usableOptions.orientIntergral >=
           UtilsFunction.converNumber(
-            this.usableOptions.realPayAmount,
+            this.usableOptions.needPayAmount,
             this.usableOptions.orientServiceCharge
           )
         ) {
           this.result.orientIntergralPayAmount =
-            this.usableOptions.realPayAmount +
+            this.usableOptions.needPayAmount +
             this.usableOptions.orientServiceCharge;
           // 实际支付手续费 = 定向支付的手续费
           this.realServiceCharge = this.usableOptions.orientServiceCharge;
