@@ -367,9 +367,9 @@ export default {
       // 若不支持现金支付 则禁止混合支付的功能
       // 暂时默认只要有 云闪付 就不支持混合
       if (
-        (!this.defaultOptions.supportWechat &&
-          !this.defaultOptions.supportAlipay) ||
-        this.defaultOptions.supportUnionpay
+        !this.defaultOptions.supportWechat &&
+        !this.defaultOptions.supportAlipay &&
+        !this.defaultOptions.supportUnionpay
       ) {
         this.defaultOptions.supportHybrid = false;
       }
@@ -1108,14 +1108,18 @@ export default {
     payTypeByselectedPayList() {
       if (!this.selectedPayList.length) return false;
       let integralList = this.selectedPayList.filter(payItem => payItem.id < 3);
+      let cashList = this.selectedPayList.filter(payItem => payItem.id >= 3);
 
       this.selectedPayList.forEach(obj => {
         if (obj.name === "orientIntergral") {
           // 定向 积分支付:0
-          this.payType = 0;
+          this.payType = 3;
           this.defaultOptions.dirIntegralSwitch = true;
         } else if (obj.name === "dooolyIntergral") {
           // 兜里 积分支付:0
+          this.payType = 0;
+        } else if (integralList.length == 2 && !cashList.length) {
+          // 只选则 兜里和定向时
           this.payType = 0;
         } else if (integralList.length && obj.name === "wechat") {
           // 微信积分混合:2
@@ -1132,6 +1136,9 @@ export default {
         } else if (!integralList.length && obj.name === "unionPay") {
           // 云闪付
           this.payType = 14;
+        } else if (integralList.length && obj.name === "unionPay") {
+          // 云闪付混合支付
+          this.payType = 17;
         }
       });
       const orientIntergralItem = this.selectedPayList.filter(
@@ -1188,6 +1195,14 @@ export default {
      *  确认订单OK后：1.判断选中的支付类型 做对于的 付款跳转
      * */
     async confirmOrder() {
+      // 若改商品 无支付列表，确认支付时禁止付款
+      if (!this.selectedPayList.length) {
+        MintUI.Toast.open({
+          message: "余额不足"
+        });
+        this.payType = null;
+        return false;
+      }
       const res = await getPayForm(
         this.orderNum,
         this.userId,
@@ -1262,6 +1277,9 @@ export default {
         } else if (this.payType === 11) {
           // 支付宝混合支付
           this.apliyPayOrder(res.data);
+        } else if (this.payType === 17) {
+          // 云闪付混合支付
+          this.applePayOrder(res.data);
         } else {
           window.pay_callBack();
         }
