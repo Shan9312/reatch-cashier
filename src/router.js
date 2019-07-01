@@ -66,9 +66,7 @@ router.beforeEach((to, from, next) => {
     document.title = to.meta.title
   }
   let url = window.location.href;
-  // console.log(GlobalProperty.localStorage.getItem('token'), Cookies.get('userId'), /orderSource/.test(url));
   if (!GlobalProperty.localStorage.getItem('token') && !Cookies.get('userId') && !/orderSource/.test(url)) {
-    // debugger
     GlobalFunction.logout();
   }
   next();
