@@ -199,6 +199,8 @@ export default {
       return;
     }
 
+    // 美团进入收银台, 获取美团地址中信息
+    this.handleThirdJudge();
     // 获取用户 订单信息
     this.getPayContentByUserId();
     const _this = this;
@@ -1379,6 +1381,8 @@ export default {
     handleThirdJudge() {
       if (UtilsFunction.getUrlParams("orderSource") === "meituan") {
         // 若是美团支付 需把信息集合
+        this.userId = UtilsFunction.getUrlParams("userId");
+        this.redirectUrl = UtilsFunction.getUrlParams("return_url");
         this.meituanObj = {
           userId: UtilsFunction.getUrlParams("userId"),
           orderSource: UtilsFunction.getUrlParams("orderSource"),
