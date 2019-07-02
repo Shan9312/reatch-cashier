@@ -38,7 +38,7 @@
                   @click="handleWhatOrientIntergral"
                   src="@/assets/images/checkout-counter/icon_why.png"
                   alt="定向积分疑问"
-                >
+                />
               </span>
               <span class="fr direct-available">
                 可抵扣余额:
@@ -62,7 +62,7 @@
                 class="picture fl"
                 :src="item.imgSrc"
                 :class="{'union-right': item.name === 'unionPay'}"
-              >
+              />
               <div class="center" :class="{'union-text': item.name === 'unionPay'}">
                 <div class="fl">
                   <span class="type-text names">{{item.text}}</span>
@@ -214,7 +214,7 @@ export default {
           dooolyAPP.gotoJumpJq(_this.$router, res.data.redirectUrl);
         } else if (_this.handleThirdJudge()) {
           // 若有美团接口 之间跳转美团
-          dooolyApp.gotoJumpJq(_this.$router, _this.meituanInfo.return_url);
+          dooolyApp.gotoJumpJq(_this.$router, _this.meituanObj.return_url);
         } else if (_this.defaultOptions.productType == 7) {
           // 活动页面
           const {
@@ -226,11 +226,7 @@ export default {
           } = res.data;
           dooolyAPP.gotoJumpJq(
             _this.$router,
-            `${
-              GlobalProperty.frontendDomain.m
-            }activity_cardBuyPayResult/${code}/${totalAmount}/${orderId}/${orderNum}/${activityParam}/${
-              _this.defaultOptions.productType
-            }`
+            `${GlobalProperty.frontendDomain.m}activity_cardBuyPayResult/${code}/${totalAmount}/${orderId}/${orderNum}/${activityParam}/${_this.defaultOptions.productType}`
           );
         } else {
           // 支付结果页面
@@ -1314,16 +1310,14 @@ export default {
       } else if (this.tradeType == "DOOOLY_H5") {
         // h5支付
         let redirect_url = window.encodeURIComponent(
-          `${currentBaseUrl}/cardBuyPayResultH5/${this.orderNum}/${
-            this.defaultOptions.productType
-          }`
+          `${currentBaseUrl}/cardBuyPayResultH5/${this.orderNum}/${this.defaultOptions.productType}`
         );
 
         if (this.handleThirdJudge()) {
           // 判断 美团h5支付，支付完成跳转页面
           redirect_url = window.encodeURIComponent(
             `${currentBaseUrl}/middle?redirect_url=${window.encodeURIComponent(
-              this.meituanInfo.return_url
+              this.meituanObj.return_url
             )}`
           );
           window.location.href = `${data.mwebUrl}&redirect_url=${redirect_url}`;
