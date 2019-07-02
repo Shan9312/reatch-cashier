@@ -101,8 +101,22 @@ export default {
       history.pushState(null, null, document.URL);
       window.addEventListener("popstate", _this.goBackDahua, false);
     }
+
+    // 若是银联支付跳转到收银台，则返回是 需跳转5个页面 且不是安卓
+    if (
+      /payType=cloudUnionPay/.test(window.location.href) &&
+      this.browserName !== "Chrome WebView" &&
+      this.browserName !== "WebKit"
+    ) {
+      history.pushState(null, null, document.URL);
+      window.addEventListener("popstate", _this.goBackUnionPay, false);
+    }
   },
   methods: {
+    // 银联支付返回页面
+    goBackUnionPay() {
+      window.history.go(-6);
+    },
     // 大华回退时 监听实际
     goBackDahua() {
       window.history.go(-2);
@@ -185,25 +199,17 @@ export default {
       "popstate",
       function() {
         this.goBackDahua();
+        this.goBackUnionPay();
       },
       false
     );
   },
   beforeRouteLeave(to, from, next) {
     if (this.browserName != "Chrome WebView" && this.browserName != "WebKit") {
-      if (
-        to.name == "Payment" &&
-        !this.backLock &&
-        !/payType=cloudUnionPay/.test(window.location.href)
-      ) {
+      if (to.name == "Payment" && !this.backLock) {
         this.backLock = true;
         window.history.go(-1);
         return;
-      } else if (
-        to.name == "Payment" &&
-        /payType=cloudUnionPay/.test(window.location.href)
-      ) {
-        window.history.go(-6);
       }
     }
     next();
