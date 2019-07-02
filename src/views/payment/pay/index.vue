@@ -38,7 +38,7 @@
                   @click="handleWhatOrientIntergral"
                   src="@/assets/images/checkout-counter/icon_why.png"
                   alt="定向积分疑问"
-                >
+                />
               </span>
               <span class="fr direct-available">
                 可抵扣余额:
@@ -62,7 +62,7 @@
                 class="picture fl"
                 :src="item.imgSrc"
                 :class="{'union-right': item.name === 'unionPay'}"
-              >
+              />
               <div class="center" :class="{'union-text': item.name === 'unionPay'}">
                 <div class="fl">
                   <span class="type-text names">{{item.text}}</span>
@@ -224,11 +224,7 @@ export default {
           } = res.data;
           dooolyAPP.gotoJumpJq(
             _this.$router,
-            `${
-              GlobalProperty.frontendDomain.m
-            }activity_cardBuyPayResult/${code}/${totalAmount}/${orderId}/${orderNum}/${activityParam}/${
-              _this.defaultOptions.productType
-            }`
+            `${GlobalProperty.frontendDomain.m}activity_cardBuyPayResult/${code}/${totalAmount}/${orderId}/${orderNum}/${activityParam}/${_this.defaultOptions.productType}`
           );
         } else {
           // 支付结果页面
@@ -297,7 +293,7 @@ export default {
           supportWechat: false,
           supportAlipay: false,
           supportUnionpay: false,
-          supportConstrucPay: true,
+          supportConstrucPay: false,
           dirIntegralSwitch: false,
           commonIntegralSwitch: false,
           supportPayType: data.supportPayType,
@@ -1383,9 +1379,7 @@ export default {
       } else if (this.tradeType == "DOOOLY_H5") {
         // h5支付
         let redirect_url = window.encodeURIComponent(
-          `${currentBaseUrl}/cardBuyPayResultH5/${this.orderNum}/${
-            this.defaultOptions.productType
-          }`
+          `${currentBaseUrl}/cardBuyPayResultH5/${this.orderNum}/${this.defaultOptions.productType}`
         );
 
         if (this.handleThirdJudge()) {
