@@ -1382,6 +1382,9 @@ export default {
           orderSource: UtilsFunction.getUrlParams("orderSource"),
           return_url: UtilsFunction.getUrlParams("return_url")
         };
+        if (!localStorage.token) {
+          localStorage.setItem("token", UtilsFunction.getUrlParams("userId"));
+        }
         return true;
       }
     },
