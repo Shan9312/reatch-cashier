@@ -38,7 +38,7 @@
                   @click="handleWhatOrientIntergral"
                   src="@/assets/images/checkout-counter/icon_why.png"
                   alt="定向积分疑问"
-                >
+                />
               </span>
               <span class="fr direct-available">
                 可抵扣余额:
@@ -62,7 +62,7 @@
                 class="picture fl"
                 :src="item.imgSrc"
                 :class="{'union-right': item.name === 'unionPay'}"
-              >
+              />
               <div class="center" :class="{'union-text': item.name === 'unionPay'}">
                 <div class="fl">
                   <span class="type-text names">{{item.text}}</span>
@@ -174,8 +174,7 @@ export default {
       realServiceCharge: 0, // 实际需要支付的手续费
       isHandleConfirm: false, // 确定用户再次选支付列表
       stashArr: [], // 临时存储上一次支付列表
-      isShowMsg: false, // 若商品无是否方式提醒
-      isFlashPay: true // 银联支付成功
+      isShowMsg: false // 若商品无是否方式提醒
     };
   },
   filters: {
@@ -200,26 +199,22 @@ export default {
       return;
     }
 
+    // 美团进入收银台, 获取美团地址中信息
+    this.handleThirdJudge();
     // 获取用户 订单信息
     this.getPayContentByUserId();
     const _this = this;
-    // 若银联支付失败，则收银台返回2级页面
-    window.addEventListener("popstate", _this.handleFlashPay, false);
     // 付款成功后返回的值
     window.pay_callBack = async function() {
       const res = await getPayResult(_this.orderNum);
       if (res.code === 1000 || res.code === 1001) {
         // 根据支付环境 跳转到不同的页面
-        if (
-          res.data &&
-          res.data.redirectUrl &&
-          !/payType=cloudUnionPay/.test(window.location.href)
-        ) {
+        if (res.data && res.data.redirectUrl) {
           // 接口有值，直接跳接口的
           dooolyAPP.gotoJumpJq(_this.$router, res.data.redirectUrl);
         } else if (_this.handleThirdJudge()) {
           // 若有美团接口 之间跳转美团
-          dooolyApp.gotoJumpJq(_this.$router, _this.meituanInfo.return_url);
+          dooolyApp.gotoJumpJq(_this.$router, _this.meituanObj.return_url);
         } else if (_this.defaultOptions.productType == 7) {
           // 活动页面
           const {
@@ -231,17 +226,7 @@ export default {
           } = res.data;
           dooolyAPP.gotoJumpJq(
             _this.$router,
-            `${
-              GlobalProperty.frontendDomain.m
-            }activity_cardBuyPayResult/${code}/${totalAmount}/${orderId}/${orderNum}/${activityParam}/${
-              _this.defaultOptions.productType
-            }`
-          );
-        } else if (/payType=cloudUnionPay/.test(window.location.href)) {
-          // 若是云闪付支付成功 则跳转到 支付结果页，带云闪付的标时
-          dooolyAPP.gotoJumpVue(
-            _this.$router,
-            `/cardBuyPayResult/${_this.orderNum}?payType=cloudUnionPay`
+            `${GlobalProperty.frontendDomain.m}activity_cardBuyPayResult/${code}/${totalAmount}/${orderId}/${orderNum}/${activityParam}/${_this.defaultOptions.productType}`
           );
         } else {
           // 支付结果页面
@@ -251,7 +236,6 @@ export default {
           );
         }
       } else {
-        this.isFlashPay = false;
         MintUI.Toast.open({
           message: res.msg
         });
@@ -280,27 +264,8 @@ export default {
     };
     dooolyAPP.initTitle("订单支付", "2", "isConfirmShow()");
   },
-  mounted() {
-    // 银联支付
-    this.handleUnionPayResult();
-  },
+  mounted() {},
   methods: {
-    // 若云闪付支付失败，回退时到下单页
-    handleFlashPay() {
-      if (
-        /payType=cloudUnionPay/.test(window.location.href) &&
-        this.browserName !== "Chrome WebView" &&
-        this.browserName !== "WebKit"
-      ) {
-        !this.isFlashPay && window.history.go(-2);
-      }
-    },
-    // 若银联支付之后返回到收银台，则调用getpayResult的接口
-    handleUnionPayResult() {
-      if (/payType=cloudUnionPay/.test(window.location.href)) {
-        window.pay_callBack();
-      }
-    },
     /**
      * 根据用户的信息 获取付款页面的内容
      * 并且根据 返回的paymethods 的值 判断付款列表
@@ -1141,14 +1106,18 @@ export default {
     payTypeByselectedPayList() {
       if (!this.selectedPayList.length) return false;
       let integralList = this.selectedPayList.filter(payItem => payItem.id < 3);
+      let cashList = this.selectedPayList.filter(payItem => payItem.id >= 3);
 
       this.selectedPayList.forEach(obj => {
         if (obj.name === "orientIntergral") {
           // 定向 积分支付:0
-          this.payType = 0;
+          this.payType = 3;
           this.defaultOptions.dirIntegralSwitch = true;
         } else if (obj.name === "dooolyIntergral") {
           // 兜里 积分支付:0
+          this.payType = 0;
+        } else if (integralList.length == 2 && !cashList.length) {
+          // 只选则 兜里和定向时
           this.payType = 0;
         } else if (integralList.length && obj.name === "wechat") {
           // 微信积分混合:2
@@ -1221,6 +1190,14 @@ export default {
      *  确认订单OK后：1.判断选中的支付类型 做对于的 付款跳转
      * */
     async confirmOrder() {
+      // 若改商品 无支付列表，确认支付时禁止付款
+      if (!this.selectedPayList.length) {
+        MintUI.Toast.open({
+          message: "余额不足"
+        });
+        this.payType = null;
+        return false;
+      }
       const res = await getPayForm(
         this.orderNum,
         this.userId,
@@ -1333,16 +1310,14 @@ export default {
       } else if (this.tradeType == "DOOOLY_H5") {
         // h5支付
         let redirect_url = window.encodeURIComponent(
-          `${currentBaseUrl}/cardBuyPayResultH5/${this.orderNum}/${
-            this.defaultOptions.productType
-          }`
+          `${currentBaseUrl}/cardBuyPayResultH5/${this.orderNum}/${this.defaultOptions.productType}`
         );
 
         if (this.handleThirdJudge()) {
           // 判断 美团h5支付，支付完成跳转页面
           redirect_url = window.encodeURIComponent(
             `${currentBaseUrl}/middle?redirect_url=${window.encodeURIComponent(
-              this.meituanInfo.return_url
+              this.meituanObj.return_url
             )}`
           );
           window.location.href = `${data.mwebUrl}&redirect_url=${redirect_url}`;
@@ -1400,11 +1375,16 @@ export default {
     handleThirdJudge() {
       if (UtilsFunction.getUrlParams("orderSource") === "meituan") {
         // 若是美团支付 需把信息集合
+        this.userId = UtilsFunction.getUrlParams("userId");
+        this.redirectUrl = UtilsFunction.getUrlParams("return_url");
         this.meituanObj = {
           userId: UtilsFunction.getUrlParams("userId"),
           orderSource: UtilsFunction.getUrlParams("orderSource"),
           return_url: UtilsFunction.getUrlParams("return_url")
         };
+        if (!localStorage.userId) {
+          localStorage.setItem("userId", UtilsFunction.getUrlParams("userId"));
+        }
         return true;
       }
     },
@@ -1418,10 +1398,6 @@ export default {
     handleReturnPrePage() {
       dooolyAPP.goBackPageIndex("1");
     }
-  },
-  destroyed() {
-    const _this = this;
-    window.removeEventListener("popstate", _this.handleFlashPay, false);
   }
 };
 </script>
