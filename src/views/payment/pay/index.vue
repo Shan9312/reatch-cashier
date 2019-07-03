@@ -38,7 +38,7 @@
                   @click="handleWhatOrientIntergral"
                   src="@/assets/images/checkout-counter/icon_why.png"
                   alt="定向积分疑问"
-                >
+                />
               </span>
               <span class="fr direct-available">
                 可抵扣余额:
@@ -62,7 +62,7 @@
                 class="picture fl"
                 :src="item.imgSrc"
                 :class="{'union-right': item.name === 'unionPay'}"
-              >
+              />
               <div class="center" :class="{'union-text': item.name === 'unionPay'}">
                 <div class="fl">
                   <span class="type-text names">{{item.text}}</span>
@@ -231,11 +231,7 @@ export default {
           } = res.data;
           dooolyAPP.gotoJumpJq(
             _this.$router,
-            `${
-              GlobalProperty.frontendDomain.m
-            }activity_cardBuyPayResult/${code}/${totalAmount}/${orderId}/${orderNum}/${activityParam}/${
-              _this.defaultOptions.productType
-            }`
+            `${GlobalProperty.frontendDomain.m}activity_cardBuyPayResult/${code}/${totalAmount}/${orderId}/${orderNum}/${activityParam}/${_this.defaultOptions.productType}`
           );
         } else if (/payType=cloudUnionPay/.test(window.location.href)) {
           // 若是云闪付支付成功 则跳转到 支付结果页，带云闪付的标时
@@ -1263,7 +1259,7 @@ export default {
           this.apliyPayOrder(res.data);
         } else if (this.payType === 14) {
           // 云闪付支付
-          this.applePayOrder(res.data);
+          this.unionPayOrder(res.data);
         }
       } else {
         // 订单 无效 则返回数据 做弹窗 提示 信息
@@ -1312,7 +1308,7 @@ export default {
           this.apliyPayOrder(res.data);
         } else if (this.payType === 17) {
           // 云闪付混合支付
-          this.applePayOrder(res.data);
+          this.unionPayOrder(res.data);
         } else {
           window.pay_callBack();
         }
@@ -1351,9 +1347,7 @@ export default {
       } else if (this.tradeType == "DOOOLY_H5") {
         // h5支付
         let redirect_url = window.encodeURIComponent(
-          `${currentBaseUrl}/cardBuyPayResultH5/${this.orderNum}/${
-            this.defaultOptions.productType
-          }`
+          `${currentBaseUrl}/cardBuyPayResultH5/${this.orderNum}/${this.defaultOptions.productType}`
         );
 
         if (this.handleThirdJudge()) {
@@ -1373,12 +1367,8 @@ export default {
     },
 
     // 云闪付支付跳转接口
-    applePayOrder(data) {
-      let form = data.unionPayUrl;
-      let div = document.createElement("div");
-      div.innerHTML = form;
-      document.body.appendChild(div);
-      document.all.pay_form.submit();
+    unionPayOrder(data) {
+      dooolyAPP.appPay(data, "pay_callBack", "union");
     },
 
     // 若是 微信环境 则微信接口跳转支付接口
