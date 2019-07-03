@@ -44,7 +44,7 @@
   },
   jumpIndexPage: function (e) {
     try {
-      "WebKit" == this.browserName ? window.webkit.messageHandlers.jumpTabarItemIndex.postMessage("0") : "Chrome WebView" == this.browserName ? RHNativeJS.jumpIndexPage() : window.location.replace(e);
+      "WebKit" == this.browserName ? window.webkit.messageHandlers.jumpTabarItemIndex.postMessage("0") : "Chrome WebView" == this.browserName ? RHNativeJS.jumpIndexPage() : window.location.replace(e)
     } catch (e) {
       dooolyAPP.errorLog(e)
     }
@@ -176,7 +176,7 @@
       }], r = {
         id: "",
         url: o
-      }, a = 0; a < t.length; a++) t[a].name === e && (r.id = t[a].id);
+      }, i = 0; i < t.length; i++) t[i].name === e && (r.id = t[i].id);
     try {
       "Chrome WebView" == this.browserName ? RHNativeJS.goCooperationApp(r.id, r.url) : window.location.href = o
     } catch (e) {
@@ -187,15 +187,19 @@
     try {
       if ("wx" == t) "WebKit" == this.browserName || "otherAPPIos" == this.browserName ? (e.func = o, window.webkit.messageHandlers.wechatPay.postMessage(JSON.stringify(e))) : "Chrome WebView" != this.browserName && "otherAPPAndroid" != this.browserName || RHNativeJS.wechatPay(JSON.stringify(e), o);
       else if ("zfb" == t)
-        if ("WebKit" == this.browserName) {
-          e.func = o, window.webkit.messageHandlers.aliPayment.postMessage(JSON.stringify(e));
-        }
-      else if ("Chrome WebView" == this.browserName) {
-        RHNativeJS.aliPay(e.aLiPayUrl, o);
-      } else {
+        if ("WebKit" == this.browserName) e.func = o, window.webkit.messageHandlers.aliPayment.postMessage(JSON.stringify(e));
+        else if ("Chrome WebView" == this.browserName) RHNativeJS.aliPay(e.aLiPayUrl, o);
+      else {
         var r = e.aLiPayUrl,
-          a = document.createElement("div");
-        a.innerHTML = r, document.body.appendChild(a), document.forms[0].submit()
+          i = document.createElement("div");
+        i.innerHTML = r, document.body.appendChild(i), document.forms[0].submit()
+      } else if ("union" == t)
+        if ("WebKit" == this.browserName) e.func = o, window.webkit.messageHandlers.unionPay.postMessage(JSON.stringify(e));
+        else if ("Chrome WebView" == this.browserName) RHNativeJS.unionPay(JSON.stringify(e), o);
+      else {
+        var a = e.unionPayUrl,
+          s = document.createElement("div");
+        s.innerHTML = a, document.body.appendChild(s), document.all.pay_form.submit()
       }
     } catch (e) {
       dooolyAPP.errorLog(e)
@@ -219,9 +223,9 @@
       else {
         var r = window.location.href.substring(0, window.location.href.indexOf("#") + 1);
         if (-1 < o.indexOf(r)) {
-          var a = o.substring(o.indexOf("#") + 1);
+          var i = o.substring(o.indexOf("#") + 1);
           e.push({
-            path: a
+            path: i
           })
         } else window.location.href = o
       }
@@ -233,11 +237,11 @@
       path: o
     });
     else {
-      var a = {
+      var i = {
         jumpType: "InsideJump",
         jumpUrl: window.location.href.substring(0, window.location.href.indexOf("#") + 1) + o
       };
-      "WebKit" == this.browserName ? (r = t && t[this.browserName] ? _.extend(a, t[this.browserName]) : a, window.webkit.messageHandlers.gotoNativeJump.postMessage(JSON.stringify(r))) : "Chrome WebView" == this.browserName ? RHNativeJS.gotoNativeJump(JSON.stringify(a)) : e.push({
+      "WebKit" == this.browserName ? (r = t && t[this.browserName] ? _.extend(i, t[this.browserName]) : i, window.webkit.messageHandlers.gotoNativeJump.postMessage(JSON.stringify(r))) : "Chrome WebView" == this.browserName ? RHNativeJS.gotoNativeJump(JSON.stringify(i)) : e.push({
         path: o
       })
     }
@@ -256,38 +260,36 @@
     var t = this.getCookie(e);
     null != t && (document.cookie = e + "=" + t + ";expires=" + o.toGMTString())
   },
-  logOut: function (e) {
-    this.removeCookie("token"), this.removeCookie("userId"), this.removeCookie("loginUrl"), 0 < window.location.href.indexOf("wiscowechat") ? localStorage.removeItem("wiscoToken") : localStorage.removeItem("dooolyToken"), localStorage.removeItem("token"), localStorage.removeItem("wiscoToken") || localStorage.removeItem("token") || (localStorage.removeItem("userId"), localStorage.removeItem("mobile"), localStorage.removeItem("activateMobile"), localStorage.removeItem("groupShortName"), localStorage.removeItem("address"), localStorage.removeItem("userName"), localStorage.removeItem("redirectUrl"), localStorage.removeItem("code"), localStorage.removeItem("storeMapUrl"), localStorage.removeItem("latitude"), localStorage.removeItem("longitude"), localStorage.removeItem("loginUrl"), localStorage.removeItem("getAppVersionName"), localStorage.removeItem("isPayPassword"), localStorage.removeItem("isSetPayPassword")), "WebKit" == this.browserName || "otherAPPIos" == this.browserName ? window.webkit.messageHandlers.forceLoginOut.postMessage("1") : "Chrome WebView" == this.browserName || "otherAPPAndroid" == this.browserName ? RHNativeJS.forceLoginOut("") : /wiscowechat/.test(window.location.href) ? e.replace("/companyLogin/wugang") : /zfhwechat/.test(window.location.href) ? e.replace("/companyLogin/zfh") : e.replace("/")
+  logOut: function (e, o) {
+    if ("WebKit" == this.browserName || "otherAPPIos" == this.browserName) window.webkit.messageHandlers.forceLoginOut.postMessage("1");
+    else if ("Chrome WebView" == this.browserName || "otherAPPAndroid" == this.browserName) RHNativeJS.forceLoginOut("");
+    else {
+      this.removeCookie("token"), this.removeCookie("userId"), this.removeCookie("loginUrl"), 0 < window.location.href.indexOf("wiscowechat") ? localStorage.removeItem("wiscoToken") : localStorage.removeItem("dooolyToken"), localStorage.removeItem("token"), 1 == e ? o ? localStorage.setItem("loginUrl", o) : localStorage.setItem("loginUrl", location.href) : localStorage.removeItem("loginUrl"), localStorage.removeItem("userId"), localStorage.removeItem("mobile"), localStorage.removeItem("activateMobile"), localStorage.removeItem("groupShortName"), localStorage.removeItem("address"), localStorage.removeItem("userName"), localStorage.removeItem("redirectUrl"), localStorage.removeItem("code"), localStorage.removeItem("storeMapUrl"), localStorage.removeItem("latitude"), localStorage.removeItem("longitude"), localStorage.removeItem("getAppVersionName"), localStorage.removeItem("isPayPassword"), localStorage.removeItem("isSetPayPassword"), sessionStorage.removeItem("oauthCode"), sessionStorage.removeItem("source");
+      var t = this.allConfig.jumpDomain.m;
+      /wiscowechat/.test(window.location.href) ? location.replace(t + "companyLogin/wugang") : /zfhwechat/.test(window.location.href) ? location.replace(t + "companyLogin/zfh") : location.replace(t)
+    }
   },
   logIn: function (e, o, t) {
-    var r = JSON.parse(o),
-      a = "";
-    if (r.token && (a = r.token, this.setCookie("token", a), 0 < window.location.href.indexOf("wiscowechat") ? localStorage.wiscoToken = a : localStorage.dooolyToken = a, localStorage.token = a), this.setCookie("userId", r.adUserConn.userId), localStorage.userId = r.adUserConn.userId, localStorage.mobile = r.adUserConn.telephone, localStorage.groupShortName = r.adUserConn.groupShortName, localStorage.userName = r.adUserConn.name, this.removeCookie("first_conponShow"), r.adUserConn.isPayPassword && (localStorage.isPayPassword = r.adUserConn.isPayPassword, localStorage.isSetPayPassword = r.adUserConn.isSetPayPassword), localStorage.groupId = r.adUserConn.groupId, localStorage.blocId = r.adUserConn.blocId, "WeChat" == this.browserName) t && (localStorage.loginUrl = t), window.location.replace(this.allConfig.jumpDomain.wx);
+    if (e) {
+      var r = JSON.parse(e),
+        i = r.token;
+      this.setCookie("token", i), this.setCookie("userId", r.adUserConn.userId), this.removeCookie("first_conponShow"), 0 < window.location.href.indexOf("wiscowechat") ? localStorage.wiscoToken = i : localStorage.dooolyToken = i, localStorage.token = i, localStorage.userId = r.adUserConn.userId, localStorage.mobile = r.adUserConn.telephone, localStorage.groupShortName = r.adUserConn.groupShortName, localStorage.userName = r.adUserConn.name, localStorage.isPayPassword = r.adUserConn.isPayPassword, localStorage.isSetPayPassword = r.adUserConn.isSetPayPassword, localStorage.groupId = r.adUserConn.groupId, localStorage.blocId = r.adUserConn.blocId
+    }
+    var a = this.allConfig.jumpDomain.m;
+    o && (new RegExp("^http(s)?://").test(o) ? localStorage.loginUrl = o : localStorage.loginUrl = a + o);
+    if ("WeChat" == this.browserName && 1 != t) location.replace(this.allConfig.jumpDomain.wx);
     else if ("WebKit" == this.browserName) {
-      var i = {
+      var s = {
         userInfo: r.adUserConn,
         type: "0",
         token: r.token,
-        url: t
+        url: o
       };
-      window.webkit.messageHandlers.nativeUserInfomation.postMessage(i)
-    } else if ("Chrome WebView" == this.browserName)
-      if (t) {
-        var s = window.location.href,
-          n = s.indexOf("#"),
-          l = s.substring(0, n + 1);
-        RHNativeJS.setUserInfo(JSON.stringify(r.adUserConn), r.token, l + t)
-      } else RHNativeJS.nativeUserInfomation(JSON.stringify(r.adUserConn), "0", r.token);
+      window.webkit.messageHandlers.nativeUserInfomation.postMessage(s)
+    } else if ("Chrome WebView" == this.browserName) o ? RHNativeJS.setUserInfo(JSON.stringify(r.adUserConn), r.token, base + localStorage.loginUrl) : RHNativeJS.nativeUserInfomation(JSON.stringify(r.adUserConn), "0", r.token);
     else {
-      var m = new RegExp("^http(s)?://");
-      if ("nav/newHome" != localStorage.loginUrl) var w = localStorage.loginUrl;
-      var g = this.getCookie("loginUrl");
-      if (localStorage.removeItem("loginUrl"), this.removeCookie("loginUrl"), t) e.replace(t);
-      else if (w || g) {
-        if (m.test(w)) return window.location.replace(w), !1;
-        if (m.test(g)) return window.location.replace(g), !1;
-        e.replace(w)
-      } else "otherAPP" == this.browserName ? "/" == window.location.href.charAt(window.location.href.length - 1) ? e.replace("nav/newHome?first=1") : e.replace("/nav/newHome?first=1") : "/" == window.location.href.charAt(window.location.href.length - 1) ? e.replace("nav/newHome") : e.replace("/nav/newHome")
+      var n = glocalStorage.loginUrl || dooolyAPP.getCookie("loginUrl");
+      localStorage.removeItem("loginUrl"), this.removeCookie("loginUrl"), n ? location.replace(n) : location.replace("otherAPP" == this.browserName ? a + "nav/newHome?first=1" : a + "nav/newHome")
     }
   },
   initTitle: function (e, o, t) {
