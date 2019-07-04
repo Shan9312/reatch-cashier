@@ -260,9 +260,10 @@ export default {
       _this.continuePay(true);
       _this.handleCloseKeyboard(false);
     };
+  },
+  mounted() {
     dooolyAPP.initTitle("订单支付", "2", "isConfirmShow()");
   },
-  mounted() {},
   methods: {
     /**
      * 根据用户的信息 获取付款页面的内容
@@ -1093,7 +1094,9 @@ export default {
     handleCloseKeyboard(v) {
       this.isShowKeyboard = v;
       this.isHandleConfirm = !v;
-      this.$refs.keybordItem.verificationCodeArr = [];
+      this.$nextTick(() => {
+        this.$refs.keybordItem.verificationCodeArr = [];
+      });
     },
     /**
      * 定向积分定义解释

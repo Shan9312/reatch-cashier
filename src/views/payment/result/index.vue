@@ -73,9 +73,9 @@ export default {
     window.isConfirmShow = function() {
       dooolyAPP.goBackPageIndex("2");
     };
-    dooolyAPP.initTitle("支付结果", "2", "isConfirmShow()");
   },
   mounted() {
+    dooolyAPP.initTitle("支付结果", "2", "isConfirmShow()");
     let _this = this;
     // 支付宝h5、微信h5支付完成后点击返回，去首页
     if (localStorage.isWeChatH5) this.isWeChatH5 = true;
