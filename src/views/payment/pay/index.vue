@@ -227,15 +227,6 @@ export default {
           dooolyAPP.gotoJumpJq(
             _this.$router,
             `${GlobalProperty.frontendDomain.m}activity_cardBuyPayResult/${code}/${totalAmount}/${orderId}/${orderNum}/${activityParam}/${_this.defaultOptions.productType}`
-<<<<<<< HEAD
-=======
-          );
-        } else if (/payType=cloudUnionPay/.test(window.location.href)) {
-          // 若是云闪付支付成功 则跳转到 支付结果页，带云闪付的标时
-          dooolyAPP.gotoJumpVue(
-            _this.$router,
-            `/cardBuyPayResult/${_this.orderNum}?payType=cloudUnionPay`
->>>>>>> feature-unionPay-hybrid
           );
         } else {
           // 支付结果页面
