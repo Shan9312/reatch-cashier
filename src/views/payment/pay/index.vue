@@ -1412,7 +1412,7 @@ export default {
 
     // 建行龙支付跳转接口
     continuePayOrder(data) {
-      dooolyApp.gotoJumpJq(this.$router, data.ccbPayUrl);
+      dooolyAPP.gotoJumpJq(this.$router, data.ccbPayUrl);
     },
 
     // 若是 微信环境 则微信接口跳转支付接口
