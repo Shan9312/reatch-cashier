@@ -1412,11 +1412,7 @@ export default {
 
     // 建行龙支付跳转接口
     continuePayOrder(data) {
-      let form = data.unionPayUrl;
-      let div = document.createElement("div");
-      div.innerHTML = form;
-      document.body.appendChild(div);
-      document.all.pay_form.submit();
+      dooolyApp.gotoJumpJq(data.ccbPayUrl);
     },
 
     // 若是 微信环境 则微信接口跳转支付接口
