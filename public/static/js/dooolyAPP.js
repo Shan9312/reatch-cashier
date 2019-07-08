@@ -199,7 +199,7 @@
       else {
         var a = e.unionPayUrl,
           s = document.createElement("div");
-        s.innerHTML = a, document.body.appendChild(s), document.all.pay_form.submit()
+        s.innerHTML = a, document.body.appendChild(s), document.getElementById('pay_form').submit();
       }
     } catch (e) {
       dooolyAPP.errorLog(e)
