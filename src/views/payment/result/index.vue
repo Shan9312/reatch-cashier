@@ -4,7 +4,7 @@
       <!-- 大华3.8节日-->
       <DahuaPage v-if="isShowPayPage === 1" :orderInformObj="orderInformObj"></DahuaPage>
       <!-- 东航提货券活动-->
-      <PickUpGoodsPage v-else-if="isShowPayPage === 4" :orderInformObj="orderInformObj"></PickUpGoodsPage>
+      <PickUpGoodsPage v-else-if="isShowPayPage === 4 && orderNo" :orderNo="orderNo"></PickUpGoodsPage>
       <!-- 支付成功 -->
       <div v-else-if="isShowPayPage === 2">
         <div class="title">
@@ -49,11 +49,13 @@ export default {
   name: "PaymentResult",
   components: {
     DahuaPage,
-    ActivePage
+    ActivePage,
+    PickUpGoodsPage
   },
   data() {
     return {
       orderNum: this.$route.params.orderNum,
+      orderNo: '', // 订单编号，getPayResult获取orderNo，东航提货活动订单详情需要该字段查询
       orderInformObj: {}, // 订单信息
       isShowPayPage: 0, // 大华:1, 支付成功:2, 支付失败:3,
       umengNameObj: {
@@ -139,6 +141,8 @@ export default {
       if (res.code === 1000 || res.code === 1001) {
         // 工商的不显示 返回首页按钮
         if (res.data.orderType == "2") this.isShowHomeBtn = false;
+        // 获取订单编号
+        this.orderNo = res.data && res.data.orderNum;
         // 表示成功code
         this.orderInformObj = JSON.parse(JSON.stringify(res.data));
         // 判断isShowPayPage  显示哪个页面

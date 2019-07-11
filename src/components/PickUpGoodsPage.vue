@@ -16,23 +16,23 @@
       <div class="order-list">
         <div class="order">
           <div>订单编号</div>
-          <div>{{ orderInformObj && orderInformObj.orderResp.orderNumber}}</div>
+          <div>{{ orderInfo && orderInfo.orderNumber}}</div>
         </div>
         <div class="order">
           <div>兑换时间</div>
-          <div>{{orderInformObj.orderResp && orderInformObj.orderResp.orderDate}}</div>
+          <div>{{orderInfo && orderInfo.orderDate}}</div>
         </div>
         <div class="order">
           <div>收货人</div>
-          <div>{{orderInformObj.orderResp && orderInformObj.orderResp.consigneeName}}</div>
+          <div>{{orderInfo && orderInfo.consigneeName}}</div>
         </div>
         <div class="order">
           <div>联系方式</div>
-          <div>{{orderInformObj.orderResp && orderInformObj.orderResp.consigneeMobile}}</div>
+          <div>{{orderInfo && orderInfo.consigneeMobile}}</div>
         </div>
         <div class="order">
           <div>收货地址</div>
-          <div>{{orderInformObj.orderResp && orderInformObj.orderResp.consigneeAddr}}</div>
+          <div>{{orderInfo && orderInfo.consigneeAddr}}</div>
         </div>
       </div>
     </div>
@@ -41,19 +41,40 @@
 
 <script>
 import { GlobalProperty } from "@/common/global";
+import { getPickUpGoodsPayResult } from "@/service";
 export default {
-  name: "DahuaPage",
+  name: "PickUpGoodsPage",
   data() {
-    return {};
+    return {
+      orderInfo: {}
+    };
   },
-  created() {},
+  created() {
+    this.getPayOrder();
+  },
   props: {
-    orderInformObj: {
-      type: Object,
+    orderNo: {
+      type: String,
       required: true
     }
   },
   methods: {
+    async getPayOrder() {
+      const res = await getPickUpGoodsPayResult(this.orderNo);
+      this.orderInfo = res.data && res.data.orderResp;
+      // if (res.code === 1000 || res.code === 1001) {
+      //   // 工商的不显示 返回首页按钮
+      //   if (res.data.orderType == "2") this.isShowHomeBtn = false;
+      //   // 表示成功code
+      //   this.orderInfo = JSON.parse(JSON.stringify(res.data));
+      //   // 判断isShowPayPage  显示哪个页面
+      //   this.isShowPayResultPage(res.code, this.orderInfo);
+      // } else {
+      //   MintUI.Toast.open({
+      //     message: res.msg
+      //   });
+      // }
+    },
     /**
      * 继续逛逛 跳转
      *

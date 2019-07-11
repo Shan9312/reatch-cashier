@@ -89,10 +89,20 @@ const getPayResult = (orderNum) => {
         orderNum
     })
 }
+/**
+ * 兜礼提货码活动-领取成功页
+ * @param {*} orderNum: 订单号
+ * */
+const getPickUpGoodsPayResult = (orderNum) => {
+    return Ajax.post(`${GlobalProperty.apiDomain.doooly}jersey/myorder/getTHMOrder`, {
+        orderNum
+    })
+}
 export {
     errorLog,
     unifiedorder,
     getPayForm,
     integralPay,
     getPayResult,
+    getPickUpGoodsPayResult
 }
