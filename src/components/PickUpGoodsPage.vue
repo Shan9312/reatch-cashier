@@ -53,14 +53,14 @@ export default {
     this.getPayOrder();
   },
   props: {
-    orderNo: {
+    orderNum: {
       type: String,
       required: true
     }
   },
   methods: {
     async getPayOrder() {
-      const res = await getPickUpGoodsPayResult(this.orderNo);
+      const res = await getPickUpGoodsPayResult(this.orderNum);
       this.orderInfo = res.data && res.data.orderResp;
       // if (res.code === 1000 || res.code === 1001) {
       //   // 工商的不显示 返回首页按钮
