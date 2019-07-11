@@ -53,14 +53,6 @@ const router = new VueRouter({
       }
     },
     {
-      path: '/customResult/:orderNum/',
-      name: 'CustomResult',
-      component: () => import( /* webpackChunkName: "result" */ '@/views/payment/result/custom-page'),
-      meta: {
-        title: '自定义支付结果页'
-      }
-    },
-    {
       path: '*',
       redirect: {
         path: '/error'
