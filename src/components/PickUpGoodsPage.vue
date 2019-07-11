@@ -16,38 +16,25 @@
       <div class="order-list">
         <div class="order">
           <div>订单编号</div>
-          <div>{a{ orderInformObj && orderInformObj.orderResp.orderNumber}}</div>
+          <div>{{ orderInformObj && orderInformObj.orderResp.orderNumber}}</div>
         </div>
         <div class="order">
           <div>兑换时间</div>
-          <div>{a{orderInformObj.orderResp && orderInformObj.orderResp.orderDate}}</div>
+          <div>{{orderInformObj.orderResp && orderInformObj.orderResp.orderDate}}</div>
         </div>
         <div class="order">
           <div>收货人</div>
-          <div>{a{orderInformObj.orderResp && orderInformObj.orderResp.consigneeName}}</div>
+          <div>{{orderInformObj.orderResp && orderInformObj.orderResp.consigneeName}}</div>
         </div>
         <div class="order">
           <div>联系方式</div>
-          <div>{a{orderInformObj.orderResp && orderInformObj.orderResp.consigneeMobile}}</div>
+          <div>{{orderInformObj.orderResp && orderInformObj.orderResp.consigneeMobile}}</div>
         </div>
         <div class="order">
           <div>收货地址</div>
-          <div>{a{orderInformObj.orderResp && orderInformObj.orderResp.consigneeAddr}}</div>
+          <div>{{orderInformObj.orderResp && orderInformObj.orderResp.consigneeAddr}}</div>
         </div>
       </div>
-      <!-- <img
-        class="banner"
-        src="@/assets/images/checkout-counter/banner.png"
-        v-show="orderInformObj.hasGift == 1"
-        @click="handleGiftList"
-        data-baidu-stats="大华活动-支付成功-查看更多礼包"
-      > -->
-      <!-- <div class="toast">
-        <b>重要提示：</b>您的礼品将在
-        <span>10个工作日发货</span>，您可至大华福利平台—“我的”—“我的订单”查看物流单号
-        <br>有任何疑问请咨询客服电话：
-        <span>400-158-2212</span>
-      </div> -->
     </div>
   </div>
 </template>
@@ -68,7 +55,7 @@ export default {
   },
   methods: {
     /**
-     *大华点击: 继续逛逛 跳转
+     * 继续逛逛 跳转
      *
      * */
     handleGoHomePage() {
@@ -87,13 +74,6 @@ export default {
         this.$router,
         `${GlobalProperty.frontendDomain.m}myOrderList/1/all`
       );
-    },
-    /**
-     *大华广告页点击跳转
-     *
-     * */
-    handleGiftList() {
-      dooolyAPP.redirectActivity("giftList");
     }
   }
 };
