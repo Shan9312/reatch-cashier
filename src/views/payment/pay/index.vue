@@ -199,6 +199,8 @@ export default {
       return;
     }
 
+    // 美团进入收银台, 获取美团地址中信息
+    this.handleThirdJudge();
     // 获取用户 订单信息
     this.getPayContentByUserId();
     const _this = this;
@@ -212,7 +214,7 @@ export default {
           dooolyAPP.gotoJumpJq(_this.$router, res.data.redirectUrl);
         } else if (_this.handleThirdJudge()) {
           // 若有美团接口 之间跳转美团
-          dooolyApp.gotoJumpJq(_this.$router, _this.meituanInfo.return_url);
+          dooolyApp.gotoJumpJq(_this.$router, _this.meituanObj.return_url);
         } else if (_this.defaultOptions.productType == 7) {
           // 活动页面
           const {
@@ -1288,7 +1290,7 @@ export default {
           this.apliyPayOrder(res.data);
         } else if (this.payType === 14) {
           // 云闪付支付
-          this.applePayOrder(res.data);
+          this.unionPayOrder(res.data);
         } else if (this.payType === 15) {
           // 建行龙支付
           this.continuePayOrder(res.data);
@@ -1340,7 +1342,7 @@ export default {
           this.apliyPayOrder(res.data);
         } else if (this.payType === 17) {
           // 云闪付混合支付
-          this.applePayOrder(res.data);
+          this.unionPayOrder(res.data);
         } else if (this.payType === 16) {
           // 龙支付混合
           this.continuePayOrder(res.data);
@@ -1389,7 +1391,7 @@ export default {
           // 判断 美团h5支付，支付完成跳转页面
           redirect_url = window.encodeURIComponent(
             `${currentBaseUrl}/middle?redirect_url=${window.encodeURIComponent(
-              this.meituanInfo.return_url
+              this.meituanObj.return_url
             )}`
           );
           window.location.href = `${data.mwebUrl}&redirect_url=${redirect_url}`;
@@ -1402,12 +1404,8 @@ export default {
     },
 
     // 云闪付支付跳转接口
-    applePayOrder(data) {
-      let form = data.unionPayUrl;
-      let div = document.createElement("div");
-      div.innerHTML = form;
-      document.body.appendChild(div);
-      document.all.pay_form.submit();
+    unionPayOrder(data) {
+      dooolyAPP.appPay(data, "pay_callBack", "union");
     },
 
     // 建行龙支付跳转接口
@@ -1452,11 +1450,16 @@ export default {
     handleThirdJudge() {
       if (UtilsFunction.getUrlParams("orderSource") === "meituan") {
         // 若是美团支付 需把信息集合
+        this.userId = UtilsFunction.getUrlParams("userId");
+        this.redirectUrl = UtilsFunction.getUrlParams("return_url");
         this.meituanObj = {
           userId: UtilsFunction.getUrlParams("userId"),
           orderSource: UtilsFunction.getUrlParams("orderSource"),
           return_url: UtilsFunction.getUrlParams("return_url")
         };
+        if (!localStorage.userId) {
+          localStorage.setItem("userId", UtilsFunction.getUrlParams("userId"));
+        }
         return true;
       }
     },

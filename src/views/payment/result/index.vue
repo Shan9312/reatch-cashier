@@ -105,7 +105,8 @@ export default {
     // 若是银联支付跳转到收银台，则返回是 需跳转5个页面 且不是安卓
     if (
       /payType=cloudUnionPay/.test(window.location.href) &&
-      this.browserName !== "Chrome WebView"
+      this.browserName !== "Chrome WebView" &&
+      this.browserName !== "WebKit"
     ) {
       history.pushState(null, null, document.URL);
       window.addEventListener("popstate", _this.goBackUnionPay, false);
