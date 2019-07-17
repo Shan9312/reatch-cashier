@@ -75,7 +75,7 @@ export default {
         this.browserName == "otherAPP"
       ) {
         // 苹果浏览器 或者 第三方app 少返回一级
-        window.history.back(3);
+        window.history.go(-3);
       } else {
         window.history.go(-2);
       }
