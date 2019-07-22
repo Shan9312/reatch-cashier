@@ -73,8 +73,6 @@ export default {
       // 苹果浏览器 或者 第三方app 少返回一级
       if (this.browserName == "Mobile Safari") {
         window.history.go(-3);
-      } else if (this.browserName == "otherAPP") {
-        window.history.back(3);
       } else {
         window.history.go(-2);
       }
