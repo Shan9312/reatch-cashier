@@ -1407,10 +1407,12 @@ export default {
     unionPayOrder(data) {
       dooolyAPP.appPay(data, "pay_callBack", "union");
     },
-
     // 建行龙支付跳转接口
     continuePayOrder(data) {
-      dooolyAPP.gotoJumpJq(this.$router, data.ccbPayUrl);
+      var a = document.createElement("a");
+      a.rel = "noreferrer";
+      a.href = data.ccbPayUrl;
+      a.click();
     },
 
     // 若是 微信环境 则微信接口跳转支付接口
