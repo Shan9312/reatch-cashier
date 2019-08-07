@@ -3,6 +3,8 @@
     <div>
       <!-- 大华3.8节日-->
       <DahuaPage v-if="isShowPayPage === 1" :orderInformObj="orderInformObj"></DahuaPage>
+      <!-- 东航提货券活动-->
+      <PickUpGoodsPage v-else-if="isShowPayPage === 4" :orderNum="orderNum"></PickUpGoodsPage>
       <!-- 支付成功 -->
       <div v-else-if="isShowPayPage === 2">
         <div class="title">
@@ -32,7 +34,7 @@
       </div>
     </div>
     <!-- 活动类型-->
-    <ActivePage v-if="umengNameObj[activityName] && (isShowPayPage === 2 || isShowPayPage === 3)"></ActivePage>
+    <ActivePage v-if="activityTypeObj[activityName] === 1 && (isShowPayPage === 2 || isShowPayPage === 3)"></ActivePage>
   </div>
 </template>
 
@@ -41,22 +43,31 @@ import { getPayResult } from "@/service";
 import { MintUI, GlobalProperty } from "@/common/global"; // 引用的封装的组件
 import DahuaPage from "@/components/DahuaPage.vue"; // 大华页面
 import ActivePage from "@/components/ActivePage.vue"; // 活动页面
+import PickUpGoodsPage from "@/components/PickUpGoodsPage.vue"; // 东航提货券活动页面
 
 export default {
   name: "PaymentResult",
   components: {
     DahuaPage,
-    ActivePage
+    ActivePage,
+    PickUpGoodsPage
   },
   data() {
     return {
       orderNum: this.$route.params.orderNum,
+      // orderNo: '', // 订单编号，getPayResult获取orderNo，东航提货活动订单详情需要该字段查询
       orderInformObj: {}, // 订单信息
       isShowPayPage: 0, // 大华:1, 支付成功:2, 支付失败:3,
       umengNameObj: {
         AirportActivity: "机场活动",
-        ChristmasActivity: "圣诞平安夜"
+        ChristmasActivity: "圣诞平安夜",
+        pickUpGoods: "东航提货券活动"
       }, // 活动名称对象
+      activityTypeObj: {
+        AirportActivity: 1, // 机场秒杀活动
+        ChristmasActivity: 1, // 圣诞平安夜活动
+        pickUpGoods: 2 // 东航提货券活动
+      }, // 活动类型对象
       activityName: "", // 活动名称
       isWeChatH5: false, // 判断是否是微信h5
       browserName: GlobalProperty.browserName, // 浏览器名称
@@ -73,9 +84,9 @@ export default {
     window.isConfirmShow = function() {
       dooolyAPP.goBackPageIndex("2");
     };
-    dooolyAPP.initTitle("支付结果", "2", "isConfirmShow()");
   },
   mounted() {
+    dooolyAPP.initTitle("支付结果", "2", "isConfirmShow()");
     let _this = this;
     // 支付宝h5、微信h5支付完成后点击返回，去首页
     if (localStorage.isWeChatH5) this.isWeChatH5 = true;
@@ -101,8 +112,22 @@ export default {
       history.pushState(null, null, document.URL);
       window.addEventListener("popstate", _this.goBackDahua, false);
     }
+
+    // 若是银联支付跳转到收银台，则返回是 需跳转5个页面 且不是安卓
+    if (
+      /payType=cloudUnionPay/.test(window.location.href) &&
+      this.browserName !== "Chrome WebView" &&
+      this.browserName !== "WebKit"
+    ) {
+      history.pushState(null, null, document.URL);
+      window.addEventListener("popstate", _this.goBackUnionPay, false);
+    }
   },
   methods: {
+    // 银联支付返回页面
+    goBackUnionPay() {
+      window.history.go(-6);
+    },
     // 大华回退时 监听实际
     goBackDahua() {
       window.history.go(-2);
@@ -116,6 +141,8 @@ export default {
       if (res.code === 1000 || res.code === 1001) {
         // 工商的不显示 返回首页按钮
         if (res.data.orderType == "2") this.isShowHomeBtn = false;
+        // 获取订单编号
+        // this.orderNo = res.data && res.data.orderNum;
         // 表示成功code
         this.orderInformObj = JSON.parse(JSON.stringify(res.data));
         // 判断isShowPayPage  显示哪个页面
@@ -142,6 +169,10 @@ export default {
       // 大华女神节
       if (obj.orderResp && obj.orderResp.orderId && obj.orderType === "1") {
         this.isShowPayPage = 1;
+      }
+      // 东航提货券活动
+      if (this.activityName === 'pickUpGoods') {
+        this.isShowPayPage = 4;
       }
     },
     /**
@@ -185,25 +216,17 @@ export default {
       "popstate",
       function() {
         this.goBackDahua();
+        this.goBackUnionPay();
       },
       false
     );
   },
   beforeRouteLeave(to, from, next) {
     if (this.browserName != "Chrome WebView" && this.browserName != "WebKit") {
-      if (
-        to.name == "Payment" &&
-        !this.backLock &&
-        !/payType=cloudUnionPay/.test(window.location.href)
-      ) {
+      if (to.name == "Payment" && !this.backLock) {
         this.backLock = true;
         window.history.go(-1);
         return;
-      } else if (
-        to.name == "Payment" &&
-        /payType=cloudUnionPay/.test(window.location.href)
-      ) {
-        window.history.go(-6);
       }
     }
     next();
