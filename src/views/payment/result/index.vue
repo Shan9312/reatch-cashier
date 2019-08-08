@@ -15,7 +15,8 @@
           {{orderInformObj.totalAmount ? orderInformObj.totalAmount : 0}}
         </div>
         <ul class="label">
-          <li @click="handleCheckList" :class="{labelChild: !isShowHomeBtn}">查看列表</li>
+          <li @click="goPageOther" v-if="isGoPageOther">查看券码</li>
+          <li @click="handleCheckList" v-if="!isGoPageOther" :class="{labelChild: !isShowHomeBtn}">查看列表</li>
           <li @click="handleReturnHomePage" v-if="isShowHomeBtn" data-baidu-stats="支付成功-返回首页">返回首页</li>
         </ul>
       </div>
@@ -72,7 +73,8 @@ export default {
       isWeChatH5: false, // 判断是否是微信h5
       browserName: GlobalProperty.browserName, // 浏览器名称
       backLock: false,
-      isShowHomeBtn: true
+      isShowHomeBtn: true,
+      isGoPageOther: false // 某些活动的特殊处理  当点击按钮是否跳转到其他页面（非订单详情页）
     };
   },
   created() {
@@ -174,6 +176,20 @@ export default {
       if (this.activityName === 'pickUpGoods') {
         this.isShowPayPage = 4;
       }
+      // 建行活动
+      if (this.activityName === 'jianhangTicket' || this.activityName === 'jianhangTicketOther') {
+        this.isGoPageOther = true;
+        this.isShowHomeBtn = false; // 不显示返回首页按钮
+      }
+    },
+    /**
+     * 点击按钮跳转其他页面（非订单列表页）
+     */
+    goPageOther(){
+      dooolyAPP.gotoJumpJq(
+        this.$router,
+        `${GlobalProperty.frontendDomain.m}coupon/0?goBankIndex=1`
+      );
     },
     /**
      * 判断 是否显示活动页面，根据localStorage是否存在 activeName
