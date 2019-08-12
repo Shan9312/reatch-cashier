@@ -373,7 +373,7 @@ export default {
         !this.defaultOptions.supportWechat &&
         !this.defaultOptions.supportAlipay &&
         !this.defaultOptions.supportUnionpay &&
-        !this.defaultOptions.supportConstrucPay
+        this.defaultOptions.supportConstrucPay
       ) {
         this.defaultOptions.supportHybrid = false;
       }
