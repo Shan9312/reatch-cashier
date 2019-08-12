@@ -15,7 +15,7 @@
           {{orderInformObj.totalAmount ? orderInformObj.totalAmount : 0}}
         </div>
         <ul class="label">
-          <li @click="goPageOther" v-if="isGoPageOther">查看券码</li>
+          <li @click="goPageOther" v-if="isGoPageOther" :class="{labelChild: !isShowHomeBtn}">查看券码</li>
           <li @click="handleCheckList" v-if="!isGoPageOther" :class="{labelChild: !isShowHomeBtn}">查看列表</li>
           <li @click="handleReturnHomePage" v-if="isShowHomeBtn" data-baidu-stats="支付成功-返回首页">返回首页</li>
         </ul>
