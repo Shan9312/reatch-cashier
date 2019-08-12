@@ -188,7 +188,7 @@ export default {
     goPageOther(){
       dooolyAPP.gotoJumpJq(
         this.$router,
-        `${GlobalProperty.frontendDomain.m}coupon/0?goBankIndex=1`
+        `${GlobalProperty.frontendDomain.m}coupon/0`
       );
     },
     /**
