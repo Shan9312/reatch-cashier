@@ -811,6 +811,10 @@ export default {
      *
      * */
     handleChoosePay(item) {
+      if (item.id === 6) { // 建行信用卡分期支付方式
+        this.defaultOptions.supportHybrid = false; // 禁止混合支付
+        this.initDefaultPayType(); // 更新页面勾选状态 TODO: 调用该方法可能会引起其他问题 --- 待测试 zhaoyang 0813
+      }
       let orientIntergralItem,
         dooolyIntergralItem,
         wechatItem,
