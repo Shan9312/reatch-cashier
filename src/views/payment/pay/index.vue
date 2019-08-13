@@ -453,7 +453,7 @@ export default {
       // 建行龙支付：
       if (this.defaultOptions.supportConstrucPay) {
         this.usablePayList.push({
-          text: "建行龙支付",
+          text: "建行信用卡分期支付", // 原建行龙支付
           name: "construcPay",
           usable: true,
           payAmount: 0,
