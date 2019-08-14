@@ -55,6 +55,7 @@ export default {
   },
   data() {
     return {
+      bigOrderNumber: '', // 大订单号
       orderNum: this.$route.params.orderNum,
       // orderNo: '', // 订单编号，getPayResult获取orderNo，东航提货活动订单详情需要该字段查询
       orderInformObj: {}, // 订单信息
@@ -80,8 +81,6 @@ export default {
   created() {
     // 订单详情 判断显示页面
     this.getPayOrder();
-    // 判断活动二维码是否显示
-    this.isShowActivityPage();
     // 安卓，ios支付后 历史返回调用方法，返回2级页面
     window.isConfirmShow = function() {
       dooolyAPP.goBackPageIndex("2");
@@ -143,10 +142,14 @@ export default {
       if (res.code === 1000 || res.code === 1001) {
         // 工商的不显示 返回首页按钮
         if (res.data.orderType == "2") this.isShowHomeBtn = false;
+        // 获取大订单号
+        this.bigOrderNumber = res.data.bigOrderNumber;
         // 获取订单编号
         // this.orderNo = res.data && res.data.orderNum;
         // 表示成功code
         this.orderInformObj = JSON.parse(JSON.stringify(res.data));
+        // 判断活动显示内容
+        this.isShowActivityPage();
         // 判断isShowPayPage  显示哪个页面
         this.isShowPayResultPage(res.code, this.orderInformObj);
       } else {
@@ -198,7 +201,7 @@ export default {
     isShowActivityPage() {
       let localStorageStr = localStorage.activity || "{}";
       // 已存的活动对象 找到订单号对应的 活动名称
-      this.activityName = JSON.parse(localStorageStr)[this.orderNum];
+      this.activityName = JSON.parse(localStorageStr)[this.bigOrderNumber];
       if (this.activityName) {
         baiduStats(
           (this.umengNameObj[this.activityName] || this.activityName) +
