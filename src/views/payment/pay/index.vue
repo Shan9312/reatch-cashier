@@ -130,6 +130,7 @@ export default {
   },
   data() {
     return {
+      installNum: 0,
       orderNum: this.$route.params.orderNum, // 订单号
       userId:
         localStorage.userId ||
@@ -320,6 +321,7 @@ export default {
           this.redirectUrl = data.redirectUrl;
           this.responseRedirectUrl = true;
         }
+        this.installNum = data.installNum || 0;
         this.supportPayType(data.payMethod);
       } else {
         if (res.msg) {
@@ -372,8 +374,8 @@ export default {
       if (
         !this.defaultOptions.supportWechat &&
         !this.defaultOptions.supportAlipay &&
-        !this.defaultOptions.supportUnionpay &&
-        !this.defaultOptions.supportConstrucPay
+        !this.defaultOptions.supportUnionpay ||
+        this.defaultOptions.supportConstrucPay
       ) {
         this.defaultOptions.supportHybrid = false;
       }
@@ -452,8 +454,9 @@ export default {
       }
       // 建行龙支付：
       if (this.defaultOptions.supportConstrucPay) {
+        let text = this.installNum === 0 ? '建行龙支付' : '建行信用卡分期支付';
         this.usablePayList.push({
-          text: "建行龙支付",
+          text, // 原建行龙支付
           name: "construcPay",
           usable: true,
           payAmount: 0,
@@ -1407,10 +1410,12 @@ export default {
     unionPayOrder(data) {
       dooolyAPP.appPay(data, "pay_callBack", "union");
     },
-
     // 建行龙支付跳转接口
     continuePayOrder(data) {
-      dooolyAPP.gotoJumpJq(this.$router, data.ccbPayUrl);
+      var a = document.createElement("a");
+      a.rel = "noreferrer";
+      a.href = data.ccbPayUrl;
+      a.click();
     },
 
     // 若是 微信环境 则微信接口跳转支付接口
