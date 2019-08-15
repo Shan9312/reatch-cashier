@@ -130,6 +130,7 @@ export default {
   },
   data() {
     return {
+      installNum: 0,
       orderNum: this.$route.params.orderNum, // 订单号
       userId:
         localStorage.userId ||
@@ -320,6 +321,7 @@ export default {
           this.redirectUrl = data.redirectUrl;
           this.responseRedirectUrl = true;
         }
+        this.installNum = data.installNum || 0;
         this.supportPayType(data.payMethod);
       } else {
         if (res.msg) {
@@ -452,8 +454,9 @@ export default {
       }
       // 建行龙支付：
       if (this.defaultOptions.supportConstrucPay) {
+        let text = this.installNum === 0 ? '建行龙支付' : '建行信用卡分期支付';
         this.usablePayList.push({
-          text: "建行信用卡分期支付", // 原建行龙支付
+          text, // 原建行龙支付
           name: "construcPay",
           usable: true,
           payAmount: 0,
