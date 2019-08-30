@@ -63,7 +63,7 @@
                 :src="item.imgSrc"
                 :class="{'union-right': item.name === 'unionPay'}"
               />
-              <span v-if="item.name === 'unionPay'" class="unionpay-text">满减活动仅限使用62开龙卡银联信用卡完成支付可享</span>
+              <span v-if="item.name === 'unionPay'" class="unionpay-text">满减活动仅限使用62开头龙卡银联信用卡完成支付可享</span>
               <div class="center" :class="{'union-text': item.name === 'unionPay'}">
                 <div class="fl">
                   <span class="type-text names">{{item.text}}</span>
