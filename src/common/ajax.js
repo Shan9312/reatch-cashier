@@ -56,6 +56,7 @@ const request = (method, url, data, options = {}) => {
 
     return Promise.resolve(resData)
   }).catch(err => {
+    debugger
     MintUI.Toast.open({
       message: '小兜兜正忙,请稍候重试!'
     })

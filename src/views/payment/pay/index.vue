@@ -57,12 +57,13 @@
         <!--/兜礼/微信/支付宝-->
         <div class="pay-type">
           <section v-for="item in usablePayList" :key="item.id">
-            <div class="line" v-if="item.id !== 1">
+            <div class="line" v-if="item.id !== 1" :class="{'union-box': item.name === 'unionPay'}">
               <img
                 class="picture fl"
                 :src="item.imgSrc"
                 :class="{'union-right': item.name === 'unionPay'}"
               />
+              <span v-if="item.name === 'unionPay'" class="unionpay-text">满减活动仅限使用62开龙卡银联信用卡完成支付可享</span>
               <div class="center" :class="{'union-text': item.name === 'unionPay'}">
                 <div class="fl">
                   <span class="type-text names">{{item.text}}</span>
@@ -372,9 +373,9 @@ export default {
       }
       // 若不支持现金支付 则禁止混合支付的功能
       if (
-        !this.defaultOptions.supportWechat &&
-        !this.defaultOptions.supportAlipay &&
-        !this.defaultOptions.supportUnionpay ||
+        (!this.defaultOptions.supportWechat &&
+          !this.defaultOptions.supportAlipay &&
+          !this.defaultOptions.supportUnionpay) ||
         this.defaultOptions.supportConstrucPay
       ) {
         this.defaultOptions.supportHybrid = false;
@@ -454,7 +455,7 @@ export default {
       }
       // 建行龙支付：
       if (this.defaultOptions.supportConstrucPay) {
-        let text = this.installNum === 0 ? '建行龙支付' : '建行信用卡分期支付';
+        let text = this.installNum === 0 ? "建行龙支付" : "建行信用卡分期支付";
         this.usablePayList.push({
           text, // 原建行龙支付
           name: "construcPay",
@@ -1540,6 +1541,12 @@ export default {
     .union-right {
       width: auto;
     }
+    .unionpay-text {
+      position: absolute;
+      left: 0;
+      top: 0.4rem;
+      font-size: 0.12rem;
+    }
 
     .line {
       height: 0.5rem;
@@ -1547,6 +1554,7 @@ export default {
       justify-content: space-between;
       align-items: center;
       text-align: left;
+      position: relative;
 
       .center {
         width: 78%;
@@ -1583,6 +1591,11 @@ export default {
           }
         }
       }
+    }
+    .union-box {
+      height: 0.6rem;
+      padding-bottom: 0.1rem;
+      // border: 1px solid red;
     }
   }
 
