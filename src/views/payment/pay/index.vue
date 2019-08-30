@@ -63,7 +63,12 @@
                 :src="item.imgSrc"
                 :class="{'union-right': item.name === 'unionPay'}"
               />
-              <span v-if="item.name === 'unionPay'" class="unionpay-text">满减活动仅限使用62开头龙卡银联信用卡完成支付可享</span>
+              <span v-if="item.name === 'unionPay'" class="unionpay-text">
+                满减活动仅限使用
+                <span class="red">62开头龙卡银联信用卡</span> 完成支付可享
+                <br />
+                <span class="red">借记卡</span>客户不可参加满减活动
+              </span>
               <div class="center" :class="{'union-text': item.name === 'unionPay'}">
                 <div class="fl">
                   <span class="type-text names">{{item.text}}</span>
@@ -1536,15 +1541,20 @@ export default {
     }
     .union-text {
       color: #ee3f44;
-      font-size: 0.12rem;
+      font-size: 0.14rem;
     }
     .union-right {
       width: auto;
     }
+    .red {
+      color: red;
+      font-weight: 600;
+    }
     .unionpay-text {
+      font-size: 0;
       position: absolute;
       left: 0;
-      top: 0.4rem;
+      top: 0.5rem;
       font-size: 0.12rem;
     }
 
@@ -1593,9 +1603,8 @@ export default {
       }
     }
     .union-box {
-      height: 0.6rem;
-      padding-bottom: 0.1rem;
-      // border: 1px solid red;
+      height: 0.9rem;
+      padding-bottom: 0.15rem;
     }
   }
 
